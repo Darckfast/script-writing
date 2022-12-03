@@ -70,7 +70,7 @@
 
 		story = {
 			...story,
-			passages: update({ nodes: story.passages, nodeToUpdate: selectedNode })
+			passages: update({ nodes: story.passages, update: selectedNode })
 		}
 	}
 
@@ -92,7 +92,7 @@
 			...story,
 			passages: add({
 				nodes: story.passages,
-				nodeToAdd
+				add: nodeToAdd
 			})
 		}
 
@@ -103,7 +103,7 @@
 	const removeNode = (node: StoryNode) => {
 		story = {
 			...story,
-			passages: remove({ nodes: story.passages, nodeToRemove: node })
+			passages: remove({ nodes: story.passages, remove: node })
 		}
 	}
 
@@ -115,7 +115,7 @@
 
 		story = {
 			...story,
-			passages: update({ nodes: story.passages, nodeToUpdate: selectedNode })
+			passages: update({ nodes: story.passages, update: selectedNode })
 		}
 	}
 
@@ -139,24 +139,12 @@
 		}
 	}
 
-	const propIsNumber = (prop: Props) => {
-		return /^\d+$/.test(prop.value)
-	}
-
-	const setRandomValue = ({ maxValue, prop }) => {
-		const max = Math.pow(10, maxValue)
-		const min = Math.pow(10, maxValue - 1)
-
-		const randomValue = Math.floor(Math.random() * (max - min + 1) + min)
-
-		updateProp({ ...prop, value: randomValue })
-	}
-
 	const getStoryAsArray = () => {
 		return story.passages.map((passage) => {
 			delete passage.links
-			delete passage.pid
 			delete passage.parentPid
+
+			if (!passage.pid) passage.pid = uuidv4()
 
 			for (const key in passage) {
 				if (Object.prototype.hasOwnProperty.call(passage, key)) {
@@ -223,17 +211,16 @@
 				<div class="node-prop">
 					<label>
 						{prop.name}
-						{#if propIsNumber(prop)}
+						<!-- {#if propIsNumber(prop)}
 							<label class="random-number">
 								<input bind:value={randomRange} type="number" min="1" max="5" />
 							</label>
-							<!-- svelte-ignore a11y-click-events-have-key-events -->
 							<a
 								on:click={() => setRandomValue({ maxValue: randomRange, prop })}
 							>
 								<ArrowRotate />
 							</a>
-						{/if}
+						{/if} -->
 
 						<input
 							on:change={() => updateProp(prop)}
@@ -295,7 +282,7 @@
 		>
 		<button
 			on:click={() =>
-				navigator.clipboard.writeText(JSON.stringify(getStoryAsArray(story)))}
+				navigator.clipboard.writeText(JSON.stringify(getStoryAsArray()))}
 			>copy as array</button
 		>
 	</div>

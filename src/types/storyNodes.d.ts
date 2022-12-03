@@ -10,8 +10,8 @@ interface StoryNode {
 	name: string
 	cleanText: string
 	links: Link[]
-	col?: number
-	row?: number
+	// col?: number
+	// row?: number
 	[key: string]: any
 }
 

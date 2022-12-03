@@ -1,54 +1,48 @@
 const add = ({
-	nodeToAdd,
+	add: nodeToAdd,
 	nodes
 }: {
-	nodeToAdd: StoryNode
+	add: StoryNode
 	nodes: StoryNode[]
 }): StoryNode[] => {
+	let hasParent = false
+
 	for (const node of nodes) {
 		if (node.pid === nodeToAdd.parentPid) {
 			if (!node.links) {
 				node.links = []
 			}
 
+			hasParent = true
+
 			node.links.push({ pid: nodeToAdd.pid })
-		}
-
-		for (const key in node) {
-			if (Object.prototype.hasOwnProperty.call(node, key)) {
-				const element = node[key]
-
-				if (!Number.isNaN(Number(element)) && element !== '') {
-					node[key] = Number(element)
-				}
-			}
 		}
 	}
 
-	nodes.push(nodeToAdd)
+	if (hasParent) nodes.push(nodeToAdd)
 
-	return nodes
+	return nodes.map((node) => patchUp(node))
 }
 
 const remove = ({
-	nodeToRemove,
+	remove,
 	nodes
 }: {
-	nodeToRemove: StoryNode
+	remove: StoryNode
 	nodes: StoryNode[]
 }): StoryNode[] => {
 	let newNodes = []
 
 	for (const node of nodes) {
-		if (node.pid === nodeToRemove.parentPid) {
-			node.links = node.links.filter((nd) => nd.pid !== nodeToRemove.pid)
+		if (node.pid === remove.parentPid) {
+			node.links = node.links.filter((nd) => nd.pid !== remove.pid)
 		}
 
-		if (node.parentPid === nodeToRemove.pid) {
-			node.parentPid = nodeToRemove.parentPid
+		if (node.parentPid === remove.pid) {
+			node.parentPid = remove.parentPid
 		}
 
-		if (node.pid !== nodeToRemove.pid) {
+		if (node.pid !== remove.pid) {
 			newNodes.push(node)
 		} else {
 			newNodes = newNodes.map((nNode) => {
@@ -65,15 +59,15 @@ const remove = ({
 }
 
 const update = ({
-	nodeToUpdate,
+	update,
 	nodes
 }: {
-	nodeToUpdate: StoryNode
+	update: StoryNode
 	nodes: StoryNode[]
 }): StoryNode[] => {
 	return nodes.map((node) => {
-		if (node.pid === nodeToUpdate.pid) {
-			return nodeToUpdate
+		if (node.pid === update.pid) {
+			return update
 		}
 
 		return node
@@ -98,7 +92,6 @@ const props = (object: any): Props[] => {
 					'row',
 					'col',
 					'position',
-					'condition',
 					'text',
 					'pid',
 					'parentPid'
@@ -110,6 +103,23 @@ const props = (object: any): Props[] => {
 	}
 
 	return passageProps.sort((a, b) => a.name.localeCompare(b.name))
+}
+
+const patchUp = (node: StoryNode): StoryNode => {
+	for (const key in node) {
+		if (Object.prototype.hasOwnProperty.call(node, key)) {
+			if (['pid', 'parentPid'].includes(key)) {
+				node[key] = `${node[key]}`
+			}
+			// const element = node[key]
+
+			// if (!Number.isNaN(Number(element)) && element !== '') {
+			// 	node[key] = Number(element)
+			// }
+		}
+	}
+
+	return node
 }
 
 export { props, add, remove, update }
