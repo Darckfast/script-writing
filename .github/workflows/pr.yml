@@ -1,0 +1,42 @@
+name: PR
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build
+        run: yarn build
+  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test
+        run: yarn test
+        
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Test
+        run: yarn check

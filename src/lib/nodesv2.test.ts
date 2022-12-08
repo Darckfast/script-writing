@@ -142,12 +142,6 @@ describe('nodev2', () => {
 		const nodeProps = props(node)
 
 		expect(nodeProps).not.toBeUndefined
-		expect(nodeProps).toHaveLength(6)
-		// expect(nodeProps).toHaveProperty('upvotes',node.upvotes)
-		// expect(nodeProps).toHaveProperty('likes',node.likes)
-		// expect(nodeProps).toHaveProperty('comments',node.comments)
-		// expect(nodeProps).toHaveProperty('sentBy',node.sentBy)
-		// expect(nodeProps).to.not.have.property('pid')
-		// expect(nodeProps).to.not.have.property('links')
-	})
+		expect(nodeProps).toHaveLength(5)
+  	})
 })

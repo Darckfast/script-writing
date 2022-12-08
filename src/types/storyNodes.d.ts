@@ -1,17 +1,16 @@
 interface Story {
 	name: string
-	ifid?: string
-	passages?: Node[]
+	ifid: string
+	passages: StoryNode[]
 }
 
 interface StoryNode {
 	parentPid?: string
 	pid: string
-	name: string
+	name: string | number
 	cleanText: string
 	links: Link[]
-	// col?: number
-	// row?: number
+
 	[key: string]: any
 }
 
