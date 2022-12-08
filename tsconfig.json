@@ -15,7 +15,7 @@
     "checkJs": true,
     "isolatedModules": true,
     "paths": {
-      "@/*": [
+      "~/*": [
         "./src/*"
       ],
     }

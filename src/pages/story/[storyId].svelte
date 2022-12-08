@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Button from '@/components/Button.svelte'
-	import NodeCard from '@/components/NodeCard.svelte'
-	import PropInput from '@/components/PropInput.svelte'
+	import Button from '~/components/Button.svelte'
+	import NodeCard from '~/components/NodeCard.svelte'
+	import PropInput from '~/components/PropInput.svelte'
 	import { onDestroy } from 'svelte'
 	import { v4 as uuidv4 } from 'uuid'
 	import InputField from '../../components/InputField.svelte'
