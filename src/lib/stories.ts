@@ -3,8 +3,6 @@ import { load, save } from './loadSave'
 
 const stories = writable<Story[]>(load('stories'))
 
-stories.subscribe((value) => {
-	save('stories', value)
-})
+stories.subscribe((value) => save('stories', value))
 
 export { stories }

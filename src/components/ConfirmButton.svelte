@@ -1,18 +1,22 @@
 <script lang="ts">
-	export let onConfirm = () => {}
+	import { createEventDispatcher } from 'svelte'
+
+	const dispatch = createEventDispatcher()
+
 	export let classes = ''
-	export let icon = null
+
+	const confirm = () => dispatch('confirm')
 
 	let state = false
-	let text = 'normal'
-	let timeout
+	let text = 'waiting'
+	let timeout: NodeJS.Timeout
 
-	const confirm = () => {
+	const checkConfirmation = () => {
 		if (state) {
-			text = 'normal'
+			text = 'waiting'
 			state = false
 
-			onConfirm()
+			confirm()
 
 			clearInterval(timeout)
 		} else {
@@ -20,7 +24,7 @@
 			state = true
 
 			timeout = setTimeout(() => {
-				text = 'normal'
+				text = 'waiting'
 				state = false
 
 				clearTimeout(timeout)
@@ -29,11 +33,10 @@
 	}
 </script>
 
-<button class={[classes, text].join(' ')} on:click={confirm}>
-	<svelte:component this={icon} class={text} />
+<button
+	class={[classes, text].join(' ')}
+	on:click={checkConfirmation}
+	tabindex="-1"
+>
+	<slot />
 </button>
-
-<style lang="scss">
-	@import '../styles/variables.scss';
-	@import '../styles/components/button.scss';
-</style>

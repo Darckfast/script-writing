@@ -7,7 +7,7 @@ const add = ({
 }): StoryNode[] => {
 	let hasParent = false
 
-	for (const node of nodes) {
+	for (const node of [...nodes]) {
 		if (node.pid === nodeToAdd.parentPid) {
 			if (!node.links) {
 				node.links = []
@@ -33,7 +33,7 @@ const remove = ({
 }): StoryNode[] => {
 	let newNodes = []
 
-	for (const node of nodes) {
+	for (const node of [...nodes]) {
 		if (node.pid === remove.parentPid) {
 			node.links = node.links.filter((nd) => nd.pid !== remove.pid)
 		}
@@ -62,12 +62,15 @@ const update = ({
 	update,
 	nodes
 }: {
-	update: StoryNode
+	update: { pid: string; [key: string]: any }
 	nodes: StoryNode[]
 }): StoryNode[] => {
-	return nodes.map((node) => {
+	return [...nodes].map((node) => {
 		if (node.pid === update.pid) {
-			return update
+			return {
+				...node,
+				...update
+			}
 		}
 
 		return node
@@ -90,10 +93,12 @@ const props = (object: any): Props[] => {
 					'passages',
 					'links',
 					'row',
+					'pid',
+					'ifid',
 					'col',
 					'position',
 					'text',
-					'pid',
+					'cleanText',
 					'parentPid'
 				].includes(key)
 			) {
