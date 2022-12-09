@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CircleXmark from '@/assets/icons/circle-xmark.svelte'
+	import CircleXmark from '../assets/icons/circle-xmark.svelte'
 	import { createEventDispatcher } from 'svelte'
 	import ConfirmButton from './ConfirmButton.svelte'
 
