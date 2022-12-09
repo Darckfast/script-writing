@@ -17,7 +17,9 @@ jobs:
         uses: actions/checkout@v3
 
       - uses: pnpm/action-setup@v2
-
+        with:
+          version: latest
+          
       - name: Set version hash
         run: echo "VITE_VERSION=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
 
