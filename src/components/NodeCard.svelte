@@ -1,5 +1,5 @@
 <script lang="ts">
-	import CircleXmark from '../assets/icons/circle-xmark.svelte'
+	import CircleXmark from '../styles/icons/circle-xmark.svelte'
 	import { createEventDispatcher } from 'svelte'
 	import ConfirmButton from './ConfirmButton.svelte'
 
@@ -17,20 +17,14 @@
 
 <button
 	class={`
-  flex
-  justify-between 
-  items-center 
-  cursor-pointer 
-  place-self-center 
+  btn 
+  btn-primary
+  no-animation
   flex-col 
   p-2 
   relative 
   h-fit 
   w-full 
-  rounded 
-  transition-all 
-  bg-indigo-700
-  hover:bg-indigo-600 
   border-transparent
   border-2
   shadow
@@ -39,8 +33,8 @@
   `}
 	on:click={select}
 >
-	<span class="text-sm self-start">{name}</span>
-	<span class="text-xs">{cleanText}</span>
+	<span class="text-xs self-start">{name}</span>
+	<span class="text-sm">{cleanText}</span>
 
 	<ConfirmButton
 		on:click={(e) => e.stopPropagation()}
