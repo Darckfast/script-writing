@@ -143,5 +143,5 @@ describe('nodev2', () => {
 
 		expect(nodeProps).not.toBeUndefined
 		expect(nodeProps).toHaveLength(5)
-  	})
+	})
 })

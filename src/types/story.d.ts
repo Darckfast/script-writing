@@ -15,7 +15,10 @@ interface StoryNode {
 }
 
 interface Props {
-	[key: string]: any
+	// [key: string]: any
+	name: string
+	value: any
+	type: string
 }
 
 interface Link {

@@ -2,7 +2,7 @@
 	class={`
   align-middle
   cursor-pointer
-  w-4
+  w-5
   transition-all
   rounded-full
   bg-white

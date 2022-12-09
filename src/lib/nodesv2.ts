@@ -6,7 +6,7 @@ const add = ({
 	nodes: StoryNode[]
 }): StoryNode[] => {
 	let hasParent = false
-
+	if (!nodes.length) hasParent = true
 	for (const node of [...nodes]) {
 		if (node.pid === nodeToAdd.parentPid) {
 			if (!node.links) {
@@ -82,7 +82,7 @@ const props = (object: any): Props[] => {
 		return []
 	}
 
-	const passageProps: { name: string; value: string }[] = []
+	const passageProps: { name: string; value: string; type: string }[] = []
 
 	for (const key in object) {
 		if (Object.prototype.hasOwnProperty.call(object, key)) {
@@ -102,7 +102,7 @@ const props = (object: any): Props[] => {
 					'parentPid'
 				].includes(key)
 			) {
-				passageProps.push({ name: key, value: element })
+				passageProps.push({ name: key, value: element, type: 'text' })
 			}
 		}
 	}
