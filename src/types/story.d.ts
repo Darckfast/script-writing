@@ -1,7 +1,13 @@
 interface Story {
-	name: string
+	name?: string
+	storyName: string
 	ifid: string
 	passages: StoryNode[]
+	createdWith?: string
+
+	optionals?: {
+		[key: string]: any
+	}
 }
 
 interface StoryNode {
