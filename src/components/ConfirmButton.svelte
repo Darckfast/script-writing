@@ -8,23 +8,23 @@
 	const confirm = () => dispatch('confirm')
 
 	let state = false
-	let text = 'waiting'
+	let text = 'btn-error'
 	let timeout: NodeJS.Timeout
 
 	const checkConfirmation = () => {
 		if (state) {
-			text = 'waiting'
+			text = 'btn-error'
 			state = false
 
 			confirm()
 
 			clearInterval(timeout)
 		} else {
-			text = 'confirm'
+			text = 'btn-warning'
 			state = true
 
 			timeout = setTimeout(() => {
-				text = 'waiting'
+				text = 'btn-error'
 				state = false
 
 				clearTimeout(timeout)
