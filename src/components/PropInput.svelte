@@ -66,7 +66,7 @@
 	{#if !isNotRemovable}
 		<ConfirmButton
 			on:confirm={remove}
-			classes="cursor-pointer w-auto h-auto p-1 rounded btn-error"
+			classes="cursor-pointer w-auto h-auto p-1 rounded"
 		>
 			<Trash />
 		</ConfirmButton>

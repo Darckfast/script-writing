@@ -4,17 +4,16 @@
 	const dispatch = createEventDispatcher()
 
 	export let classes = ''
-	export let label = ''
 
 	const confirm = () => dispatch('confirm')
 
 	let state = false
-	let text = ''
+	let text = 'btn-error'
 	let timeout: NodeJS.Timeout
 
 	const checkConfirmation = () => {
 		if (state) {
-			text = ''
+			text = 'btn-error'
 			state = false
 
 			confirm()
@@ -25,7 +24,7 @@
 			state = true
 
 			timeout = setTimeout(() => {
-				text = ''
+				text = 'btn-error'
 				state = false
 
 				clearTimeout(timeout)
@@ -39,6 +38,5 @@
 	on:click={checkConfirmation}
 	tabindex="-1"
 >
-	{label}
 	<slot />
 </button>
