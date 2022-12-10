@@ -1,11 +1,15 @@
 <script lang="ts">
 	import { url } from '@roxi/routify'
 	import { v4 as uuidv4 } from 'uuid'
-	import CircleXmark from '../styles/icons/circle-xmark.svelte'
+	import { longpress } from '../actions/longPress'
 	import ConfirmButton from '../components/ConfirmButton.svelte'
 	import { stories } from '../lib/stories'
+	import ArrowLeft from '../styles/icons/arrow-left.svelte'
+	import Copy from '../styles/icons/copy.svelte'
+	import Trash from '../styles/icons/trash.svelte'
 
 	let storyName = ''
+	let showStoryOptions = ''
 
 	const add = () => {
 		if (!storyName) return
@@ -15,7 +19,7 @@
 				ifid: uuidv4(),
 				passages: [],
 				createdWith: import.meta.env.VITE_VERSION ?? 'none',
-				name: storyName
+				storyName
 			}
 		])
 
@@ -35,22 +39,48 @@
 
 		const story = JSON.parse(storyString)
 
-		stories.update((prev) => [...prev, story])
+		if (story.length) {
+			stories.update((prev) => [...prev, ...story])
+		} else {
+			stories.update((prev) => [...prev, story])
+		}
 	}
 </script>
 
 <div class="flex items-center justify-center flex-wrap h-auto w-full gap-4 p-2">
 	{#each $stories as story, index}
-		<a href={$url(`./story/${story.ifid}`)} class="btn btn-primary relative">
-			<span>{story.name}</span>
+		<a
+			use:longpress
+			on:click={(e) => showStoryOptions && e.preventDefault()}
+			on:longpress={() => (showStoryOptions = story.ifid)}
+			href={$url(`./story/${story.ifid}`)}
+			class={`btn
+      gap-2 
+      relative no-animation ${
+				showStoryOptions === story.ifid ? 'btn-success' : 'btn-primary'
+			}`}
+		>
+			{#if showStoryOptions === story.ifid}
+				<button
+					class="btn btn-sm btn-primary"
+					on:click={() => (showStoryOptions = '')}
+				>
+					<ArrowLeft />
+				</button>
 
-			<ConfirmButton
-				on:click={(e) => e.stopPropagation()}
-				classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto"
-				on:confirm={() => remove(index)}
-			>
-				<CircleXmark />
-			</ConfirmButton>
+				<button
+					class="btn btn-sm"
+					on:click={() => navigator.clipboard.writeText(JSON.stringify(story))}
+				>
+					<Copy />
+				</button>
+
+				<ConfirmButton on:confirm={() => remove(index)} classes="btn btn-sm">
+					<Trash />
+				</ConfirmButton>
+			{:else}
+				<span>{story.storyName}</span>
+			{/if}
 		</a>
 	{/each}
 </div>
@@ -63,6 +93,12 @@
 		<button class="btn btn-primary" on:click={add}>+ create new</button>
 		<button class="btn btn-primary" on:click={importStory}
 			>+ import from clipboard</button
+		>
+
+		<button
+			class="btn btn-primary"
+			on:click={() => navigator.clipboard.writeText(JSON.stringify($stories))}
+			>> export all stories</button
 		>
 	</div>
 

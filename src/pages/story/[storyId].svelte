@@ -12,23 +12,22 @@
 
 	export let storyId: string
 
-	let storyName = ''
 	let storyProps = []
 	let localProps = load<Props[]>(`props-${storyId}`)
-	let story: Story
 	let propName = ''
 	let propValue = null
-	// let nodeText = ''
+	let story: Story
+
 	let selectedPid = ''
 	let propType = 'text'
 
-	const propTypes = ['text', 'boolean']
+	const propTypes = ['text', 'boolean', 'number']
 
 	$: selectedNode = passages.find((p) => p.pid === selectedPid) ?? {
 		cleanText: '',
 		pid: uuidv4()
 	}
-	$: passages = story.passages
+	$: passages = story?.passages ?? []
 	$: nodeProps = props(selectedNode)
 	$: {
 		stories.update((values: Story[]) =>
@@ -57,7 +56,6 @@
 			selectedPid = story.passages[story.passages.length - 1].pid
 		}
 
-		storyName = story.name
 		storyProps = props(story)
 	})
 
@@ -75,6 +73,14 @@
 		localProps.splice(index, 1)
 
 		localProps = [...localProps]
+	}
+
+	const removePropFromStory = (name: string) => {
+		delete story[name]
+
+		story = {
+			...story
+		}
 	}
 
 	const removePropFromNode = (name: string) => {
@@ -161,7 +167,7 @@
 
 <header class="flex justify-between items-center w-full gap-2 px-2">
 	<a href={$url('..')} class="btn btn-primary"> <ArrowLeft /> go back</a>
-	<h1>{storyName}</h1>
+	<h1>{story?.storyName}</h1>
 
 	<button
 		class="btn btn-xs gap-2"
@@ -207,10 +213,12 @@
 			class="flex justify-between items-center p-1 gap-2 flex-wrap overflow-y-scroll custom-scroll"
 		>
 			{#each storyProps as prop}
-				<PropInput {...prop} on:change={setProp} isNotRemovable />
+				<PropInput
+					{...prop}
+					on:change={setProp}
+					on:remove={() => removePropFromStory(prop.name)}
+				/>
 			{/each}
-
-			<hr class="m-4 w-full border-t-2 border-primary" />
 
 			{#each nodeProps as prop}
 				<PropInput
@@ -253,6 +261,13 @@
 							type="checkbox"
 							bind:checked={propValue}
 							class="toggle toggle-primary"
+						/>
+					{:else if propType === 'number'}
+						<input
+							placeholder="0"
+							type="number"
+							bind:value={propValue}
+							class="input input-primary input-sm"
 						/>
 					{:else}
 						<input

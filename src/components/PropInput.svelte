@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CircleXmark from '../styles/icons/circle-xmark.svelte'
 	import { createEventDispatcher } from 'svelte'
+	import Trash from '../styles/icons/trash.svelte'
 	import ConfirmButton from './ConfirmButton.svelte'
 
 	const dispatch = createEventDispatcher()
@@ -40,6 +40,14 @@
 			bind:checked={value}
 			class="toggle toggle-primary ml-auto"
 		/>
+	{:else if typeof value === 'number'}
+		<input
+			{placeholder}
+			on:change={change}
+			type="number"
+			bind:value
+			class="input w-full input-primary input-sm"
+		/>
 	{:else}
 		<input
 			{placeholder}
@@ -56,8 +64,11 @@
 	/> -->
 
 	{#if !isNotRemovable}
-		<ConfirmButton on:confirm={remove}>
-			<CircleXmark />
+		<ConfirmButton
+			on:confirm={remove}
+			classes="cursor-pointer w-auto h-auto p-1 rounded"
+		>
+			<Trash />
 		</ConfirmButton>
 	{/if}
 </label>
