@@ -39,7 +39,7 @@
 	<ConfirmButton
 		on:click={(e) => e.stopPropagation()}
 		on:confirm={remove}
-		classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto p-1 rounded"
+		classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto p-1 rounded btn-error"
 	>
 		<Trash />
 	</ConfirmButton>
