@@ -1,6 +1,6 @@
 <script lang="ts">
-	import CircleXmark from '../styles/icons/circle-xmark.svelte'
 	import { createEventDispatcher } from 'svelte'
+	import Trash from '../styles/icons/trash.svelte'
 	import ConfirmButton from './ConfirmButton.svelte'
 
 	const dispatch = createEventDispatcher()
@@ -39,9 +39,9 @@
 	<ConfirmButton
 		on:click={(e) => e.stopPropagation()}
 		on:confirm={remove}
-		classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto"
+		classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto p-1 rounded"
 	>
-		<CircleXmark />
+		<Trash />
 	</ConfirmButton>
 </button>
 
