@@ -75,7 +75,10 @@
 					<Copy />
 				</button>
 
-				<ConfirmButton on:confirm={() => remove(index)} classes="btn btn-sm">
+				<ConfirmButton
+					on:confirm={() => remove(index)}
+					classes="btn btn-sm btn-error"
+				>
 					<Trash />
 				</ConfirmButton>
 			{:else}
