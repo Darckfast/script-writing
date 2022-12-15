@@ -1,11 +1,11 @@
 
 /**
  * @roxi/routify 2.18.8
- * File generated Sat Dec 10 2022 09:22:10 GMT-0300 (Brasilia Standard Time)
+ * File generated Thu Dec 15 2022 08:46:51 GMT-0300 (Brasilia Standard Time)
  */
 
 export const __version = "2.18.8"
-export const __timestamp = "2022-12-10T12:22:10.463Z"
+export const __timestamp = "2022-12-15T11:46:51.103Z"
 
 //buildRoutes
 import { buildClientTree } from "@roxi/routify/runtime/buildRoutes"
@@ -22,7 +22,7 @@ export const _tree = {
   "filepath": "/_layout.svelte",
   "root": true,
   "ownMeta": {},
-  "absolutePath": "/home/costa/Documents/script-writing/src/pages/_layout.svelte",
+  "absolutePath": "/home/costa/Documents/remote-accss/script-writing/src/pages/_layout.svelte",
   "children": [
     {
       "isFile": true,
@@ -32,7 +32,7 @@ export const _tree = {
       "name": "index",
       "ext": "svelte",
       "badExt": false,
-      "absolutePath": "/home/costa/Documents/script-writing/src/pages/index.svelte",
+      "absolutePath": "/home/costa/Documents/remote-accss/script-writing/src/pages/index.svelte",
       "importPath": "../src/pages/index.svelte",
       "isLayout": false,
       "isReset": false,
@@ -57,7 +57,7 @@ export const _tree = {
       "name": "story",
       "ext": "",
       "badExt": false,
-      "absolutePath": "/home/costa/Documents/script-writing/src/pages/story",
+      "absolutePath": "/home/costa/Documents/remote-accss/script-writing/src/pages/story",
       "children": [
         {
           "isFile": true,
@@ -67,7 +67,7 @@ export const _tree = {
           "name": "[storyId]",
           "ext": "svelte",
           "badExt": false,
-          "absolutePath": "/home/costa/Documents/script-writing/src/pages/story/[storyId].svelte",
+          "absolutePath": "/home/costa/Documents/remote-accss/script-writing/src/pages/story/[storyId].svelte",
           "importPath": "../src/pages/story/[storyId].svelte",
           "isLayout": false,
           "isReset": false,
