@@ -8,7 +8,7 @@ specifiers:
   '@types/uuid': ^9.0.0
   autoprefixer: ^10.4.13
   cypress: ^12.1.0
-  daisyui: ^2.43.2
+  daisyui: ^2.45.0
   dayjs: ^1.11.7
   npm-run-all: ^4.1.5
   postcss: ^8.4.20
@@ -34,7 +34,7 @@ devDependencies:
   '@types/uuid': 9.0.0
   autoprefixer: 10.4.13_postcss@8.4.20
   cypress: 12.1.0
-  daisyui: 2.43.2_r4gnkvssmvyxmi2wmat5xbx36a
+  daisyui: 2.45.0_r4gnkvssmvyxmi2wmat5xbx36a
   dayjs: 1.11.7
   npm-run-all: 4.1.5
   postcss: 8.4.20
@@ -1106,8 +1106,8 @@ packages:
       yauzl: 2.10.0
     dev: true
 
-  /daisyui/2.43.2_r4gnkvssmvyxmi2wmat5xbx36a:
-    resolution: {integrity: sha512-GLOCqzv5YUtnVhVz6HrcoZUULFk7UL/Eyr2732UG1Q2e5rz77lOzSlGKpZyzi1vrdsPgagn29vxLgx/MvaQiIA==}
+  /daisyui/2.45.0_r4gnkvssmvyxmi2wmat5xbx36a:
+    resolution: {integrity: sha512-hAWs7vQLxsWXCd3KMLAMBrZPO6OdU0gIDfOKGmZlyM0ro/pW3J2eGEaBs90Dy8w8L6wD/w1s8Ujd7zG8TYtD3g==}
     peerDependencies:
       autoprefixer: ^10.0.2
       postcss: ^8.1.6
