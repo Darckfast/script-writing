@@ -13,6 +13,23 @@
 
 	const select = () => dispatch('select', { pid })
 	const remove = () => dispatch('remove', { pid })
+
+	const stringToColour = (str?: string): string => {
+		if (!str) return '#fff'
+		let hash = 0
+		let colour = '#'
+
+		for (var i = 0; i < str.length; i++) {
+			hash = str.charCodeAt(i) + ((hash << 5) - hash)
+		}
+
+		for (var i = 0; i < 3; i++) {
+			const value = (hash >> (i * 8)) & 0xff
+			colour += ('00' + value.toString(16)).substr(-2)
+		}
+
+		return colour
+	}
 </script>
 
 <button
@@ -29,13 +46,24 @@
   border-2
   shadow
   ${isSelected ? 'border-cyan-400' : ''}
-  ${sentBy}
   `}
 	on:click={select}
 >
 	<span class="text-xs self-start">{name}</span>
 	<span class="text-sm">{cleanText}</span>
 
+	<span
+		class="
+    w-5
+    h-5
+  bg-white
+    absolute
+    rounded-full
+    -left-2
+    -bottom-2
+    "
+		style={`background-color: ${stringToColour(sentBy)};`}
+	/>
 	<ConfirmButton
 		on:click={(e) => e.stopPropagation()}
 		on:confirm={remove}

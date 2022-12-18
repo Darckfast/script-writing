@@ -36,39 +36,3 @@ div[id='app'] {
 	height: 100%;
 	width: 100%;
 }
-
-.taro::before {
-	background-color: #bae8e8;
-}
-
-.arita::before {
-	background-color: #8a00d4;
-}
-
-.matsukiTakashi::before {
-	background-color: #f9c46b;
-}
-
-.matsymuraKeita::before {
-	background-color: #1ac0c6;
-}
-
-.moriyamaMasato::before {
-	background-color: #e74645;
-}
-
-.okutaShou::before {
-	background-color: #facd60;
-}
-
-.UnknonwNumber::before {
-	background-color: #12492f;
-}
-
-.yanagiMaiko::before {
-	background-color: #f3e549;
-}
-
-.aritaAi::before {
-	background-color: #d433b7;
-}
