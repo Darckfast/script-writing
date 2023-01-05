@@ -4,39 +4,47 @@ import { loadV2, saveV2 } from '../loadSave'
 const createStories = () => {
 	const { set, subscribe, update } = writable<Story[]>([])
 
-	const checkForPromises = (value: any, storyId?: string) => {
-		if (value instanceof Array) {
-			value.map((subElem) => checkForPromises(subElem, subElem.ifid))
-		}
+	const updateStoryWithPassage = ({ storyId, resolvedValue, key }) => {
+		update((currStories) =>
+			currStories.map((currStory) => {
+				if (currStory.ifid === storyId) {
+					currStory.passages = currStory.passages.map((passage) => {
+						if (passage.pid === resolvedValue.pid) {
+							passage[key] = resolvedValue
+						}
 
-		for (const key in value) {
-			if (Object.prototype.hasOwnProperty.call(value, key)) {
-				const element = value[key]
-
-				if (element instanceof Promise) {
-					element.then((res) => {
-						update((currStories) =>
-							currStories.map((story) => {
-								if (story.ifid === storyId) {
-									story.passages = story.passages.map((passage) => {
-										if (passage.pid === value.pid) {
-											passage[key] = res
-										}
-
-										return passage
-									})
-								}
-
-								return story
-							})
-						)
+						return passage
 					})
 				}
 
-				if (element instanceof Array) {
-					element.map((subElem) => checkForPromises(subElem, storyId))
+				return currStory
+			})
+		)
+	}
+
+	const iterateOverPassages = ({ passage, storyId }) => {
+		for (const key in passage) {
+			if (Object.prototype.hasOwnProperty.call(passage, key)) {
+				const passageProp = passage[key]
+
+				if (passageProp instanceof Promise) {
+					passageProp.then((resolvedValue) =>
+						updateStoryWithPassage({
+							storyId,
+							resolvedValue,
+							key
+						})
+					)
 				}
 			}
+		}
+	}
+
+	const resolvePromises = (stories: Story[]) => {
+		for (const story of stories) {
+			story.passages.forEach((passage) =>
+				iterateOverPassages({ passage, storyId: story.ifid })
+			)
 		}
 	}
 
@@ -46,7 +54,7 @@ const createStories = () => {
 			subscribe((value) => {
 				if (!value.length) return
 
-				checkForPromises(value)
+				resolvePromises(value)
 
 				saveV2({ key: 'stories', value })
 			})
