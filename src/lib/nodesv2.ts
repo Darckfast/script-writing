@@ -96,10 +96,12 @@ const props = (object: any): Props[] => {
 					'pid',
 					'ifid',
 					'col',
+					'isTrusted',
 					'position',
 					'text',
 					'cleanText',
-					'parentPid'
+					'parentPid',
+					'version'
 				].includes(key)
 			) {
 				passageProps.push({ name: key, value: element, type: 'text' })
