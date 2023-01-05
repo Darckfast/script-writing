@@ -16,10 +16,10 @@ const createDbxAuth = () => {
 		})
 	)
 
-	const { access_token, refresh_token, expires_in } = load<any>(
-		'dbx-access_token',
-		{}
-	)
+	const { access_token, refresh_token, expires_in } = load<any>({
+		key: 'dbx-access_token',
+		defaultValue: {}
+	})
 
 	if (access_token) {
 		set(
@@ -47,10 +47,13 @@ const createDbxAuth = () => {
 				.getAccessTokenFromCode(undefined, accessCode)
 				.then(
 					({ result: { access_token, refresh_token, expires_in } }: any) => {
-						save('dbx-access_token', {
-							access_token,
-							refresh_token,
-							expires_in: dayjs().add(expires_in, 'second').unix()
+						save({
+							key: 'dbx-access_token',
+							value: {
+								access_token,
+								refresh_token,
+								expires_in: dayjs().add(expires_in, 'second').unix()
+							}
 						})
 
 						state.setAccessToken(access_token)
