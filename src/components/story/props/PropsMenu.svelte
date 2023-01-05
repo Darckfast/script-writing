@@ -32,7 +32,7 @@
 		type: 'text'
 	}
 
-	let localProps = load<Props[]>(`props-${$params.storyId}`)
+	let localProps = load<Props[]>({ key: `props-${$params.storyId}` })
 
 	$: if (localProps.length) {
 		saveV2({ key: `props-${$params.storyId}`, value: localProps })
