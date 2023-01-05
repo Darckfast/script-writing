@@ -12,6 +12,8 @@ jobs:
       matrix:
         platform: [macos-latest, ubuntu-20.04, windows-latest]
     runs-on: ${{ matrix.platform }}
+    env:
+      VITE_DBX_CLIENT_ID: ${{ secrets.VITE_DBX_CLIENT_ID }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
