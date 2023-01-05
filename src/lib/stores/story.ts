@@ -11,12 +11,12 @@ const getStory = (id: string) => {
 
 	isFetching.set(true)
 
-	loadV2<Story[]>({ key: 'stories', defaultValue: {} })
+	loadV2<Story[]>({ key: 'stories', defaultValue: [] })
 		.then((res) => set(res.find(({ ifid }) => ifid === id)))
 		.finally(() => isFetching.set(false))
 
 	subscribe((story) => {
-		if (!story.storyName) return
+		if (!story || !story.storyName) return
 
 		stories.update((values: Story[]) =>
 			values.map((value) => (value.ifid === story?.ifid ? story : value))

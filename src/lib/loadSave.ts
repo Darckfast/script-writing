@@ -1,15 +1,4 @@
-import {
-	BaseDirectory,
-	createDir,
-	readTextFile,
-	writeFile
-} from '@tauri-apps/api/fs'
-
-export const createLocalDataFolder = async () =>
-	createDir('data', {
-		dir: BaseDirectory.AppData,
-		recursive: true
-	}).catch((err) => console.error(err))
+import { BaseDirectory, readTextFile, writeFile } from '@tauri-apps/api/fs'
 
 const save = (key: string, progress: any): void => {
 	localStorage.setItem(key, JSON.stringify(progress))
@@ -28,7 +17,7 @@ const loadV2 = async <T>({
 	key
 }: LoadProp): Promise<T | undefined> => {
 	try {
-		const file = await readTextFile(`data/${key}.json`, {
+		const file = await readTextFile(`${key}.json`, {
 			dir: BaseDirectory.AppData
 		})
 
@@ -48,7 +37,7 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<void> => {
 	await writeFile(
 		{
 			contents: JSON.stringify(value),
-			path: `./data/${key}.json`
+			path: `${key}.json`
 		},
 		{
 			dir: BaseDirectory.AppData

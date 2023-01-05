@@ -1,9 +1,7 @@
 import { writable } from 'svelte/store'
-import { createLocalDataFolder, loadV2, saveV2 } from '../loadSave'
+import { loadV2, saveV2 } from '../loadSave'
 
 const createStories = () => {
-	createLocalDataFolder()
-
 	const { set, subscribe, update } = writable<Story[]>([])
 
 	const checkForPromises = (value: any, storyId?: string) => {
