@@ -7,6 +7,7 @@ on:
 
 jobs:
   release:
+    environment: prd
     strategy:
       fail-fast: false
       matrix:
@@ -14,6 +15,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     env:
       VITE_DBX_CLIENT_ID: ${{ secrets.VITE_DBX_CLIENT_ID }}
+      VITE_VERSION: ${{ github.ref_name}}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -21,9 +24,6 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: latest
-
-      - name: Set version hash
-        run: echo "VITE_VERSION=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-20.04'
