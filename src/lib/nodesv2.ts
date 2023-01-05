@@ -118,11 +118,6 @@ const patchUp = (node: StoryNode): StoryNode => {
 			if (['pid', 'parentPid'].includes(key)) {
 				node[key] = `${node[key]}`
 			}
-			// const element = node[key]
-
-			// if (!Number.isNaN(Number(element)) && element !== '') {
-			// 	node[key] = Number(element)
-			// }
 		}
 	}
 
