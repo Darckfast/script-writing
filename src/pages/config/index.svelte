@@ -2,7 +2,6 @@
 	import { url } from '@roxi/routify'
 	import ArrowLeft from '../../styles/icons/arrow-left.svelte'
 
-	import { onMount } from 'svelte'
 	import { dbxAuth, isFetching } from '../../lib/stores/dbx'
 	import Check from '../../styles/icons/check.svelte'
 	import DropboxIcon from '../../styles/icons/dropbox-icon.svelte'
@@ -11,28 +10,27 @@
 	import { globalError } from '../../lib/stores/globalError'
 	import Spinner from '../../styles/icons/spinner.svelte'
 
-	let dbxUrl = ''
 	let accessCode = ''
 
-	onMount(() => {
-		if ($dbxAuth.getAccessToken()) return
+	const dbxAuthUrl = $dbxAuth
+		.getAuthenticationUrl(
+			undefined,
+			undefined,
+			'code',
+			'offline',
+			undefined,
+			undefined,
+			true
+		)
+		.then((authUrl) => {
+			localStorage.setItem('codeVerifier', $dbxAuth.getCodeVerifier())
+			return authUrl.toString()
+		})
+		.catch((err) => {
+			globalError.pushError(err)
 
-		$dbxAuth
-			.getAuthenticationUrl(
-				undefined,
-				undefined,
-				'code',
-				'offline',
-				undefined,
-				undefined,
-				true
-			)
-			.then((authUrl) => {
-				localStorage.setItem('codeVerifier', $dbxAuth.getCodeVerifier())
-				dbxUrl = authUrl.toString()
-			})
-			.catch((err) => globalError.pushError(err))
-	})
+			return ''
+		})
 
 	const pasteCode = async () => {
 		accessCode = await readText()
@@ -54,16 +52,21 @@
 
 	<div class="flex flex-wrap items-center justify-center gap-2">
 		<div class="flex gap-2 items-center">
-			<a
-				class="btn btn-primary gap-2"
-				class:btn-disabled={$dbxAuth.getAccessToken()}
-				title={$dbxAuth.getAccessToken()
-					? 'already authenticated'
-					: 'click to authenticate'}
-				target="_blank"
-				rel="noreferrer"
-				href={dbxUrl}><DropboxIcon /> oauth</a
-			>
+			{#await dbxAuthUrl}
+				<Spinner />
+			{:then dbxUrl}
+				<a
+					class="btn btn-primary gap-2"
+					class:btn-disabled={$dbxAuth.getAccessToken()}
+					title={$dbxAuth.getAccessToken()
+						? 'already authenticated'
+						: 'click to authenticate'}
+					target="_blank"
+					rel="noreferrer"
+					href={dbxUrl}><DropboxIcon /> oauth</a
+				>
+			{/await}
+
 			{#if !$dbxAuth.getAccessToken()}
 				<label class="input-group w-auto">
 					<input
