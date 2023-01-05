@@ -96,10 +96,12 @@ const props = (object: any): Props[] => {
 					'pid',
 					'ifid',
 					'col',
+					'isTrusted',
 					'position',
 					'text',
 					'cleanText',
-					'parentPid'
+					'parentPid',
+					'version'
 				].includes(key)
 			) {
 				passageProps.push({ name: key, value: element, type: 'text' })
@@ -116,11 +118,6 @@ const patchUp = (node: StoryNode): StoryNode => {
 			if (['pid', 'parentPid'].includes(key)) {
 				node[key] = `${node[key]}`
 			}
-			// const element = node[key]
-
-			// if (!Number.isNaN(Number(element)) && element !== '') {
-			// 	node[key] = Number(element)
-			// }
 		}
 	}
 

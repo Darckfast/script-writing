@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { url } from '@roxi/routify'
+	import { readText, writeText } from '@tauri-apps/api/clipboard'
 	import { v4 as uuidv4 } from 'uuid'
-	import { longpress } from '../actions/longPress'
-	import ConfirmButton from '../components/ConfirmButton.svelte'
-	import { stories } from '../lib/stories'
+	import ConfirmButton from '../components/button/ConfirmButton.svelte'
+	import { stories } from '../lib/stores/stories'
 	import ArrowLeft from '../styles/icons/arrow-left.svelte'
 	import Copy from '../styles/icons/copy.svelte'
 	import Trash from '../styles/icons/trash.svelte'
@@ -17,7 +17,14 @@
 			...prev,
 			{
 				ifid: uuidv4(),
-				passages: [],
+				passages: [
+					{
+						cleanText: '',
+						links: [],
+						name: 1,
+						pid: '1'
+					}
+				],
 				createdWith: import.meta.env.VITE_VERSION ?? 'none',
 				storyName
 			}
@@ -35,7 +42,7 @@
 	}
 
 	const importStory = async () => {
-		const storyString = await navigator.clipboard.readText()
+		const storyString = await readText()
 
 		const story = JSON.parse(storyString)
 
@@ -50,9 +57,6 @@
 <div class="flex items-center justify-center flex-wrap h-auto w-full gap-4 p-2">
 	{#each $stories as story, index}
 		<a
-			use:longpress
-			on:click={(e) => showStoryOptions && e.preventDefault()}
-			on:longpress={() => (showStoryOptions = story.ifid)}
 			href={$url(`./story/${story.ifid}`)}
 			class={`btn
       gap-2 
@@ -70,15 +74,12 @@
 
 				<button
 					class="btn btn-sm"
-					on:click={() => navigator.clipboard.writeText(JSON.stringify(story))}
+					on:click={() => writeText(JSON.stringify(story))}
 				>
 					<Copy />
 				</button>
 
-				<ConfirmButton
-					on:confirm={() => remove(index)}
-					classes="btn btn-sm btn-error"
-				>
+				<ConfirmButton on:confirm={() => remove(index)} classes="btn btn-sm">
 					<Trash />
 				</ConfirmButton>
 			{:else}
@@ -100,9 +101,10 @@
 
 		<button
 			class="btn btn-primary"
-			on:click={() => navigator.clipboard.writeText(JSON.stringify($stories))}
+			on:click={() => writeText(JSON.stringify($stories))}
 			>> export all stories</button
 		>
+		<a href={$url(`./config`)} class="btn btn-primary">$ configuration</a>
 	</div>
 
 	<label class="w-full text-sm">
