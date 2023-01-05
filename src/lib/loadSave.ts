@@ -1,18 +1,25 @@
 import { BaseDirectory, readTextFile, writeFile } from '@tauri-apps/api/fs'
+import { globalError } from './stores/globalError'
 
-const save = (key: string, progress: any): void => {
-	localStorage.setItem(key, JSON.stringify(progress))
+const save = ({ key, value }: SaveProp): string => {
+	const strValue = JSON.stringify(value)
+
+	localStorage.setItem(key, strValue)
+
+	return strValue
 }
 
-const load = <T>(key: string, defaultValue: any = []): T | undefined => {
+const load = <T = any>({ key, defaultValue }: LoadProp): T | undefined => {
 	try {
 		return JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
-	} catch {
+	} catch (err) {
+		globalError.pushError(err)
+
 		return defaultValue
 	}
 }
 
-const loadV2 = async <T>({
+const loadV2 = async <T = any>({
 	defaultValue = [],
 	key
 }: LoadProp): Promise<T | undefined> => {
@@ -21,28 +28,36 @@ const loadV2 = async <T>({
 			dir: BaseDirectory.AppData
 		})
 
-		const parsedValue = JSON.parse(file)
-
-		if (!parsedValue) return defaultValue
+		const parsedValue = JSON.parse(file) ?? defaultValue
 
 		return parsedValue
 	} catch (err) {
-		return defaultValue
+		globalError.pushError(err)
+
+		return load({ key, defaultValue }) ?? defaultValue
 	}
 }
 
-const saveV2 = async ({ key, value }: SaveProp): Promise<void> => {
-	localStorage.setItem(key, JSON.stringify(value))
+const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
+	const strValue = JSON.stringify(value)
 
-	await writeFile(
-		{
-			contents: JSON.stringify(value),
-			path: `${key}.json`
-		},
-		{
-			dir: BaseDirectory.AppData
-		}
-	)
+	try {
+		await writeFile(
+			{
+				contents: strValue,
+				path: `${key}.json`
+			},
+			{
+				dir: BaseDirectory.AppData
+			}
+		)
+
+		return strValue
+	} catch (err) {
+		globalError.pushError(err)
+
+		return save({ key, value })
+	}
 }
 
 export { save, load, loadV2, saveV2 }
