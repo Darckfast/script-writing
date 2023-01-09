@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
-	import { load, saveV2 } from '../../../lib/loadSave'
+	import { load, save } from '../../../lib/loadSave'
 	import { props } from '../../../lib/nodesv2'
 	import { dbxAuth } from '../../../lib/stores/dbx'
 	import PropInput from '../PropInput.svelte'
@@ -35,7 +35,7 @@
 	let localProps = load<Props[]>({ key: `props-${$params.storyId}` })
 
 	$: if (localProps.length) {
-		saveV2({ key: `props-${$params.storyId}`, value: localProps })
+		save({ key: `props-${$params.storyId}`, value: localProps })
 	}
 
 	const createProp = () => {

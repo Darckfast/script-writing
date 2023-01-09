@@ -91,7 +91,3 @@ const createDbxAuth = () => {
 }
 
 export const dbxAuth = createDbxAuth()
-
-// dbx.subscribe((s) => {
-// 	s.checkUser({ query: '' }).catch(() => dbxAuth.resetToken())
-// })

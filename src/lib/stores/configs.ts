@@ -1,8 +1,8 @@
 import { writable } from 'svelte/store'
-import { load, saveV2 } from '../loadSave'
+import { load, save } from '../loadSave'
 
 export const config = writable<Config>(
 	load({ key: 'configs', defaultValue: {} })
 )
 
-config.subscribe((value) => saveV2({ key: 'configs', value }))
+config.subscribe((value) => save({ key: 'configs', value }))
