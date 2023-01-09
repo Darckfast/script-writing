@@ -8,9 +8,9 @@
     "dev": "run-p dev:*",
     "dev:vite": "vite",
     "dev:routify": "routify",
-    "build": "vite build",
+    "build": "routify -b && vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check": "routify -b && svelte-check --tsconfig ./tsconfig.json",
     "coverage": "vitest run --coverage",
     "cy:run": "cypress run",
     "test:e2e:ci": "start-server-and-test dev http://localhost:5177 cy:run"
