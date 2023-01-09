@@ -9,7 +9,7 @@ const save = ({ key, value }: SaveProp): string => {
 	return strValue
 }
 
-const load = <T = any>({ key, defaultValue }: LoadProp): T | undefined => {
+const load = <T = any>({ key, defaultValue = [] }: LoadProp): T | undefined => {
 	try {
 		return JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
 	} catch (err) {

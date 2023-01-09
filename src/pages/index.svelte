@@ -3,6 +3,7 @@
 	import { readText, writeText } from '@tauri-apps/api/clipboard'
 	import { v4 as uuidv4 } from 'uuid'
 	import ConfirmButton from '../components/button/ConfirmButton.svelte'
+	import { globalError } from '../lib/stores/globalError'
 	import { stories } from '../lib/stores/stories'
 	import ArrowLeft from '../styles/icons/arrow-left.svelte'
 	import Copy from '../styles/icons/copy.svelte'
@@ -13,6 +14,7 @@
 
 	const add = () => {
 		if (!storyName) return
+
 		stories.update((prev) => [
 			...prev,
 			{
@@ -22,10 +24,10 @@
 						cleanText: '',
 						links: [],
 						name: 1,
-						pid: '1'
+						pid: 'root'
 					}
 				],
-				createdWith: import.meta.env.VITE_VERSION ?? 'none',
+				createdWith: import.meta.env.VITE_VERSION,
 				storyName
 			}
 		])
@@ -42,14 +44,16 @@
 	}
 
 	const importStory = async () => {
-		const storyString = await readText()
+		try {
+			const story = JSON.parse(await readText())
 
-		const story = JSON.parse(storyString)
-
-		if (story.length) {
-			stories.update((prev) => [...prev, ...story])
-		} else {
-			stories.update((prev) => [...prev, story])
+			if (story.length) {
+				stories.update((prev) => [...prev, ...story])
+			} else {
+				stories.update((prev) => [...prev, story])
+			}
+		} catch (err) {
+			globalError.pushError(err)
 		}
 	}
 </script>
