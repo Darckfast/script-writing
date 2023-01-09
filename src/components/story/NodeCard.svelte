@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, onMount } from 'svelte'
 	import { genColor } from '../../lib/colorGen'
 	import { dbx } from '../../lib/stores/dbx'
 	import { globalError } from '../../lib/stores/globalError'
@@ -15,14 +15,31 @@
 	export let isSelected = false
 	export let sentBy = ''
 
+	let container
 	let imagePrm = Promise.resolve('')
 
-	$: if (image) {
-		imagePrm =
-			image instanceof Promise
-				? image.then((path) => getLink(path))
-				: getLink(image)
-	}
+	onMount(() => {
+		let observer = new IntersectionObserver(
+			([entry], self) => {
+				if (entry.isIntersecting && image) {
+					imagePrm =
+						image instanceof Promise
+							? image.then((path) => getLink(path))
+							: getLink(image)
+
+					self.unobserve(entry.target)
+				}
+			},
+			{
+				rootMargin: '0px 0px 0px 0px',
+				threshold: 0
+			}
+		)
+
+		observer.observe(container)
+
+		return () => observer.unobserve(container)
+	})
 
 	const getLink = (path: string): Promise<string> =>
 		$dbx
@@ -39,6 +56,7 @@
 </script>
 
 <button
+	bind:this={container}
 	class={`
   btn 
   btn-primary
@@ -67,7 +85,13 @@
 				<Spinner />
 			</div>
 		{:then src}
-			<img {src} alt="message" style="min-height: 24rem;" loading="lazy" />
+			<img
+				{src}
+				alt="message"
+				style="min-height: 24rem;"
+				loading="lazy"
+				data-lazy-load
+			/>
 		{/await}
 	{/if}
 	<span
