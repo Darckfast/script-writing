@@ -11,14 +11,14 @@
 	}
 
 	const remove = (prop: string) => {
-		delete $config[prop]
+		delete $config[storyId][prop]
 
 		$config = { ...$config }
 	}
 </script>
 
 <div class="flex flex-wrap gap-2 w-full">
-	{#each props($config[storyId]) as { name, value }}
+	{#each props($config[storyId]) as { name }}
 		<PropInput
 			{name}
 			bind:value={$config[storyId][name].value}
@@ -44,17 +44,10 @@
 	<div class="w-full flex justify-between items-center">
 		<label class="p-1 w-1/2">
 			<input
+				type="text"
 				placeholder="name"
 				class="input input-primary input-sm w-full"
 				bind:value={prop.name}
-			/>
-		</label>
-
-		<label class="p-1 w-1/2">
-			<input
-				placeholder="value"
-				bind:value={prop.value}
-				class="input input-primary input-sm w-full"
 			/>
 		</label>
 
