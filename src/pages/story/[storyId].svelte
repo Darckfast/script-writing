@@ -41,23 +41,7 @@
 	const deleteNode = (node: StoryNode) => {
 		if (selectedIndex === 0) return
 
-		const newIndex = $story.passages.findIndex(
-			({ pid }) => pid === selectedNode.pid
-		)
-
-		if (newIndex !== -1) {
-			selectedIndex = newIndex
-		} else {
-			selectedIndex = $story.passages.findIndex(
-				({ pid }) => pid === selectedNode.parentPid
-			)
-		}
-
-		if (node.pid === selectedNode.pid) {
-			selectedIndex = $story.passages.findIndex(
-				({ pid }) => pid === selectedNode.parentPid
-			)
-		}
+		selectedIndex -= 1
 
 		$story.passages = [...remove({ nodes: $story.passages, remove: node })]
 	}
