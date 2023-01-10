@@ -1,4 +1,5 @@
 import { BaseDirectory, readTextFile, writeFile } from '@tauri-apps/api/fs'
+import { dbx } from './stores/dbx'
 import { globalError } from './stores/globalError'
 
 const save = ({ key, value }: SaveProp): string => {
@@ -60,4 +61,15 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
 	}
 }
 
-export { save, load, loadV2, saveV2 }
+const loadCloud = async ({ key }: LoadProp) => {
+	return dbx.filesDownload({ path: `/${key}.json` })
+}
+
+const saveCloud = async ({ key, value }: SaveProp) => {
+	return dbx.filesUpload({
+		path: `/${key}`,
+		contents: value
+	})
+}
+
+export { save, load, loadV2, saveV2, loadCloud, saveCloud }

@@ -56,9 +56,11 @@ const createStories = () => {
 		}
 	}
 
-	setInterval(() => syncFile(), 120_000)
+	setInterval(() => syncFile(), 60_000)
 
 	const syncFile = async () => {
+		if (!getConfig('sync')) return
+
 		let currValue: Story[]
 
 		subscribe((value) => (currValue = value))()
