@@ -52,7 +52,7 @@
 				}
 			})
 			.then(({ path, imageBuffer }) =>
-				$dbx.filesUpload({
+				dbx.filesUpload({
 					path,
 					contents: imageBuffer
 				})

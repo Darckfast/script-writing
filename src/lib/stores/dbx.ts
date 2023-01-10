@@ -6,7 +6,7 @@ import { globalError } from './globalError'
 
 const clientId = import.meta.env.VITE_DBX_CLIENT_ID
 
-export const dbx = writable(new Dropbox())
+export let dbx = new Dropbox()
 export const isFetching = writable(false)
 
 const createDbxAuth = () => {
@@ -35,7 +35,7 @@ const createDbxAuth = () => {
 	subscribe((state) => {
 		state.checkAndRefreshAccessToken()
 
-		dbx.set(new Dropbox({ auth: state }))
+		dbx = new Dropbox({ auth: state })
 	})
 
 	const setToken = (accessCode: string) => {

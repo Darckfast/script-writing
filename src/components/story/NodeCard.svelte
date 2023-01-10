@@ -42,7 +42,7 @@
 	})
 
 	const getLink = (path: string): Promise<string> =>
-		$dbx
+		dbx
 			.filesGetTemporaryLink({ path })
 			.then(({ result: { link } }) => link)
 			.catch((err) => {
