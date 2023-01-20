@@ -16,22 +16,19 @@
 	export let sentBy = ''
 
 	let container
-	let imagePrm = Promise.resolve('')
+	let canFetch = false
+	$: imagePrm = getLink(image)
 
 	onMount(() => {
 		let observer = new IntersectionObserver(
 			([entry], self) => {
 				if (entry.isIntersecting && image) {
-					imagePrm =
-						image instanceof Promise
-							? image.then((path) => getLink(path))
-							: getLink(image)
+					canFetch = true
 
 					self.unobserve(entry.target)
 				}
 			},
 			{
-				rootMargin: '0px 0px 0px 0px',
 				threshold: 0
 			}
 		)
@@ -41,8 +38,12 @@
 		return () => observer.unobserve(container)
 	})
 
-	const getLink = (path: string): Promise<string> =>
-		$dbx
+	$: getLink = async (pathProp: string | Promise<string>): Promise<string> => {
+		if (!pathProp || !canFetch) return Promise.resolve('')
+
+		let path = pathProp instanceof Promise ? await pathProp : pathProp
+
+		return dbx
 			.filesGetTemporaryLink({ path })
 			.then(({ result: { link } }) => link)
 			.catch((err) => {
@@ -50,6 +51,7 @@
 
 				return ''
 			})
+	}
 
 	const select = () => dispatch('select')
 	const remove = () => dispatch('remove')
@@ -57,7 +59,8 @@
 
 <button
 	bind:this={container}
-	class={`
+	class:!border-cyan-400={isSelected}
+	class="
   btn 
   btn-primary
   no-animation
@@ -65,13 +68,10 @@
   p-2 
   relative 
   h-fit
-
   w-full 
   border-transparent
   border-2
-  shadow
-  ${isSelected ? 'border-cyan-400' : ''}
-  `}
+  shadow"
 	on:click={select}
 	on:focus={select}
 	type="button"
