@@ -19,12 +19,22 @@
 			>{$globalError[0].message}</span
 		>
 		<div class="flex-none">
-			<button on:click={globalError.clearCurrent} class="btn btn-sm btn-ghost"
-				>Clear</button
-			>
-			<button on:click={globalError.clearAll} class="btn btn-sm btn-ghost"
-				>Clear All</button
-			>
+			{#if $globalError.at(0).onConfirm}
+				<button
+					on:click={$globalError.at(0).onConfirm}
+					class="btn btn-sm btn-ghost">procced</button
+				>
+				<button on:click={globalError.clearAll} class="btn btn-sm btn-ghost"
+					>cancel</button
+				>
+			{:else}
+				<button on:click={globalError.clearCurrent} class="btn btn-sm btn-ghost"
+					>Clear</button
+				>
+				<button on:click={globalError.clearAll} class="btn btn-sm btn-ghost"
+					>Clear All</button
+				>
+			{/if}
 		</div>
 	</div>
 {/if}
