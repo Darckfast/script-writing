@@ -41,6 +41,10 @@
 	const createProp = () => {
 		if (isPropNotEnabled(prop.type)) return
 
+		if (prop.type === 'boolean') {
+			prop.value = false
+		}
+
 		localProps = [...localProps, { ...prop }]
 
 		prop.name = ''
@@ -96,11 +100,11 @@
 </div>
 
 <form
-	on:submit|preventDefault
+	on:submit|preventDefault={createProp}
 	class="w-auto h-auto mt-2 flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded "
 >
 	<div class="w-full flex justify-between items-center">
-		<label class="p-1 w-1/2 flex items-center">
+		<label class="p-1 w-full flex items-center">
 			<input
 				placeholder="name"
 				class="input input-primary input-sm w-full"
@@ -108,36 +112,10 @@
 			/>
 		</label>
 
-		<label class="p-1 w-1/2 flex items-center">
-			{#if prop.type === 'boolean'}
-				<input
-					type="checkbox"
-					bind:checked={prop.value}
-					class="toggle toggle-primary"
-				/>
-			{:else if prop.type === 'number'}
-				<input
-					placeholder="0"
-					type="number"
-					bind:value={prop.value}
-					class="input input-primary input-sm w-full"
-				/>
-			{:else if prop.type === 'file'}
-				<span>File can be selected after</span>
-			{:else}
-				<input
-					placeholder="value"
-					bind:value={prop.value}
-					class="input input-primary input-sm w-full"
-				/>
-			{/if}
-		</label>
-
 		<button
 			type="submit"
 			class="btn btn-primary"
-			disabled={isPropNotEnabled(prop.type)}
-			on:click={createProp}>add</button
+			disabled={isPropNotEnabled(prop.type)}>add</button
 		>
 	</div>
 
