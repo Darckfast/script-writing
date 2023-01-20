@@ -7,6 +7,7 @@
 	import DropboxIcon from '../../styles/icons/dropbox-icon.svelte'
 
 	import { readText } from '@tauri-apps/api/clipboard'
+	import { config } from '../../lib/stores/configs'
 	import { globalError } from '../../lib/stores/globalError'
 	import Spinner from '../../styles/icons/spinner.svelte'
 
@@ -24,6 +25,7 @@
 		)
 		.then((authUrl) => {
 			localStorage.setItem('codeVerifier', $dbxAuth.getCodeVerifier())
+
 			return authUrl.toString()
 		})
 		.catch((err) => {
@@ -50,7 +52,7 @@
 		<h1>Configurations</h1>
 	</header>
 
-	<div class="flex flex-wrap items-center justify-center gap-2">
+	<div class="flex flex-wrap flex-col items-center justify-center gap-2">
 		<div class="flex gap-2 items-center">
 			{#await dbxAuthUrl}
 				<Spinner />
@@ -96,6 +98,17 @@
 					}).format($dbxAuth.getAccessTokenExpiresAt())}</span
 				>
 			{/if}
+		</div>
+
+		<div class="flex gap-2 items-center">
+			<label class="cursor-pointer label gap-2">
+				Sync stories
+				<input
+					type="checkbox"
+					class="toggle toggle-primary"
+					bind:checked={$config.sync}
+				/>
+			</label>
 		</div>
 	</div>
 </div>

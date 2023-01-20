@@ -4,9 +4,10 @@
 	import { v4 as uuidv4 } from 'uuid'
 	import ConfirmButton from '../components/button/ConfirmButton.svelte'
 	import { globalError } from '../lib/stores/globalError'
-	import { stories } from '../lib/stores/stories'
+	import { stories, storiesFetching, storiesInit } from '../lib/stores/stories'
 	import ArrowLeft from '../styles/icons/arrow-left.svelte'
 	import Copy from '../styles/icons/copy.svelte'
+	import Spinner from '../styles/icons/spinner.svelte'
 	import Trash from '../styles/icons/trash.svelte'
 
 	let storyName = ''
@@ -59,6 +60,13 @@
 </script>
 
 <div class="flex items-center justify-center flex-wrap h-auto w-full gap-4 p-2">
+	<div class="w-full flex justify-center gap-2 items-center h-4">
+		{#if $storiesFetching}
+			<Spinner />
+			<span>syncing stories...</span>
+		{/if}
+	</div>
+
 	{#each $stories as story, index}
 		<a
 			href={$url(`./story/${story.ifid}`)}
@@ -107,6 +115,10 @@
 			class="btn btn-primary"
 			on:click={() => writeText(JSON.stringify($stories))}
 			>> export all stories</button
+		>
+
+		<button class="btn btn-primary" on:click={() => storiesInit()}
+			>+ sync</button
 		>
 		<a href={$url(`./config`)} class="btn btn-primary">$ configuration</a>
 	</div>
