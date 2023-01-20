@@ -7,4 +7,6 @@ interface LoadProp {
 interface SaveProp {
 	key: string
 	value: any
+	fileExtension?: string
+	rev?: string
 }
