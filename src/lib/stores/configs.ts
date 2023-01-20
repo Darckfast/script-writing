@@ -1,8 +1,12 @@
-import { writable } from 'svelte/store'
-import { load, save } from '../loadSave'
+import { createSyncable } from './sync'
 
-export const config = writable<Config>(
-	load({ key: 'configs', defaultValue: {} })
-)
-
-config.subscribe((value) => save({ key: 'configs', value }))
+export const {
+	initialObject: config,
+	objectHash: configHash,
+  isFetching: configFetching,
+	getProp: getConfig,
+  doSync: configSync
+} = createSyncable<Story[]>({
+	initialSate: {},
+	key: 'global-configuration'
+})

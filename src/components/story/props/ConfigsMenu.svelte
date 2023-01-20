@@ -1,6 +1,11 @@
 <script lang="ts">
 	import { props } from '../../../lib/nodesv2'
-	import { config } from '../../../lib/stores/configs'
+	import {
+		config,
+		configFetching,
+		configSync
+	} from '../../../lib/stores/configs'
+	import Spinner from '../../../styles/icons/spinner.svelte'
 	import PropInput from '../PropInput.svelte'
 
 	export let storyId: string
@@ -14,6 +19,17 @@
 		delete $config[storyId][prop]
 
 		$config = { ...$config }
+
+		configSync()
+	}
+
+	const addProp = () => {
+		$config[storyId] = {
+			...$config[storyId],
+			[prop.name]: { value: prop.value, enabled: true }
+		}
+
+		configSync()
 	}
 </script>
 
@@ -33,12 +49,18 @@
 	{/each}
 </div>
 
+<div class="flex items-center justify-center w-full">
+	<button class="btn btn-primary w-auto " on:click={() => configSync()}
+		>{#if $configFetching}
+			<Spinner />saving...
+		{:else}
+			> save
+		{/if}</button
+	>
+</div>
+
 <form
-	on:submit|preventDefault={() =>
-		($config[storyId] = {
-			...$config[storyId],
-			[prop.name]: { value: prop.value, enabled: true }
-		})}
+	on:submit|preventDefault={addProp}
 	class="mt-2 flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded "
 >
 	<div class="w-full flex justify-between items-center">

@@ -6,8 +6,10 @@ import { globalError } from './globalError'
 
 const clientId = import.meta.env.VITE_DBX_CLIENT_ID
 
-export const dbx = writable(new Dropbox())
+export let dbx = new Dropbox()
 export const isFetching = writable(false)
+
+const localStorageKey = 'dbx-access-token'
 
 const createDbxAuth = () => {
 	const { set, subscribe, update } = writable(
@@ -16,8 +18,8 @@ const createDbxAuth = () => {
 		})
 	)
 
-	const { access_token, refresh_token, expires_in } = load<any>({
-		key: 'dbx-access_token',
+	const { access_token, refresh_token, expires_in } = load({
+		key: localStorageKey,
 		defaultValue: {}
 	})
 
@@ -35,7 +37,7 @@ const createDbxAuth = () => {
 	subscribe((state) => {
 		state.checkAndRefreshAccessToken()
 
-		dbx.set(new Dropbox({ auth: state }))
+		dbx = new Dropbox({ auth: state })
 	})
 
 	const setToken = (accessCode: string) => {
@@ -48,7 +50,7 @@ const createDbxAuth = () => {
 				.then(
 					({ result: { access_token, refresh_token, expires_in } }: any) => {
 						save({
-							key: 'dbx-access_token',
+							key: localStorageKey,
 							value: {
 								access_token,
 								refresh_token,
@@ -91,3 +93,20 @@ const createDbxAuth = () => {
 }
 
 export const dbxAuth = createDbxAuth()
+
+const loadCloud = async ({ key }: LoadProp) => {
+	return dbx.filesDownload({ path: `/${key}.json` })
+}
+
+const saveCloud = async ({ key, value, fileExtension, rev }: SaveProp) => {
+	return dbx.filesUpload({
+		path: `/${key}.${fileExtension}`,
+		contents: value,
+		mode: {
+			'.tag': 'update',
+			update: rev
+		}
+	})
+}
+
+export { saveCloud, loadCloud }

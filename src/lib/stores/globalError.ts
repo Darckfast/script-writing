@@ -15,14 +15,21 @@ const createGlobalError = () => {
 		})
 	}
 
-	const pushError = (err: Error) =>
-		update((state) => [
-			{
-				type: 'error',
-				message: `${err.name}: ${err.message}`
-			},
-			...state
-		])
+	const pushError = (err: Error, { onConfirm = null } = {}) =>
+		update((state) => {
+			const errorMsg = `${err.name}: ${err.message}`
+
+			if (state.filter((x) => x.message === errorMsg).length) return state
+
+			return [
+				{
+					type: 'error',
+					message: `${err.name}: ${err.message}`,
+					onConfirm
+				},
+				...state
+			]
+		})
 
 	const clearAll = () => set([])
 

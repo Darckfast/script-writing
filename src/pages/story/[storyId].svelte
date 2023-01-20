@@ -6,11 +6,13 @@
 	import ConfigsMenu from '../../components/story/props/ConfigsMenu.svelte'
 	import PropsMenu from '../../components/story/props/PropsMenu.svelte'
 	import { add, remove } from '../../lib/nodesv2'
+	import { storiesFetching, storiesSync } from '../../lib/stores/stories'
 	import { getStory } from '../../lib/stores/story'
 	import ArrowLeft from '../../styles/icons/arrow-left.svelte'
 	import Copy from '../../styles/icons/copy.svelte'
 	import Gear from '../../styles/icons/gear.svelte'
 	import Magnet from '../../styles/icons/magnet.svelte'
+	import Spinner from '../../styles/icons/spinner.svelte'
 
 	export let storyId: string
 
@@ -83,6 +85,14 @@
 		<button
 			class="btn btn-primary w-auto "
 			on:click={() => writeText(JSON.stringify(story))}>> copy</button
+		>
+
+		<button class="btn btn-primary w-auto " on:click={() => storiesSync()}
+			>{#if $storiesFetching}
+				<Spinner />saving...
+			{:else}
+				> save
+			{/if}</button
 		>
 		<button
 			class="btn btn-primary"
