@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
 	import { createEventDispatcher } from 'svelte'
+	import { genColor } from '../../lib/colorGen'
 	import { config } from '../../lib/stores/configs'
 	import { dbx } from '../../lib/stores/dbx'
 	import { globalError } from '../../lib/stores/globalError'
@@ -48,13 +49,16 @@
 
 				return {
 					...image,
-					path: `/data/assets${configValue}${image.fileName}`
+					path: `/${configValue}${image.fileName}`
 				}
 			})
 			.then(({ path, imageBuffer }) =>
-				$dbx.filesUpload({
+				dbx.filesUpload({
 					path,
-					contents: imageBuffer
+					contents: imageBuffer,
+					mode: {
+						'.tag': 'overwrite'
+					}
 				})
 			)
 			.then(({ result: { path_display } }) => path_display)
@@ -76,7 +80,13 @@
 >
 	<slot />
 	{#if isAddable}
-		<button on:click={add}>+</button>
+		<button
+			class="w-8 rounded-full  transition-all hover:scale-105"
+			style={`background-color: ${
+				name === 'sentBy' ? genColor(value) : 'white'
+			};`}
+			on:click={add}><span class="text-slate-900 font-bold">+</span></button
+		>
 	{/if}
 
 	{name}
