@@ -4,7 +4,7 @@ const rebuildLinks = (nodes: StoryNode[], fix = false) => {
 	let totalFixed = 0
 
 	for (const [index, node] of nodes.entries()) {
-		node.name = index + 1
+		node.name = `${index + 1}`
 
 		if (!index) continue
 
