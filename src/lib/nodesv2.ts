@@ -1,3 +1,31 @@
+import { globalError } from './stores/globalError'
+
+const rebuildLinks = (nodes: StoryNode[], fix = false) => {
+	let totalFixed = 0
+
+	for (const [index, node] of nodes.entries()) {
+		node.name = index + 1
+
+		if (!index) continue
+
+		const prevNode = nodes[index - 1]
+
+		if (!prevNode?.links?.length) continue
+
+		if (prevNode.links[0].pid !== node.pid) {
+			totalFixed += 1
+
+			nodes[index - 1].links = [{ pid: node.pid }]
+		}
+	}
+
+	if (totalFixed) {
+		globalError.pushError(new Error(`fixed ${totalFixed} orphan nodes`))
+	}
+
+	return nodes
+}
+
 const add = ({
 	add: nodeToAdd,
 	nodes
@@ -21,7 +49,7 @@ const add = ({
 
 	if (hasParent) nodes.push(nodeToAdd)
 
-	return nodes.map((node) => patchUp(node))
+	return rebuildLinks(nodes).map((node) => patchUp(node))
 }
 
 const remove = ({
@@ -55,7 +83,7 @@ const remove = ({
 		}
 	}
 
-	return newNodes
+	return rebuildLinks(newNodes)
 }
 
 const update = ({
