@@ -84,7 +84,7 @@
 
 		<button
 			class="btn btn-primary w-auto "
-			on:click={() => writeText(JSON.stringify(story))}>> copy</button
+			on:click={() => writeText(JSON.stringify($story))}>> copy</button
 		>
 
 		<button class="btn btn-primary w-auto " on:click={() => storiesSync()}

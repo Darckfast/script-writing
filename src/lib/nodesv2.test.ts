@@ -1,6 +1,6 @@
 import { add, props, remove, update } from './nodesv2'
 
-import { describe, expect, it, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 describe('nodev2', () => {
 	let baseNodes = []
@@ -10,21 +10,21 @@ describe('nodev2', () => {
 			{
 				cleanText: 'first base node',
 				links: [{ pid: '2' }],
-				name: 'line-1',
+				name: '1',
 				pid: '1',
 				parentPid: ''
 			},
 			{
 				cleanText: 'second base node',
 				links: [{ pid: '3' }],
-				name: 'line-2',
+				name: '2',
 				pid: '2',
 				parentPid: '1'
 			},
 			{
 				cleanText: 'second base node',
 				links: [],
-				name: 'line-3',
+				name: '3',
 				pid: '3',
 				parentPid: '2'
 			}
@@ -35,7 +35,7 @@ describe('nodev2', () => {
 		const node = {
 			cleanText: 'new node',
 			links: [],
-			name: 'line-4',
+			name: '4',
 			pid: '4'
 		}
 
@@ -56,7 +56,7 @@ describe('nodev2', () => {
 		const node = {
 			cleanText: 'new node',
 			links: [],
-			name: 'line-4',
+			name: '4',
 			pid: '4',
 			parentPid: '3'
 		}
@@ -80,17 +80,17 @@ describe('nodev2', () => {
 		const nodeToRemove = baseNodes[1]
 
 		const nodes = remove({ nodes: [...baseNodes], remove: nodeToRemove })
-
+		console.log(nodes)
 		expect(nodes).toHaveLength(2)
 		expect(nodes[0]).toHaveProperty('pid', '1')
-		expect(nodes[0]).toHaveProperty('name', 'line-1')
+		expect(nodes[0]).toHaveProperty('name', '1')
 		expect(nodes[0]).toHaveProperty('parentPid', '')
 		expect(nodes[0]).toHaveProperty('links')
 		expect(nodes[0].links).toHaveLength(1)
 		expect(nodes[0].links[0]).toHaveProperty('pid', '3')
 
 		expect(nodes[1]).toHaveProperty('pid', '3')
-		expect(nodes[1]).toHaveProperty('name', 'line-3')
+		expect(nodes[1]).toHaveProperty('name', '2')
 		expect(nodes[1]).toHaveProperty('parentPid', '1')
 		expect(nodes[1]).toHaveProperty('links')
 		expect(nodes[1].links).toHaveLength(0)
@@ -100,7 +100,7 @@ describe('nodev2', () => {
 		const nodeToRemove = {
 			cleanText: 'new node',
 			links: [],
-			name: 'line-4',
+			name: '4',
 			pid: '4'
 		}
 
@@ -113,7 +113,7 @@ describe('nodev2', () => {
 		const nodeToUpdate = {
 			cleanText: 'new node 1',
 			links: [{ pid: '2' }],
-			name: 'line-5',
+			name: '5',
 			pid: '1'
 		}
 
@@ -131,7 +131,7 @@ describe('nodev2', () => {
 		const node = {
 			cleanText: 'new node 1',
 			links: [{ pid: '2' }],
-			name: 'line-5',
+			name: '5',
 			pid: '1',
 			likes: 1,
 			comments: 12,
