@@ -1,91 +1,89 @@
-describe('empty spec', () => {
+describe('story page', () => {
 	beforeEach(() => {
 		cy.visit('http://localhost:5177')
 		cy.get('input').type('new story')
-		cy.get('.self-end > .flex > :nth-child(1)').click()
-		cy.get('main > div > a').click()
-
+		cy.get('button[data-test="btn-create-story"]').click()
+		cy.get('a[data-test="a-story-node-0"]').click()
 	})
 
-	it('create new node', () => {	
-		cy.get('.relative > .mt-2 > :nth-child(1)').should('have.text', '+ new')
-		cy.get('.relative > .mt-2 > :nth-child(2)').should('have.text', '+ duplicate node')
+	it('create new node', () => {
+		cy.get('input[data-test="input-node"]').type('first node')
+		cy.get('button[data-test="add-node"]').click()
+		cy.get('input[data-test="input-node"]').type('second node')
 
-		cy.get('.relative > .mt-2 > :nth-child(1)').click()
-		cy.get('.no-animation > .text-xs').should('have.text', '1')
-		cy.get('.overflow-y-scroll > :nth-child(2) > .input').should('have.value', 'new story')
-		cy.get('.h-20').type('testing node')
-		cy.get('.no-animation > .text-sm').should('have.text', 'testing node')
+		cy.get('span[data-test="node-name-1"] ').should('have.text', '1')
+		cy.get('span[data-test="node-text-1"] ').should('have.text', 'first node')
+
+		cy.get('span[data-test="node-name-2"] ').should('have.text', '2')
+		cy.get('span[data-test="node-text-2"] ').should('have.text', 'second node')
 	})
 
-	it('add prop of type text', () => {	
-		cy.get('.relative > .mt-2 > :nth-child(1)').should('have.text', '+ new')
-		cy.get('.relative > .mt-2 > :nth-child(2)').should('have.text', '+ duplicate node')
+	it('add prop of type number', () => {
+		cy.get('input[data-test="input-prop"]').type('testProp')
+		cy.get('button[data-test="add-prop"]').click()
 
-		cy.get('.relative > .mt-2 > :nth-child(1)').click()
-		cy.get('.no-animation > .text-xs').should('have.text', '1')
-		cy.get('.overflow-y-scroll > :nth-child(2) > .input').should('have.value', 'new story')
-		cy.get('.h-20').type('testing node')
-		cy.get('.no-animation > .text-sm').should('have.text', 'testing node')
+		cy.get('button[data-test="add-local-prop-testProp"]').click()
 
-		// add new prop - text
-		cy.get('.mt-2 > .justify-between > :nth-child(1) > .input').type('testProp')
-		cy.get('.p-1 > .input').type('propValue')
-		cy.get('.mt-2 > .justify-between > .btn').click()
-		
-		// add prop to the story
-		cy.get(':nth-child(7) > .input').should('have.value', 'propValue')
-		cy.get(':nth-child(7) > :nth-child(1)').click()
-		cy.get(':nth-child(6) > .input').should('have.value', 'propValue')
-		cy.get(':nth-child(6) > .cursor-pointer').dblclick()
+		cy.get('input[data-test="input-node-prop-testProp"]').should('exist')
 
-		cy.get('.no-animation > .cursor-pointer').dblclick()
-		cy.get('.no-animation').should('not.exist')
+		cy.get('input[data-test="input-node-prop-testProp"]').type(
+			'prop of type text'
+		)
+
+		cy.get('input[data-test="input-node-prop-testProp"]').should(
+			'have.value',
+			'prop of type text'
+		)
 	})
 
-	it('add prop of type boolean', () => {	
-		cy.get('.relative > .mt-2 > :nth-child(1)').should('have.text', '+ new')
-		cy.get('.relative > .mt-2 > :nth-child(2)').should('have.text', '+ duplicate node')
-		
-		//create node
-		cy.get('.relative > .mt-2 > :nth-child(1)').click()
-		cy.get('.no-animation > .text-xs').should('have.text', '1')
-		cy.get('.overflow-y-scroll > :nth-child(2) > .input').should('have.value', 'new story')
-		cy.get('.h-20').type('testing node')
-		cy.get('.no-animation > .text-sm').should('have.text', 'testing node')
+	it('add prop of type text', () => {
+		cy.get('input[data-test="input-prop"]').type('testProp')
+		cy.get('input[data-test="radio-prop-number"]').click()
 
-		// add new prop - text
-		cy.get('.mt-2 > .justify-between > :nth-child(1) > .input').type('testProp')
-		cy.get('.gap-4 > :nth-child(2)').click()
-		cy.get('.p-1 > .toggle').click()
-		cy.get('.mt-2 > .justify-between > .btn').click()
-		
-		// add prop to the story
-		cy.get(':nth-child(7) > .toggle').should('have.value', 'on')
-		cy.get(':nth-child(7) > :nth-child(1)').click()
-		cy.get(':nth-child(6) > .toggle').should('have.value', 'on')
+		cy.get('button[data-test="add-prop"]').click()
+
+		cy.get('button[data-test="add-local-prop-testProp"]').click()
+
+		cy.get('input[data-test="input-node-prop-testProp"]').should('exist')
+
+		cy.get('input[data-test="input-node-prop-testProp"]').type('12.34')
+
+		cy.get('input[data-test="input-node-prop-testProp"]').should(
+			'have.value',
+			'12.34'
+		)
 	})
 
-	it('add prop of type number', () => {	
-		cy.get('.relative > .mt-2 > :nth-child(1)').should('have.text', '+ new')
-		cy.get('.relative > .mt-2 > :nth-child(2)').should('have.text', '+ duplicate node')
-		
-		//create node
-		cy.get('.relative > .mt-2 > :nth-child(1)').click()
-		cy.get('.no-animation > .text-xs').should('have.text', '1')
-		cy.get('.overflow-y-scroll > :nth-child(2) > .input').should('have.value', 'new story')
-		cy.get('.h-20').type('testing node')
-		cy.get('.no-animation > .text-sm').should('have.text', 'testing node')
+	it('add prop of type boolean', () => {
+		cy.get('input[data-test="input-prop"]').type('testProp')
+		cy.get('input[data-test="radio-prop-boolean"]').click()
 
-		// add new prop - text
-		cy.get('.mt-2 > .justify-between > :nth-child(1) > .input').type('testProp')
-		cy.get('.gap-4 > :nth-child(3)').click()
-		cy.get('.p-1 > .input').type('1234')
-		cy.get('.mt-2 > .justify-between > .btn').click()
-		
-		// add prop to the story
-		cy.get(':nth-child(7) > .input').should('have.value', '1234')
-		cy.get(':nth-child(7) > :nth-child(1)').click()
-		cy.get(':nth-child(6) > .input').should('have.value', '1234')
+		cy.get('button[data-test="add-prop"]').click()
+
+		cy.get('button[data-test="add-local-prop-testProp"]').click()
+		cy.get('input[data-test="input-node-prop-testProp"]').click()
+
+		cy.get('input[data-test="input-node-prop-testProp"]').should('exist')
+
+		cy.get('input[data-test="input-node-prop-testProp"]').should(
+			'have.been.checked'
+		)
+	})
+
+	it('remove prop', () => {
+		cy.get('input[data-test="input-prop"]').type('testProp')
+		cy.get('button[data-test="add-prop"]').click()
+
+		cy.get('button[data-test="add-local-prop-testProp"]').click()
+
+		cy.get('button[data-test="remove-node-prop-testProp"]').click()
+		cy.get('button[data-test="remove-node-prop-testProp"]').click()
+
+		cy.get('input[data-test="input-node-prop-testProp"]').should('not.exist')
+
+		cy.get('button[data-test="remove-local-prop-testProp"]').click()
+		cy.get('button[data-test="remove-local-prop-testProp"]').click()
+
+		cy.get('input[data-test="input-local-prop-testProp"]').should('not.exist')
 	})
 })
