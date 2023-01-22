@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { url } from '@roxi/routify'
-	import { writeText } from '@tauri-apps/api/clipboard'
 	import { v4 as uuidv4 } from 'uuid'
 	import NodeCard from '../../components/story/NodeCard.svelte'
 	import ConfigsMenu from '../../components/story/props/ConfigsMenu.svelte'
 	import PropsMenu from '../../components/story/props/PropsMenu.svelte'
+	import { copy } from '../../lib/copy'
 	import { add, remove } from '../../lib/nodesv2'
+	import { isDbxAuth } from '../../lib/stores/dbx'
 	import { storiesFetching, storiesSync } from '../../lib/stores/stories'
 	import { getStory } from '../../lib/stores/story'
 	import ArrowLeft from '../../styles/icons/arrow-left.svelte'
@@ -70,24 +71,29 @@
 
 <form on:submit|preventDefault class="w-full h-full">
 	<header class="flex justify-between items-center w-full gap-2 px-2">
-		<a href={$url('../../..')} class="btn btn-primary">
+		<a href={$url('../../..')} data-test="btn-return" class="btn btn-primary">
 			<ArrowLeft /> go back</a
 		>
-		<h1>{$story.storyName}</h1>
+		<h1 data-test="story-name">{$story.storyName}</h1>
 
 		<button
 			class="btn btn-xs gap-2 w-auto text-sm overflow-auto overflow-ellipsis"
-			on:click={() => writeText(storyId)}
+			on:click={() => copy(storyId)}
+			data-test="copy-story-id"
 		>
 			{storyId}<Copy /></button
 		>
 
 		<button
-			class="btn btn-primary w-auto "
-			on:click={() => writeText(JSON.stringify($story))}>> copy</button
+			class="btn btn-primary w-auto"
+			data-test="export-story"
+			on:click={() => copy($story)}>> copy</button
 		>
 
-		<button class="btn btn-primary w-auto " on:click={() => storiesSync()}
+		<button
+			class="btn btn-primary w-auto "
+			disabled={!isDbxAuth()}
+			on:click={() => storiesSync()}
 			>{#if $storiesFetching}
 				<Spinner />saving...
 			{:else}
@@ -96,7 +102,8 @@
 		>
 		<button
 			class="btn btn-primary"
-			on:click={() => writeText(JSON.stringify(getAsArray()))}>> array</button
+			data-test="export-story-array"
+			on:click={() => copy(getAsArray())}>> array</button
 		>
 	</header>
 	<div class="flex items-center justify-center w-full h-4/5 gap-2 p-2">
@@ -116,9 +123,13 @@
 			{/each}
 
 			<div class="mt-2">
-				<button class="btn btn-primary" on:click={addNode}>+ new</button>
-				<button class="btn btn-primary" on:click={() => addNode(selectedNode)}
-					>+ duplicate node</button
+				<button class="btn btn-primary" data-test="add-node" on:click={addNode}
+					>+ new</button
+				>
+				<button
+					class="btn btn-primary"
+					data-test="duplicate-node"
+					on:click={() => addNode(selectedNode)}>+ duplicate node</button
 				>
 			</div>
 		</div>
@@ -128,11 +139,13 @@
 				<button
 					on:click={() => (tabOpen = 'props')}
 					class="tab gap-2"
+					data-test="prop-menu"
 					class:tab-active={tabOpen === 'props'}><Magnet /> Props</button
 				>
 				<button
 					on:click={() => (tabOpen = 'configs')}
 					class="tab gap-2"
+					data-test="prop-confi"
 					class:tab-active={tabOpen === 'configs'}
 				>
 					<Gear /> Config</button
@@ -146,15 +159,16 @@
 		</div>
 	</div>
 
-	<div class="flex self-end w-full h-auto p-2 gap-1">
+	<form
+		class="flex self-end w-full h-auto p-2 gap-1"
+		on:submit|preventDefault={addNode}
+	>
 		<label class="w-full text-sm">
 			<input
+				data-test="input-node"
 				bind:value={$story.passages[selectedIndex].cleanText}
-				class="
-      h-20 
-      w-full 
-      input input-primary input-lg"
+				class="h-20 w-full input input-primary input-lg"
 			/>
 		</label>
-	</div>
+	</form>
 </form>

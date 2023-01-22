@@ -76,8 +76,8 @@
 	on:focus={select}
 	type="button"
 >
-	<span class="text-xs self-start">{name}</span>
-	<span class="text-sm">{cleanText}</span>
+	<span data-test={`node-name-${name}`} class="text-xs self-start">{name}</span>
+	<span data-test={`node-text-${name}`} class="text-sm">{cleanText}</span>
 
 	{#if image}
 		{#await imagePrm}

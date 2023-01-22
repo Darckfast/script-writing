@@ -94,7 +94,19 @@ const createDbxAuth = () => {
 
 export const dbxAuth = createDbxAuth()
 
+export const isDbxAuth = () => {
+	let token = ''
+
+	dbxAuth.subscribe((val) => (token = val.getAccessToken()))()
+
+	return !!token
+}
+
 const loadCloud = async ({ key }: LoadProp) => {
+	if (!isDbxAuth()) {
+		throw new Error('not authenticated')
+	}
+
 	return dbx.filesDownload({ path: `/${key}.json` })
 }
 

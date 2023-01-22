@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs'
 import { writable, type Writable } from 'svelte/store'
 import { loadV2 } from '../loadSave'
-import { dbx, loadCloud, saveCloud } from './dbx'
+import { dbx, isDbxAuth, loadCloud, saveCloud } from './dbx'
 import { globalError } from './globalError'
 
 interface FallBackProps {
@@ -123,6 +123,10 @@ export const createSyncable = <T = any>({
 	}
 
 	const doSync = async () => {
+		if (!isDbxAuth()) {
+			return
+		}
+
 		isFetching.set(true)
 
 		let localHash = ''

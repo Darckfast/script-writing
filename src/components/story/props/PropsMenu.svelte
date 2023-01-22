@@ -2,7 +2,7 @@
 	import { params } from '@roxi/routify'
 	import { load, save } from '../../../lib/loadSave'
 	import { props } from '../../../lib/nodesv2'
-	import { dbxAuth } from '../../../lib/stores/dbx'
+	import { isDbxAuth } from '../../../lib/stores/dbx'
 	import PropInput from '../PropInput.svelte'
 
 	export let node: StoryNode
@@ -22,7 +22,7 @@
 		},
 		{
 			type: 'file',
-			enabled: !!$dbxAuth.getAccessToken()
+			enabled: !isDbxAuth()
 		}
 	]
 
@@ -106,6 +106,7 @@
 	<div class="w-full flex justify-between items-center">
 		<label class="p-1 w-full flex items-center">
 			<input
+				data-test="input-prop"
 				placeholder="name"
 				class="input input-primary input-sm w-full"
 				bind:value={prop.name}
@@ -114,6 +115,7 @@
 
 		<button
 			type="submit"
+			data-test="add-prop"
 			class="btn btn-primary"
 			disabled={isPropNotEnabled(prop.type)}>add</button
 		>
@@ -123,6 +125,7 @@
 		{#each propTypes as { enabled, type }}
 			<label class="flex items-center gap-2">
 				<input
+					data-test={`radio-prop-${type}`}
 					bind:group={prop.type}
 					disabled={!enabled}
 					value={type}

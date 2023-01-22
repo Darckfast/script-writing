@@ -81,7 +81,8 @@
 	<slot />
 	{#if isAddable}
 		<button
-			class="w-8 rounded-full  transition-all hover:scale-105"
+			data-test={`add-${isAddable ? 'local' : 'node'}-prop-${name}`}
+			class="w-8 rounded-full transition-all hover:scale-105"
 			style={`background-color: ${
 				name === 'sentBy' ? genColor(value) : 'white'
 			};`}
@@ -93,6 +94,7 @@
 
 	{#if typeof value === 'boolean'}
 		<input
+			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
 			type="checkbox"
 			bind:checked={value}
 			class="toggle toggle-primary ml-auto"
@@ -100,12 +102,15 @@
 	{:else if type === 'number'}
 		<input
 			{placeholder}
+			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
 			type="number"
+			step="any"
 			bind:value
 			class="input w-full input-primary input-sm"
 		/>
 	{:else if type === 'file'}
 		<input
+			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
 			type="file"
 			bind:files
 			on:change={loadImage}
@@ -114,6 +119,7 @@
 	{:else}
 		<input
 			{placeholder}
+			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
 			bind:value
 			class="input w-full input-primary input-sm"
 		/>
@@ -121,6 +127,7 @@
 
 	{#if !isNotRemovable}
 		<ConfirmButton
+			dataTest={`remove-${isAddable ? 'local' : 'node'}-prop-${name}`}
 			on:confirm={remove}
 			classes="cursor-pointer w-auto h-auto p-1 rounded"
 		>

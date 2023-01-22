@@ -12,8 +12,9 @@
     "preview": "vite preview",
     "check": "routify -b && svelte-check --tsconfig ./tsconfig.json",
     "coverage": "vitest run --coverage",
-    "cy:run": "cypress run",
-    "test:e2e:ci": "start-server-and-test dev http://localhost:5177 cy:run"
+    "cy:run": "cypress run --config video=false",
+    "cy:open": "cypress open",
+    "test:e2e": "start-server-and-test dev http://localhost:5177 cy:run"
   },
   "devDependencies": {
     "@roxi/routify": "^2.18.8",
@@ -32,6 +33,7 @@
     "postcss": "^8.4.21",
     "prettier": "^2.8.3",
     "prettier-plugin-svelte": "^2.9.0",
+    "prettier-plugin-tailwindcss": "^0.2.1",
     "start-server-and-test": "^1.15.2",
     "svelte": "^3.55.1",
     "svelte-check": "^3.0.2",
