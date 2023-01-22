@@ -7,7 +7,8 @@
   "endOfLine": "auto",
   "tabWidth": 2,
   "plugins": [
-    "prettier-plugin-svelte"
+    "prettier-plugin-svelte",
+    "prettier-plugin-tailwindcss"
   ],
   "pluginSearchDirs": [
     "."

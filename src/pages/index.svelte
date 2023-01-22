@@ -3,10 +3,9 @@
 	import { readText, writeText } from '@tauri-apps/api/clipboard'
 	import { v4 as uuidv4 } from 'uuid'
 	import ConfirmButton from '../components/button/ConfirmButton.svelte'
+	import { dbxAuth } from '../lib/stores/dbx'
 	import { globalError } from '../lib/stores/globalError'
 	import { stories, storiesFetching, storiesInit } from '../lib/stores/stories'
-	import ArrowLeft from '../styles/icons/arrow-left.svelte'
-	import Copy from '../styles/icons/copy.svelte'
 	import Spinner from '../styles/icons/spinner.svelte'
 	import Trash from '../styles/icons/trash.svelte'
 
@@ -57,6 +56,10 @@
 			globalError.pushError(err)
 		}
 	}
+
+	const copyStory = () => {
+
+	}
 </script>
 
 <div class="flex items-center justify-center flex-wrap h-auto w-full gap-4 p-2">
@@ -68,36 +71,24 @@
 	</div>
 
 	{#each $stories as story, index}
-		<a
-			href={$url(`./story/${story.ifid}`)}
-			class={`btn
-      gap-2 
-      relative no-animation ${
-				showStoryOptions === story.ifid ? 'btn-success' : 'btn-primary'
-			}`}
-		>
-			{#if showStoryOptions === story.ifid}
-				<button
-					class="btn btn-sm btn-primary"
-					on:click={() => (showStoryOptions = '')}
-				>
-					<ArrowLeft />
-				</button>
+		<div>
+			<a
+				data-test={`a-story-node-${index}`}
+				href={$url(`./story/${story.ifid}`)}
+				class="gap-2 btn relative no-animation"
+			>
+				{story.storyName}
+			</a>
 
-				<button
-					class="btn btn-sm"
-					on:click={() => writeText(JSON.stringify(story))}
-				>
-					<Copy />
-				</button>
-
-				<ConfirmButton on:confirm={() => remove(index)} classes="btn btn-sm">
-					<Trash />
-				</ConfirmButton>
-			{:else}
-				<span>{story.storyName}</span>
-			{/if}
-		</a>
+			<ConfirmButton
+				dataTest="btn-delete-story"
+				on:click={(e) => e.stopImmediatePropagation()}
+				on:confirm={() => remove(index)}
+				classes="cursor-pointer w-auto h-auto p-1 rounded"
+			>
+				<Trash />
+			</ConfirmButton>
+		</div>
 	{/each}
 </div>
 
@@ -106,25 +97,35 @@
 	class="flex self-end justify-center w-full p-2 gap-1 h-auto flex-wrap"
 >
 	<div class="w-full flex items-center justify-center flex-wrap gap-2 mb-2">
-		<button class="btn btn-primary" on:click={add}>+ create new</button>
-		<button class="btn btn-primary" on:click={importStory}
-			>+ import from clipboard</button
+		<button class="btn btn-primary" data-test="btn-create-story" on:click={add}
+			>+ create new</button
+		>
+		<button
+			class="btn btn-primary"
+			data-test="btn-import-story"
+			on:click={importStory}>+ import from clipboard</button
 		>
 
 		<button
 			class="btn btn-primary"
-			on:click={() => writeText(JSON.stringify($stories))}
-			>> export all stories</button
+			data-test="btn-export-story"
+			on:click={() => copyStory()}>> export all stories</button
 		>
 
-		<button class="btn btn-primary" on:click={() => storiesInit()}
-			>+ sync</button
+		<button
+			data-test="btn-sync-story"
+			class="btn btn-primary"
+			disabled={!$dbxAuth.getAccessToken()}
+			on:click={() => storiesInit()}>+ sync</button
 		>
-		<a href={$url(`./config`)} class="btn btn-primary">$ configuration</a>
+		<a href={$url(`./config`)} class="btn btn-primary" data-test="a-config"
+			>$ configuration</a
+		>
 	</div>
 
 	<label class="w-full text-sm">
 		<input
+			data-test="input-story-name"
 			bind:value={storyName}
 			class="
       h-20 

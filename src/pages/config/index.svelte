@@ -2,7 +2,7 @@
 	import { url } from '@roxi/routify'
 	import ArrowLeft from '../../styles/icons/arrow-left.svelte'
 
-	import { dbxAuth, isFetching } from '../../lib/stores/dbx'
+	import { dbxAuth, isDbxAuth, isFetching } from '../../lib/stores/dbx'
 	import Check from '../../styles/icons/check.svelte'
 	import DropboxIcon from '../../styles/icons/dropbox-icon.svelte'
 
@@ -59,10 +59,7 @@
 			{:then dbxUrl}
 				<a
 					class="btn btn-primary gap-2"
-					class:btn-disabled={$dbxAuth.getAccessToken()}
-					title={$dbxAuth.getAccessToken()
-						? 'already authenticated'
-						: 'click to authenticate'}
+					class:btn-disabled={!isDbxAuth()}
 					target="_blank"
 					rel="noreferrer"
 					href={dbxUrl}><DropboxIcon /> oauth</a

@@ -5,6 +5,7 @@
 
 	export let classes = ''
 	export let label = ''
+	export let dataTest = ''
 
 	const confirm = () => dispatch('confirm')
 
@@ -35,6 +36,7 @@
 </script>
 
 <button
+	data-test={dataTest}
 	class={['transition-all', classes, text].join(' ')}
 	on:click={checkConfirmation}
 	tabindex="-1"

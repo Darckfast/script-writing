@@ -23,6 +23,12 @@ const loadV2 = async <T = any>({
 	defaultValue = [],
 	key
 }: LoadProp): Promise<T | undefined> => {
+	const isTauri = !!(window as any).__TAURI_IPC__
+
+	if (!isTauri) {
+		return load({ key, defaultValue }) ?? defaultValue
+	}
+
 	try {
 		const file = await readTextFile(`${key}.json`, {
 			dir: BaseDirectory.AppData
@@ -40,6 +46,12 @@ const loadV2 = async <T = any>({
 
 const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
 	const strValue = JSON.stringify(value)
+
+	const isTauri = !!(window as any).__TAURI_IPC__
+
+	if (!isTauri) {
+		return save({ key, value })
+	}
 
 	try {
 		await writeFile(

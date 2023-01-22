@@ -62,7 +62,7 @@ const remove = ({
 	let newNodes = []
 
 	for (const node of [...nodes]) {
-		if (node.pid === remove.parentPid) {
+		if (node.pid === remove.parentPid && node.links) {
 			node.links = node.links.filter((nd) => nd.pid !== remove.pid)
 		}
 

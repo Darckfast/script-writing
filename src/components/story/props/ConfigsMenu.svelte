@@ -5,6 +5,7 @@
 		configFetching,
 		configSync
 	} from '../../../lib/stores/configs'
+	import { isDbxAuth } from '../../../lib/stores/dbx'
 	import Spinner from '../../../styles/icons/spinner.svelte'
 	import PropInput from '../PropInput.svelte'
 
@@ -50,7 +51,10 @@
 </div>
 
 <div class="flex items-center justify-center w-full">
-	<button class="btn btn-primary w-auto " on:click={() => configSync()}
+	<button
+		class="btn btn-primary w-auto "
+		disabled={!isDbxAuth()}
+		on:click={() => configSync()}
 		>{#if $configFetching}
 			<Spinner />saving...
 		{:else}
