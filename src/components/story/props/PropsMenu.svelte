@@ -22,7 +22,7 @@
 		},
 		{
 			type: 'file',
-			enabled: !isDbxAuth()
+			enabled: !!isDbxAuth()
 		}
 	]
 

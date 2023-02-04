@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { url } from '@roxi/routify'
-	import { readText, writeText } from '@tauri-apps/api/clipboard'
+	import { readText } from '@tauri-apps/api/clipboard'
 	import { v4 as uuidv4 } from 'uuid'
 	import ConfirmButton from '../components/button/ConfirmButton.svelte'
 	import { dbxAuth } from '../lib/stores/dbx'
@@ -57,9 +57,7 @@
 		}
 	}
 
-	const copyStory = () => {
-
-	}
+	const copyStory = () => {}
 </script>
 
 <div class="flex items-center justify-center flex-wrap h-auto w-full gap-4 p-2">
@@ -75,7 +73,7 @@
 			<a
 				data-test={`a-story-node-${index}`}
 				href={$url(`./story/${story.ifid}`)}
-				class="gap-2 btn relative no-animation"
+				class="gap-2 btn btn-primary relative no-animation"
 			>
 				{story.storyName}
 			</a>
