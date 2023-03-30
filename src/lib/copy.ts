@@ -7,5 +7,5 @@ export const copy = (value: any) => {
 		return navigator.clipboard.writeText(content)
 	}
 
-	writeText(content)
+	return writeText(content)
 }
