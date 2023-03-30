@@ -1,33 +1,15 @@
 import { writable } from 'svelte/store'
-import { loadV2 } from '../loadSave'
-import { stories } from './stories'
 
 export const isFetching = writable(false)
 
-const getStory = (id: string) => {
-	const { set, subscribe, update } = writable<Story>({
-		passages: [{ cleanText: '' }]
-	} as Story)
+export const EmptyStory = {
+	name: null,
+	passages: [{ cleanText: '' }]
+} as Story
 
-	isFetching.set(true)
+const findStory = (storyId: String) => (story: Story) => story.ifid === storyId
 
-	loadV2<Story[]>({ key: 'stories', defaultValue: [] })
-		.then((res) => set(res.find(({ ifid }) => ifid === id)))
-		.finally(() => isFetching.set(false))
+const updateStory = (newStory: Story) => (story: Story) =>
+	story.ifid === newStory.ifid ? newStory : story
 
-	subscribe((story) => {
-		if (!story || !story.storyName) return
-
-		stories.update((values: Story[]) =>
-			values.map((value) => (value.ifid === story?.ifid ? story : value))
-		)
-	})
-
-	return {
-		set,
-		subscribe,
-		update
-	}
-}
-
-export { getStory }
+export { findStory, updateStory }
