@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { url } from '@roxi/routify'
 	import { readText } from '@tauri-apps/api/clipboard'
+	import { save } from '@tauri-apps/api/dialog'
+	import { writeTextFile } from '@tauri-apps/api/fs'
 	import { v4 as uuidv4 } from 'uuid'
 	import ConfirmButton from '../components/button/ConfirmButton.svelte'
+	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
 	import { globalError } from '../lib/stores/globalError'
 	import { stories, storiesFetching, storiesInit } from '../lib/stores/stories'
@@ -10,15 +13,16 @@
 	import Trash from '../styles/icons/trash.svelte'
 
 	let storyName = ''
-	let showStoryOptions = ''
 
 	const add = () => {
 		if (!storyName) return
 
+		const ifid = uuidv4()
+
 		stories.update((prev) => [
 			...prev,
 			{
-				ifid: uuidv4(),
+				ifid,
 				passages: [
 					{
 						cleanText: '',
@@ -31,6 +35,13 @@
 				storyName
 			}
 		])
+
+		$config[ifid] = {
+			baseDir: { value: `public/${storyName}`, enabled: true },
+			reverseOrder: { value: true, enabled: true },
+			group: '',
+			type: 'story'
+		}
 
 		storyName = ''
 	}
@@ -57,7 +68,53 @@
 		}
 	}
 
-	const copyStory = () => {}
+	const copyStory = async () => {
+		const tempIndex = {}
+
+		$stories.forEach((story) => {
+			const configs = $config[story.ifid]
+
+			if (!configs?.group.value) return
+
+			tempIndex[configs.group.value] ||= []
+
+			if (configs?.type?.value === 'array') {
+				tempIndex[configs.group.value] = [
+					...tempIndex[configs.group.value],
+					...story.passages
+				]
+
+				return
+			}
+
+			tempIndex[configs.group.value].push(story)
+		})
+
+		const exportedIndex = []
+
+		for (const key of Object.keys(tempIndex)) {
+			exportedIndex.push({
+				name: key,
+				contents: tempIndex[key]
+			})
+		}
+
+		const filePath = await save({
+			title: 'bundle.json',
+			defaultPath: 'bundle.json',
+			filters: [
+				{
+					name: 'JSON',
+					extensions: ['json']
+				}
+			]
+		})
+
+		await writeTextFile({
+			contents: JSON.stringify(exportedIndex),
+			path: filePath
+		})
+	}
 </script>
 
 <div class="flex items-center justify-center flex-wrap h-auto w-full gap-4 p-2">
@@ -69,7 +126,7 @@
 	</div>
 
 	{#each $stories as story, index}
-		<div>
+		<div class="relative">
 			<a
 				data-test={`a-story-node-${index}`}
 				href={$url(`./story/${story.ifid}`)}
@@ -82,7 +139,7 @@
 				dataTest="btn-delete-story"
 				on:click={(e) => e.stopImmediatePropagation()}
 				on:confirm={() => remove(index)}
-				classes="cursor-pointer w-auto h-auto p-1 rounded"
+				classes="cursor-pointer w-auto h-auto p-1 rounded absolute -left-2 -top-2"
 			>
 				<Trash />
 			</ConfirmButton>

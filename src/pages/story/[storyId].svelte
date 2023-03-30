@@ -6,6 +6,7 @@
 	import PropsMenu from '../../components/story/props/PropsMenu.svelte'
 	import { copy } from '../../lib/copy'
 	import { add, remove } from '../../lib/nodesv2'
+	import { config } from '../../lib/stores/configs'
 	import { isDbxAuth } from '../../lib/stores/dbx'
 	import { storiesFetching, storiesSync } from '../../lib/stores/stories'
 	import { getStory } from '../../lib/stores/story'
@@ -21,12 +22,15 @@
 	let tabOpen = 'props'
 	const story = getStory(storyId)
 
+	$: storyConfigs = $config[storyId]
+
 	$: selectedNode = $story.passages[selectedIndex]
 
 	const addNode = (node = {}) => {
 		$story.passages = [
 			...add({
 				nodes: $story.passages,
+				beginning: $config[storyId].reverseOrder,
 				add: {
 					...node,
 					parentPid: selectedNode.pid ?? uuidv4(),
@@ -42,11 +46,28 @@
 	}
 
 	const deleteNode = (node: StoryNode) => {
-		if (selectedIndex === 0) return
+		if (selectedIndex !== 0) selectedIndex -= 1
 
-		selectedIndex -= 1
+		if ($story.passages.length !== 1) {
+			$story.passages = [...remove({ nodes: $story.passages, remove: node })]
 
-		$story.passages = [...remove({ nodes: $story.passages, remove: node })]
+			return
+		}
+
+		$story.passages[0] = {
+			cleanText: '',
+			links: [],
+			name: '1',
+			pid: 'root',
+			parentPid: null
+		}
+	}
+
+	$: if (
+		(storyConfigs?.reverseOrder?.enabled && $story.passages[0].name === '1') ||
+		(!storyConfigs?.reverseOrder?.enabled && $story.passages[0].name !== '1')
+	) {
+		$story.passages = [...$story.passages.reverse()]
 	}
 
 	const getAsArray = () =>
@@ -91,7 +112,7 @@
 		>
 
 		<button
-			class="btn btn-primary w-auto "
+			class="btn btn-primary w-auto"
 			disabled={!isDbxAuth()}
 			on:click={() => storiesSync()}
 			>{#if $storiesFetching}
@@ -108,21 +129,28 @@
 	</header>
 	<div class="flex items-center justify-center w-full h-4/5 gap-2 p-2">
 		<div
-			class="flex items-center justify-center relative flex-wrap gap-2 p-4 w-1/2 h-auto max-h-full overflow-y-scroll custom-scroll "
+			class="flex items-center justify-center relative flex-wrap gap-2 p-4 w-1/2 h-auto max-h-full overflow-y-scroll custom-scroll"
 		>
-			{#each $story.passages as node, index}
-				<NodeCard
-					cleanText={node.cleanText}
-					image={node.image}
-					name={node.name}
-					sentBy={node.sentBy}
-					isSelected={index === selectedIndex}
-					on:select={() => (selectedIndex = index)}
-					on:remove={() => deleteNode(node)}
-				/>
-			{/each}
+			<div
+				class="flex items-center justify-center relative flex-wrap w-full gap-2"
+			>
+				{#each $story.passages as node, index}
+					<NodeCard
+						cleanText={node.cleanText}
+						image={node.image}
+						name={node.name}
+						fetchOnLoad={index === 0}
+						sentBy={node.sentBy}
+						isSelected={index === selectedIndex}
+						on:select={() => (selectedIndex = index)}
+						on:remove={() => deleteNode(node)}
+					/>
+				{/each}
+			</div>
 
-			<div class="mt-2">
+			<div
+				class="mt-2 sticky bottom-0 rounded flex items-center justify-center bg-slate-900 p-4 gap-2"
+			>
 				<button class="btn btn-primary" data-test="add-node" on:click={addNode}
 					>+ new</button
 				>
