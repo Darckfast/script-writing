@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
 	import { createEventDispatcher } from 'svelte'
+	import { v4 as uuidv4 } from 'uuid'
 	import { genColor } from '../../lib/colorGen'
 	import { config } from '../../lib/stores/configs'
 	import { dbx } from '../../lib/stores/dbx'
@@ -47,7 +48,10 @@
 					configValue = '/'
 				}
 
-				return {
+				const [_, extension] = image.fileName.split('.')
+				image.fileName = [uuidv4(), extension].join('.')
+
+        return {
 					...image,
 					path: `/${configValue}${image.fileName}`
 				}
