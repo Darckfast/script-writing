@@ -93,7 +93,7 @@ export const createSyncable = <T = any>({
 	syncEvery = 120_000,
 	key
 }: Syncable) => {
-	const mainObject = writable(initialSate)
+	const initialObject = writable<T>(initialSate)
 	const hash = writable('')
 	const lastUpdate = writable<Dayjs>(null)
 	const isFetching = writable(false)
@@ -110,12 +110,12 @@ export const createSyncable = <T = any>({
 
 						return fileBlob.text()
 					})
-					.then((fileText: string) => mainObject.set(JSON.parse(fileText))),
-			afterRun: [createInterval, () => afterLoad(mainObject)],
+					.then((fileText: string) => initialObject.set(JSON.parse(fileText))),
+			afterRun: [createInterval, () => afterLoad(initialObject)],
 			onFail: [
 				() =>
 					loadV2({ key, defaultValue: initialSate }).then((savedValue) =>
-						mainObject.set(savedValue)
+						initialObject.set(savedValue)
 					)
 			],
 			afterDone: [() => isFetching.set(false)]
@@ -133,7 +133,7 @@ export const createSyncable = <T = any>({
 		let currValue
 
 		hash.subscribe((value) => (localHash = value))()
-		mainObject.subscribe((value) => (currValue = value))()
+		initialObject.subscribe((value) => (currValue = value))()
 
 		currValue = beforeSave(currValue)
 
@@ -183,7 +183,7 @@ export const createSyncable = <T = any>({
 	const getProp = <T = any>(propKey: string): T => {
 		let objectValue
 
-		mainObject.subscribe((value) => (objectValue = value))()
+		initialObject.subscribe((value) => (objectValue = value))()
 
 		return objectValue[propKey]
 	}
@@ -191,7 +191,7 @@ export const createSyncable = <T = any>({
 	void doInit()
 
 	return {
-		initialObject: mainObject,
+		initialObject,
 		objectHash: hash,
 		lastUpdate,
 		isFetching,
