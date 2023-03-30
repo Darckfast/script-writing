@@ -1,4 +1,9 @@
-import { BaseDirectory, readTextFile, writeFile } from '@tauri-apps/api/fs'
+import {
+	BaseDirectory,
+	createDir,
+	readTextFile,
+	writeFile
+} from '@tauri-apps/api/fs'
 import { globalError } from './stores/globalError'
 
 const save = ({ key, value }: SaveProp): string => {
@@ -54,6 +59,8 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
 	}
 
 	try {
+		await createDir('', { dir: BaseDirectory.AppData, recursive: true })
+
 		await writeFile(
 			{
 				contents: strValue,
