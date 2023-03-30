@@ -70,7 +70,7 @@
 </script>
 
 <div
-	class="flex justify-between items-center p-1 gap-2 flex-wrap overflow-y-scroll custom-scroll"
+	class="flex justify-between items-center p-1 gap-2 flex-wrap overflow-y-scroll custom-scroll h-4/5"
 >
 	{#each props(node) as { name }}
 		<PropInput
