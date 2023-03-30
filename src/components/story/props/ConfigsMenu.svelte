@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { load, save } from '../../../lib/loadSave'
 	import { props } from '../../../lib/nodesv2'
 	import {
 		config,
@@ -6,14 +7,32 @@
 		configSync
 	} from '../../../lib/stores/configs'
 	import { isDbxAuth } from '../../../lib/stores/dbx'
+	import { getStory } from '../../../lib/stores/story'
 	import Spinner from '../../../styles/icons/spinner.svelte'
 	import PropInput from '../PropInput.svelte'
 
 	export let storyId: string
+	const story = getStory(storyId)
 
 	const prop = {
 		name: '',
 		value: null
+	}
+
+	const inferProps = () => {
+		let localProps = load<Props[]>({ key: `props-${storyId}` })
+
+		$story.passages.map((passage) => {
+			const passageProps = props(passage)
+
+			passageProps.forEach((pProp) => {
+				if (!localProps.find((sProp) => sProp.name === pProp.name)) {
+					localProps.push({ ...pProp, value: null })
+				}
+			})
+		})
+
+		save({ key: `props-${storyId}`, value: localProps })
 	}
 
 	const remove = (prop: string) => {
@@ -50,7 +69,7 @@
 	{/each}
 </div>
 
-<div class="flex items-center justify-center w-full">
+<div class="flex items-center justify-center w-full gap-4">
 	<button
 		class="btn btn-primary w-auto "
 		disabled={!isDbxAuth()}
@@ -61,13 +80,15 @@
 			> save
 		{/if}</button
 	>
+
+	<button class="btn btn-primary" on:click={inferProps}>+ infer props</button>
 </div>
 
 <form
 	on:submit|preventDefault={addProp}
 	class="mt-2 flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded "
 >
-	<div class="w-full flex justify-between items-center">
+	<div class="w-full flex justify-between items-center ">
 		<label class="p-1 w-1/2">
 			<input
 				type="text"

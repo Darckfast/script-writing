@@ -28,10 +28,12 @@ const rebuildLinks = (nodes: StoryNode[], fix = false) => {
 
 const add = ({
 	add: nodeToAdd,
-	nodes
+	nodes,
+	beginning = false
 }: {
 	add: StoryNode
 	nodes: StoryNode[]
+	beginning?: boolean
 }): StoryNode[] => {
 	let hasParent = false
 	if (!nodes.length) hasParent = true
@@ -47,9 +49,15 @@ const add = ({
 		}
 	}
 
-	if (hasParent) nodes.push(nodeToAdd)
+	if (hasParent) {
+		if (beginning) {
+			nodes = [nodeToAdd, ...nodes]
+		} else {
+			nodes.push(nodeToAdd)
+		}
+	}
 
-	return rebuildLinks(nodes).map((node) => patchUp(node))
+	return nodes.map((node) => patchUp(node))
 }
 
 const remove = ({
@@ -59,7 +67,7 @@ const remove = ({
 	remove: StoryNode
 	nodes: StoryNode[]
 }): StoryNode[] => {
-	let newNodes = []
+	let newNodes = [] 
 
 	for (const node of [...nodes]) {
 		if (node.pid === remove.parentPid && node.links) {
@@ -83,7 +91,7 @@ const remove = ({
 		}
 	}
 
-	return rebuildLinks(newNodes)
+	return newNodes
 }
 
 const update = ({
@@ -128,6 +136,7 @@ const props = (object: any): Props[] => {
 					'position',
 					'text',
 					'cleanText',
+					'name',
 					'parentPid',
 					'version'
 				].includes(key)

@@ -8,10 +8,18 @@
   },
   "package": {
     "productName": "script-writing",
-    "version": "0.1.5"
+    "version": "0.1.11"
   },
   "tauri": {
     "allowlist": {
+      "dialog": {
+        "all": false,
+        "ask": false,
+        "confirm": false,
+        "message": false,
+        "open": false,
+        "save": true
+      },
       "clipboard": {
         "all": true,
         "readText": true,
