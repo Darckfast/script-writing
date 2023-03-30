@@ -13,11 +13,11 @@
 	export let name: string | number = ''
 	export let image: Promise<string> | string = ''
 	export let isSelected = false
+	export let fetchOnLoad = false
 	export let sentBy = ''
 
 	let container
 	let canFetch = false
-	$: imagePrm = getLink(image)
 
 	onMount(() => {
 		let observer = new IntersectionObserver(
@@ -38,19 +38,32 @@
 		return () => observer.unobserve(container)
 	})
 
-	$: getLink = async (pathProp: string | Promise<string>): Promise<string> => {
-		if (!pathProp || !canFetch) return Promise.resolve('')
+	let imagePrm = null
 
-		let path = pathProp instanceof Promise ? await pathProp : pathProp
+	$: if ((image && canFetch) || (image && fetchOnLoad)) {
+		if (image instanceof Promise) {
+			imagePrm = image.then((path) =>
+				dbx
+					.filesGetTemporaryLink({ path })
+					.then(({ result: { link } }) => link)
+					.catch((err) => {
+						globalError.pushError(err)
 
-		return dbx
-			.filesGetTemporaryLink({ path })
-			.then(({ result: { link } }) => link)
-			.catch((err) => {
-				globalError.pushError(err)
+						return '/unicorn.svg'
+					})
+			)
+		} else {
+			let path = image
 
-				return ''
-			})
+			imagePrm = dbx
+				.filesGetTemporaryLink({ path })
+				.then(({ result: { link } }) => link)
+				.catch((err) => {
+					globalError.pushError(err)
+
+					return '/unicorn.svg'
+				})
+		}
 	}
 
 	const select = () => dispatch('select')
@@ -60,18 +73,7 @@
 <button
 	bind:this={container}
 	class:!border-cyan-400={isSelected}
-	class="
-  btn 
-  btn-primary
-  no-animation
-  flex-col 
-  p-2 
-  relative 
-  h-fit
-  w-full 
-  border-transparent
-  border-2
-  shadow"
+	class="btn   btn-primary  no-animation  flex-col   p-2   relative   h-fit  w-full   border-transparent  border-2  shadow"
 	on:click={select}
 	on:focus={select}
 	type="button"
@@ -88,7 +90,15 @@
 			<img
 				{src}
 				alt="message"
-				style="min-height: 24rem;"
+				style="width: 100%;"
+				loading="lazy"
+				data-lazy-load
+			/>
+		{:catch}
+			<img
+				src="/unicorn.svg"
+				alt="error"
+				style="width: 100%;"
 				loading="lazy"
 				data-lazy-load
 			/>
