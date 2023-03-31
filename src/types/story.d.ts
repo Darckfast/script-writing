@@ -4,10 +4,6 @@ interface Story {
 	ifid: string
 	passages: StoryNode[]
 	createdWith?: string
-
-	optionals?: {
-		[key: string]: any
-	}
 }
 
 interface StoryNode {
@@ -21,7 +17,6 @@ interface StoryNode {
 }
 
 interface Props {
-	// [key: string]: any
 	name: string
 	value: any
 	type: string

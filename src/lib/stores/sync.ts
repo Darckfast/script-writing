@@ -1,18 +1,18 @@
 import dayjs, { Dayjs } from 'dayjs'
-import { writable, type Writable } from 'svelte/store'
+import { get, writable, type Writable } from 'svelte/store'
 import { loadV2 } from '../loadSave'
 import { dbx, isDbxAuth, loadCloud, saveCloud } from './dbx'
 import { globalError } from './globalError'
 
-interface FallBackProps {
-	run: () => any | Promise<any>
-	onFail: Array<() => any>
+interface FallBackProps<T = unknown> {
+	run: () => T | Promise<T>
+	onFail: Array<() => T>
 	afterRun?: Array<() => void>
 	beforeRun?: Array<() => void>
 	afterDone?: Array<() => void>
 }
 
-const createFallback = <T = any>({
+const createFallback = <T = unknown>({
 	run = () => {},
 	onFail,
 	afterRun,
@@ -31,7 +31,7 @@ const createFallback = <T = any>({
 		)
 	}
 
-	const execute = async (runFunction: () => any): Promise<T> => {
+	const execute = async <T = unknown>(runFunction: () => T): Promise<T> => {
 		const result = runFunction()
 
 		if (is_promise(result)) {
@@ -46,10 +46,10 @@ const createFallback = <T = any>({
 	}
 
 	const doRun = async (): Promise<T> => {
-		if (beforeRun) beforeRun.forEach((func) => execute(func))
+		if (beforeRun) beforeRun.forEach((func) => execute<void>(func))
 
 		try {
-			const result = await execute(executionArray[index])
+			const result = await execute<T>(executionArray[index] as () => T)
 
 			success = true
 			return result
@@ -85,11 +85,11 @@ interface Syncable {
 	key: string
 }
 
-export const createSyncable = <T = any>({
+export const createSyncable = <T = unknown>({
 	initialSate,
 	fileExtension = 'json',
 	afterLoad = () => {},
-	beforeSave = (value: any) => JSON.stringify(value),
+	beforeSave = (value: T) => JSON.stringify(value),
 	syncEvery = 120_000,
 	key
 }: Syncable) => {
@@ -115,7 +115,7 @@ export const createSyncable = <T = any>({
 			onFail: [
 				() =>
 					loadV2({ key, defaultValue: initialSate }).then((savedValue) =>
-						initialObject.set(savedValue)
+						initialObject.set(savedValue as T)
 					)
 			],
 			afterDone: [() => isFetching.set(false)]
@@ -181,11 +181,7 @@ export const createSyncable = <T = any>({
 	}
 
 	const getProp = <T = any>(propKey: string): T => {
-		let objectValue
-
-		initialObject.subscribe((value) => (objectValue = value))()
-
-		return objectValue[propKey]
+    return get(initialObject)[propKey]
 	}
 
 	void doInit()

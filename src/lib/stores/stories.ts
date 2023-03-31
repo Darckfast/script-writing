@@ -12,7 +12,7 @@ export const {
 	initialSate: [],
 	key: 'stories',
 	afterLoad: (self) => {
-		self.subscribe((value: any) => {
+		self.subscribe((value: Story[]) => {
 			if (!value.length) return
 
 			resolvePromises(value)

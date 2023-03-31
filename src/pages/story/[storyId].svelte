@@ -34,7 +34,7 @@
 		story.passages = [
 			...add({
 				nodes: story.passages,
-				beginning: $config[storyId]?.reverseOrder,
+				beginning: $config[storyId]?.reverseOrder?.value,
 				add: {
 					...node,
 					parentPid: selectedNode.pid ?? uuidv4(),

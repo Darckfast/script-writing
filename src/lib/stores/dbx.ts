@@ -18,7 +18,7 @@ const createDbxAuth = () => {
 		})
 	)
 
-	const { access_token, refresh_token, expires_in } = load({
+	const { access_token, refresh_token, expires_in } = load<DBXToken>({
 		key: localStorageKey,
 		defaultValue: {}
 	})
