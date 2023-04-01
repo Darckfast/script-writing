@@ -3,10 +3,10 @@ import { createSyncable } from './sync'
 export const {
 	initialObject: config,
 	objectHash: configHash,
-  isFetching: configFetching,
+	isFetching: configFetching,
 	getProp: getConfig,
-  doSync: configSync
-} = createSyncable<Story[]>({
+	doSync: configSync
+} = createSyncable<GlobalConfig>({
 	initialSate: {},
 	key: 'global-configuration'
 })

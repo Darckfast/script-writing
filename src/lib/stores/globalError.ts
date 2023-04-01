@@ -2,7 +2,7 @@ import { writable } from 'svelte/store'
 
 const createGlobalError = () => {
 	const { set, subscribe, update } = writable([])
-  
+
 	const clearCurrent = () => {
 		update((state) => {
 			if (state.length === 1) {
@@ -15,11 +15,16 @@ const createGlobalError = () => {
 		})
 	}
 
-	const pushError = (err: Error, { onConfirm = null } = {}) => {
+	const pushError = (err: Error | string, { onConfirm = null } = {}) => {
 		update((state) => {
-			const errorMsg = `${err.name}: ${err.message}`
 
-			if (state.filter((x) => x.message === errorMsg).length) return state
+      // TODO: create a error log file
+			console.error(err)
+
+			const message =
+				typeof err === 'string' ? err : `${err.name}: ${err.message}`
+
+			if (state.some((x) => x.message === message)) return state
 
 			setTimeout(() => {
 				update((s) => {
@@ -32,7 +37,7 @@ const createGlobalError = () => {
 			return [
 				{
 					type: 'error',
-					message: `${err.name}: ${err.message}`,
+					message,
 					onConfirm
 				},
 				...state

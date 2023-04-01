@@ -1,7 +1,7 @@
-interface LoadProp {
+interface LoadProp <T = any> {
 	key: string
-	defaultValue?: any
-	shouldUpdate?: (value: any) => boolean
+	defaultValue?: T
+	shouldUpdate?: (value: T) => boolean
 }
 
 interface SaveProp {

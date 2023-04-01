@@ -8,8 +8,12 @@
 	import { add, remove } from '../../lib/nodesv2'
 	import { config } from '../../lib/stores/configs'
 	import { isDbxAuth } from '../../lib/stores/dbx'
-	import { storiesFetching, storiesSync } from '../../lib/stores/stories'
-	import { getStory } from '../../lib/stores/story'
+	import {
+		stories,
+		storiesFetching,
+		storiesSync
+	} from '../../lib/stores/stories'
+	import { EmptyStory, findStory, updateStory } from '../../lib/stores/story'
 	import ArrowLeft from '../../styles/icons/arrow-left.svelte'
 	import Copy from '../../styles/icons/copy.svelte'
 	import Gear from '../../styles/icons/gear.svelte'
@@ -20,41 +24,43 @@
 
 	let selectedIndex = 0
 	let tabOpen = 'props'
-	const story = getStory(storyId)
+
+	const story = $stories.find(findStory(storyId)) ?? EmptyStory
 
 	$: storyConfigs = $config[storyId]
-
-	$: selectedNode = $story.passages[selectedIndex]
+	$: selectedNode = story.passages[selectedIndex]
 
 	const addNode = (node = {}) => {
-		$story.passages = [
+		story.passages = [
 			...add({
-				nodes: $story.passages,
-				beginning: $config[storyId].reverseOrder,
+				nodes: story.passages,
+				beginning: $config[storyId]?.reverseOrder?.value,
 				add: {
 					...node,
 					parentPid: selectedNode.pid ?? uuidv4(),
 					pid: uuidv4(),
-					name: $story.passages.length + 1,
+					name: story.passages.length + 1,
 					cleanText: '',
 					links: []
 				}
 			})
 		]
 
-		selectedIndex = $story.passages.length - 1
+		selectedIndex = $config[storyId]?.reverseOrder
+			? 0
+			: story.passages.length - 1
 	}
 
 	const deleteNode = (node: StoryNode) => {
 		if (selectedIndex !== 0) selectedIndex -= 1
 
-		if ($story.passages.length !== 1) {
-			$story.passages = [...remove({ nodes: $story.passages, remove: node })]
+		if (story.passages.length !== 1) {
+			story.passages = [...remove({ nodes: story.passages, remove: node })]
 
 			return
 		}
 
-		$story.passages[0] = {
+		story.passages[0] = {
 			cleanText: '',
 			links: [],
 			name: '1',
@@ -64,14 +70,18 @@
 	}
 
 	$: if (
-		(storyConfigs?.reverseOrder?.enabled && $story.passages[0].name === '1') ||
-		(!storyConfigs?.reverseOrder?.enabled && $story.passages[0].name !== '1')
+		(storyConfigs?.reverseOrder?.enabled && story.passages[0].name === '1') ||
+		(!storyConfigs?.reverseOrder?.enabled && story.passages[0].name !== '1')
 	) {
-		$story.passages = [...$story.passages.reverse()]
+		story.passages = [...story.passages.reverse()]
+	}
+
+	$: if (story?.name) {
+		$stories = { ...$stories.map(updateStory(story)) }
 	}
 
 	const getAsArray = () =>
-		$story.passages.map((passage) => {
+		story.passages.map((passage) => {
 			delete passage.links
 			delete passage.parentPid
 
@@ -95,7 +105,7 @@
 		<a href={$url('../../..')} data-test="btn-return" class="btn btn-primary">
 			<ArrowLeft /> go back</a
 		>
-		<h1 data-test="story-name">{$story.storyName}</h1>
+		<h1 data-test="story-name">{story.storyName}</h1>
 
 		<button
 			class="btn btn-xs gap-2 w-auto text-sm overflow-auto overflow-ellipsis"
@@ -108,7 +118,7 @@
 		<button
 			class="btn btn-primary w-auto"
 			data-test="export-story"
-			on:click={() => copy($story)}>> copy</button
+			on:click={() => copy(story)}>> copy</button
 		>
 
 		<button
@@ -134,7 +144,7 @@
 			<div
 				class="flex items-center justify-center relative flex-wrap w-full gap-2"
 			>
-				{#each $story.passages as node, index}
+				{#each story.passages as node, index}
 					<NodeCard
 						cleanText={node.cleanText}
 						image={node.image}
@@ -180,7 +190,7 @@
 				>
 			</div>
 			{#if tabOpen === 'props'}
-				<PropsMenu bind:node={$story.passages[selectedIndex]} />
+				<PropsMenu bind:node={story.passages[selectedIndex]} />
 			{:else if tabOpen === 'configs'}
 				<ConfigsMenu {storyId} />
 			{/if}
@@ -194,7 +204,7 @@
 		<label class="w-full text-sm">
 			<input
 				data-test="input-node"
-				bind:value={$story.passages[selectedIndex].cleanText}
+				bind:value={story.passages[selectedIndex].cleanText}
 				class="h-20 w-full input input-primary input-lg"
 			/>
 		</label>

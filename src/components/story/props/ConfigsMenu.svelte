@@ -7,12 +7,12 @@
 		configSync
 	} from '../../../lib/stores/configs'
 	import { isDbxAuth } from '../../../lib/stores/dbx'
-	import { getStory } from '../../../lib/stores/story'
+	import { stories } from '../../../lib/stores/stories'
+	import { findStory } from '../../../lib/stores/story'
 	import Spinner from '../../../styles/icons/spinner.svelte'
 	import PropInput from '../PropInput.svelte'
 
 	export let storyId: string
-	const story = getStory(storyId)
 
 	const prop = {
 		name: '',
@@ -22,15 +22,15 @@
 	const inferProps = () => {
 		let localProps = load<Props[]>({ key: `props-${storyId}` })
 
-		$story.passages.map((passage) => {
-			const passageProps = props(passage)
+		const story = $stories.find(findStory(storyId))
 
-			passageProps.forEach((pProp) => {
-				if (!localProps.find((sProp) => sProp.name === pProp.name)) {
+		story.passages.forEach((passage) =>
+			props(passage).forEach((pProp) => {
+				if (!localProps.some((sProp) => sProp.name === pProp.name)) {
 					localProps.push({ ...pProp, value: null })
 				}
 			})
-		})
+		)
 
 		save({ key: `props-${storyId}`, value: localProps })
 	}
@@ -71,7 +71,7 @@
 
 <div class="flex items-center justify-center w-full gap-4">
 	<button
-		class="btn btn-primary w-auto "
+		class="btn btn-primary w-auto"
 		disabled={!isDbxAuth()}
 		on:click={() => configSync()}
 		>{#if $configFetching}
@@ -86,9 +86,9 @@
 
 <form
 	on:submit|preventDefault={addProp}
-	class="mt-2 flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded "
+	class="mt-2 flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded"
 >
-	<div class="w-full flex justify-between items-center ">
+	<div class="w-full flex justify-between items-center">
 		<label class="p-1 w-1/2">
 			<input
 				type="text"

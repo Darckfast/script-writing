@@ -39,8 +39,14 @@
 		$config[ifid] = {
 			baseDir: { value: `public/${storyName}`, enabled: true },
 			reverseOrder: { value: true, enabled: true },
-			group: '',
-			type: 'story'
+			group: {
+				enabled: true,
+				value: ''
+			},
+			type: {
+				enabled: true,
+				value: 'story'
+			}
 		}
 
 		storyName = ''
@@ -183,8 +189,8 @@
 			data-test="input-story-name"
 			bind:value={storyName}
 			class="
-      h-20 
-      w-full 
+      h-20
+      w-full
       input input-primary input-lg"
 		/>
 	</label>

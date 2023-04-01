@@ -1,4 +1,9 @@
-import { BaseDirectory, readTextFile, writeFile } from '@tauri-apps/api/fs'
+import {
+	BaseDirectory,
+	createDir,
+	readTextFile,
+	writeFile
+} from '@tauri-apps/api/fs'
 import { globalError } from './stores/globalError'
 
 const save = ({ key, value }: SaveProp): string => {
@@ -9,24 +14,27 @@ const save = ({ key, value }: SaveProp): string => {
 	return strValue
 }
 
-const load = <T = any>({ key, defaultValue = [] }: LoadProp): T | undefined => {
+const load = <T = unknown>({
+	key,
+	defaultValue = []
+}: LoadProp): T | undefined => {
 	try {
 		return JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
 	} catch (err) {
 		globalError.pushError(err)
 
-		return defaultValue
+		return defaultValue as T
 	}
 }
 
-const loadV2 = async <T = any>({
+const loadV2 = async <T = unknown>({
 	defaultValue = [],
 	key
 }: LoadProp): Promise<T | undefined> => {
 	const isTauri = !!(window as any).__TAURI_IPC__
 
 	if (!isTauri) {
-		return load({ key, defaultValue }) ?? defaultValue
+		return load<T>({ key, defaultValue }) ?? (defaultValue as T)
 	}
 
 	try {
@@ -40,7 +48,7 @@ const loadV2 = async <T = any>({
 	} catch (err) {
 		globalError.pushError(err)
 
-		return load({ key, defaultValue }) ?? defaultValue
+		return load<T>({ key, defaultValue }) ?? (defaultValue as T)
 	}
 }
 
@@ -54,6 +62,8 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
 	}
 
 	try {
+		await createDir('', { dir: BaseDirectory.AppData, recursive: true })
+
 		await writeFile(
 			{
 				contents: strValue,

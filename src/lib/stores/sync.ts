@@ -1,18 +1,18 @@
 import dayjs, { Dayjs } from 'dayjs'
-import { writable, type Writable } from 'svelte/store'
+import { get, writable, type Writable } from 'svelte/store'
 import { loadV2 } from '../loadSave'
 import { dbx, isDbxAuth, loadCloud, saveCloud } from './dbx'
 import { globalError } from './globalError'
 
-interface FallBackProps {
-	run: () => any | Promise<any>
-	onFail: Array<() => any>
+interface FallBackProps<T = unknown> {
+	run: () => T | Promise<T>
+	onFail: Array<() => T>
 	afterRun?: Array<() => void>
 	beforeRun?: Array<() => void>
 	afterDone?: Array<() => void>
 }
 
-const createFallback = <T = any>({
+const createFallback = <T = unknown>({
 	run = () => {},
 	onFail,
 	afterRun,
@@ -31,7 +31,7 @@ const createFallback = <T = any>({
 		)
 	}
 
-	const execute = async (runFunction: () => any): Promise<T> => {
+	const execute = async <T = unknown>(runFunction: () => T): Promise<T> => {
 		const result = runFunction()
 
 		if (is_promise(result)) {
@@ -46,10 +46,10 @@ const createFallback = <T = any>({
 	}
 
 	const doRun = async (): Promise<T> => {
-		if (beforeRun) beforeRun.forEach((func) => execute(func))
+		if (beforeRun) beforeRun.forEach((func) => execute<void>(func))
 
 		try {
-			const result = await execute(executionArray[index])
+			const result = await execute<T>(executionArray[index] as () => T)
 
 			success = true
 			return result
@@ -85,15 +85,15 @@ interface Syncable {
 	key: string
 }
 
-export const createSyncable = <T = any>({
+export const createSyncable = <T = unknown>({
 	initialSate,
 	fileExtension = 'json',
 	afterLoad = () => {},
-	beforeSave = (value: any) => JSON.stringify(value),
+	beforeSave = (value: T) => JSON.stringify(value),
 	syncEvery = 120_000,
 	key
 }: Syncable) => {
-	const mainObject = writable(initialSate)
+	const initialObject = writable<T>(initialSate)
 	const hash = writable('')
 	const lastUpdate = writable<Dayjs>(null)
 	const isFetching = writable(false)
@@ -110,12 +110,12 @@ export const createSyncable = <T = any>({
 
 						return fileBlob.text()
 					})
-					.then((fileText: string) => mainObject.set(JSON.parse(fileText))),
-			afterRun: [createInterval, () => afterLoad(mainObject)],
+					.then((fileText: string) => initialObject.set(JSON.parse(fileText))),
+			afterRun: [createInterval, () => afterLoad(initialObject)],
 			onFail: [
 				() =>
 					loadV2({ key, defaultValue: initialSate }).then((savedValue) =>
-						mainObject.set(savedValue)
+						initialObject.set(savedValue as T)
 					)
 			],
 			afterDone: [() => isFetching.set(false)]
@@ -133,7 +133,7 @@ export const createSyncable = <T = any>({
 		let currValue
 
 		hash.subscribe((value) => (localHash = value))()
-		mainObject.subscribe((value) => (currValue = value))()
+		initialObject.subscribe((value) => (currValue = value))()
 
 		currValue = beforeSave(currValue)
 
@@ -181,17 +181,13 @@ export const createSyncable = <T = any>({
 	}
 
 	const getProp = <T = any>(propKey: string): T => {
-		let objectValue
-
-		mainObject.subscribe((value) => (objectValue = value))()
-
-		return objectValue[propKey]
+    return get(initialObject)[propKey]
 	}
 
 	void doInit()
 
 	return {
-		initialObject: mainObject,
+		initialObject,
 		objectHash: hash,
 		lastUpdate,
 		isFetching,
