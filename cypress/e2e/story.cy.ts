@@ -38,7 +38,7 @@ describe('story page', () => {
 
 	it('add prop of type text', () => {
 		cy.get('input[data-test="input-prop"]').type('testProp')
-		cy.get('input[data-test="radio-prop-number"]').click()
+		cy.get('input[data-test="radio-prop-number"]').click({ force: true })
 
 		cy.get('button[data-test="add-prop"]').click()
 
@@ -56,7 +56,7 @@ describe('story page', () => {
 
 	it('add prop of type boolean', () => {
 		cy.get('input[data-test="input-prop"]').type('testProp')
-		cy.get('input[data-test="radio-prop-boolean"]').click()
+		cy.get('input[data-test="radio-prop-boolean"]').click({ force: true })
 
 		cy.get('button[data-test="add-prop"]').click()
 

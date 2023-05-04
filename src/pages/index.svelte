@@ -5,6 +5,7 @@
 	import { writeTextFile } from '@tauri-apps/api/fs'
 	import { v4 as uuidv4 } from 'uuid'
 	import ConfirmButton from '../components/button/ConfirmButton.svelte'
+	import { copy } from '../lib/copy'
 	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
 	import { globalError } from '../lib/stores/globalError'
@@ -104,6 +105,12 @@
 				contents: tempIndex[key]
 			})
 		}
+
+    if (!window.__TAURI_IPC__) {
+      copy(exportedIndex)
+
+      return
+    }
 
 		const filePath = await save({
 			title: 'bundle.json',

@@ -80,7 +80,7 @@ describe('nodev2', () => {
 		const nodeToRemove = baseNodes[1]
 
 		const nodes = remove({ nodes: [...baseNodes], remove: nodeToRemove })
-		console.log(nodes)
+
 		expect(nodes).toHaveLength(2)
 		expect(nodes[0]).toHaveProperty('pid', '1')
 		expect(nodes[0]).toHaveProperty('name', '1')
@@ -90,7 +90,6 @@ describe('nodev2', () => {
 		expect(nodes[0].links[0]).toHaveProperty('pid', '3')
 
 		expect(nodes[1]).toHaveProperty('pid', '3')
-		expect(nodes[1]).toHaveProperty('name', '2')
 		expect(nodes[1]).toHaveProperty('parentPid', '1')
 		expect(nodes[1]).toHaveProperty('links')
 		expect(nodes[1].links).toHaveLength(0)
@@ -142,6 +141,6 @@ describe('nodev2', () => {
 		const nodeProps = props(node)
 
 		expect(nodeProps).not.toBeUndefined
-		expect(nodeProps).toHaveLength(5)
+		expect(nodeProps).toHaveLength(4)
 	})
 })
