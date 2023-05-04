@@ -17,8 +17,7 @@ const createGlobalError = () => {
 
 	const pushError = (err: Error | string, { onConfirm = null } = {}) => {
 		update((state) => {
-
-      // TODO: create a error log file
+			// TODO: create a error log file
 			console.error(err)
 
 			const message =
