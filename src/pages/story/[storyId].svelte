@@ -23,7 +23,7 @@
 	export let storyId: string
 
 	let selectedIndex = 0
-	let tabOpen = 'props'
+	let tabOpen = 'props'   
 
 	const story = $stories.find(findStory(storyId)) ?? EmptyStory
 
