@@ -5,8 +5,8 @@ export default defineConfig({
 		baseUrl: 'http://localhost:5177'
 	},
 	reporter: 'junit',
-  reporterOptions: {
-    mochaFile: 'results/test-output.xml',
-    toConsole: false,
-  },
+	reporterOptions: {
+		mochaFile: 'results/test-output.xml',
+		toConsole: false
+	}
 })

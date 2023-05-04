@@ -67,7 +67,7 @@ const remove = ({
 	remove: StoryNode
 	nodes: StoryNode[]
 }): StoryNode[] => {
-	let newNodes = [] 
+	let newNodes = []
 
 	for (const node of [...nodes]) {
 		if (node.pid === remove.parentPid && node.links) {

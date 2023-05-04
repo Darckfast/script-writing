@@ -1,4 +1,4 @@
-interface LoadProp <T = any> {
+interface LoadProp<T = any> {
 	key: string
 	defaultValue?: T
 	shouldUpdate?: (value: T) => boolean

@@ -7,11 +7,11 @@
 @layer base {
 	.custom-scroll {
 		@apply scrollbar-thin
-     scrollbar-thumb-indigo-700
-     hover:scrollbar-thumb-indigo-600
      scrollbar-track-transparent
+     scrollbar-thumb-indigo-700
+     scrollbar-track-rounded-md
      scrollbar-thumb-rounded-md
-     scrollbar-track-rounded-md;
+     hover:scrollbar-thumb-indigo-600;
 	}
 }
 

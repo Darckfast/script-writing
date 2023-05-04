@@ -7,7 +7,7 @@ export const {
 	isFetching: storiesFetching,
 	lastUpdate: storiesLastUpdate,
 	doSync: storiesSync,
-  doInit: storiesInit
+	doInit: storiesInit
 } = createSyncable<Story[]>({
 	initialSate: [],
 	key: 'stories',

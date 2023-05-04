@@ -181,7 +181,7 @@ export const createSyncable = <T = unknown>({
 	}
 
 	const getProp = <T = any>(propKey: string): T => {
-    return get(initialObject)[propKey]
+		return get(initialObject)[propKey]
 	}
 
 	void doInit()
