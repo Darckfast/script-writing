@@ -106,11 +106,11 @@
 			})
 		}
 
-    if (!window.__TAURI_IPC__) {
-      copy(exportedIndex)
+		if (!(window as any).__TAURI_IPC__) {
+			copy(exportedIndex)
 
-      return
-    }
+			return
+		}
 
 		const filePath = await save({
 			title: 'bundle.json',
