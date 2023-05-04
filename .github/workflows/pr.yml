@@ -14,7 +14,7 @@ jobs:
 
       - uses: actions/setup-node@v3
         with:
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -36,17 +36,18 @@ jobs:
       - name: Build
         run: pnpm build
 
-  test:
+  unit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: latest
+
       - uses: actions/setup-node@v3
         with:
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -66,7 +67,15 @@ jobs:
         run: pnpm install
 
       - name: Test
-        run: pnpm test
+        run: pnpm test:unit
+
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure() # run this step even if previous step failed
+        with:
+          name: Vitest
+          path: results/*.xml
+          reporter: jest-junit
 
   test-e2e:
     runs-on: ubuntu-latest
@@ -75,7 +84,7 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: latest
       - uses: actions/setup-node@v3
 
       - name: Install dependencies
@@ -84,6 +93,14 @@ jobs:
       - name: Test E2E
         run: pnpm test:e2e
 
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure() # run this step even if previous step failed
+        with:
+          name: Cypress
+          path: results/*.xml
+          reporter: jest-junit
+
   check:
     runs-on: ubuntu-latest
     steps:
@@ -91,11 +108,11 @@ jobs:
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: latest
 
       - uses: actions/setup-node@v3
         with:
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: Get pnpm store directory
         id: pnpm-cache
