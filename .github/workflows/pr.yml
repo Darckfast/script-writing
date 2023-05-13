@@ -3,6 +3,7 @@ on: [pull_request]
 
 jobs:
   build:
+    name: 🏗️ Build 
     environment: test
     runs-on: ubuntu-latest
     steps:
@@ -37,6 +38,7 @@ jobs:
         run: pnpm build
 
   unit-test:
+    name: 🧪 Unit Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -73,11 +75,12 @@ jobs:
         uses: dorny/test-reporter@v1
         if: success() || failure() # run this step even if previous step failed
         with:
-          name: Vitest
+          name: 🧪 Vitest
           path: results/*.xml
           reporter: jest-junit
 
-  test-e2e:
+  e2e-test:
+    name: 🧪 E2E Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -97,11 +100,12 @@ jobs:
         uses: dorny/test-reporter@v1
         if: success() || failure() # run this step even if previous step failed
         with:
-          name: Cypress
+          name: 🧪 Cypress
           path: results/*.xml
           reporter: jest-junit
 
   check:
+    name: ✅ Check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -131,38 +135,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Setup matcher
+        run: echo "::add-matcher::.github/actions/problemMatcher.json"
+
       - name: Test
         run: pnpm check
 
-  # test-tauri:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       platform: [macos-latest, ubuntu-20.04, windows-latest]
+  eslint:
+    name: 🧹 ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
 
-  #   runs-on: ${{ matrix.platform }}
-  #   steps:
-  #     - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
-  #     - name: setup node
-  #       uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: 'pnpm'
 
-  #     - uses: pnpm/action-setup@v2
-  #       with:
-  #         version: latest
+      - run: pnpm install
 
-  #     - name: install Rust stable
-  #       uses: dtolnay/rust-toolchain@stable
-
-  #     - name: install dependencies (ubuntu only)
-  #       if: matrix.platform == 'ubuntu-20.04'
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
-
-  #     - name: install app dependencies and build it
-  #       run: pnpm i && pnpm build
-
-  #     - uses: tauri-apps/tauri-action@v0
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: reviewdog/action-eslint@v1
+        with:
+          eslint_flags: 'src/'            

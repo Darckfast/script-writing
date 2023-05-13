@@ -1,0 +1,21 @@
+{
+  "problemMatcher": [
+    {
+      "owner": "svelte-check-machine",
+      "pattern": [
+        {
+          "regexp": "^[0-9]+\\s+START\\s+\"(.*)\"$"
+        },
+        {
+          "regexp": "^[0-9]+\\s+(WARNING|ERROR|HINT)\\s+\"(.*)\"\\s+([0-9]*):([0-9]*)\\s+\"(.*)\"$",
+          "severity": 1,
+          "file": 2,
+          "line": 3,
+          "column": 4,
+          "message": 5,
+          "loop": true
+        }
+      ]
+    }
+  ]
+}
