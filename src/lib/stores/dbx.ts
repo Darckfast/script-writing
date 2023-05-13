@@ -110,12 +110,12 @@ const loadCloud = async ({ key }: LoadProp) => {
 	return dbx.filesDownload({ path: `/${key}.json` })
 }
 
-const saveCloud = async ({ key, value, fileExtension, rev }: SaveProp) => {
+const saveCloud = async ({ key, value, fileExtension, rev, mode = 'update' }: SaveProp) => {
 	return dbx.filesUpload({
 		path: `/${key}.${fileExtension}`,
 		contents: value,
 		mode: {
-			'.tag': 'update',
+			'.tag': mode,
 			update: rev
 		}
 	})
