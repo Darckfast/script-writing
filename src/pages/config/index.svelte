@@ -13,6 +13,7 @@
 
 	let accessCode = ''
 
+  // TODO: wrap this in a function
 	const dbxAuthUrl = $dbxAuth
 		.getAuthenticationUrl(
 			undefined,

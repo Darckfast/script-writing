@@ -8,6 +8,7 @@
 	import { copy } from '../lib/copy'
 	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
+	import { documents } from '../lib/stores/documents'
 	import { globalError } from '../lib/stores/globalError'
 	import { stories, storiesFetching, storiesInit } from '../lib/stores/stories'
 	import Spinner from '../styles/icons/spinner.svelte'
@@ -15,27 +16,40 @@
 
 	let storyName = ''
 
+	const addDocument = () => {
+		if (!storyName) return
+
+		$documents.push({
+			id: uuidv4(),
+			name: storyName,
+			content: {
+				json: {}
+			}
+		})
+
+		storyName = ''
+
+		$documents = [...$documents]
+	}
+
 	const add = () => {
 		if (!storyName) return
 
 		const ifid = uuidv4()
 
-		stories.update((prev) => [
-			...prev,
-			{
-				ifid,
-				passages: [
-					{
-						cleanText: '',
-						links: [],
-						name: 1,
-						pid: 'root'
-					}
-				],
-				createdWith: import.meta.env.VITE_VERSION,
-				storyName
-			}
-		])
+		$stories.push({
+			ifid,
+			passages: [
+				{
+					cleanText: '',
+					links: [],
+					name: 1,
+					pid: 'root'
+				}
+			],
+			createdWith: import.meta.env.VITE_VERSION,
+			storyName
+		})
 
 		$config[ifid] = {
 			baseDir: { value: `public/${storyName}`, enabled: true },
@@ -51,14 +65,17 @@
 		}
 
 		storyName = ''
+		$stories = [...$stories]
+	}
+
+	const removeDoc = (index: number) => {
+		$documents.splice(index, 1)
+		$documents = [...$documents]
 	}
 
 	const remove = (index: number) => {
-		stories.update((prev) => {
-			prev.splice(index, 1)
-
-			return [...prev]
-		})
+		$stories.splice(index, 1)
+		$stories = [...$stories]
 	}
 
 	const importStory = async () => {
@@ -95,6 +112,10 @@
 			}
 
 			tempIndex[configs.group.value].push(story)
+		})
+
+		$documents.forEach((document) => {
+			tempIndex[document.name] = JSON.parse(document.content.text)
 		})
 
 		const exportedIndex = []
@@ -138,6 +159,9 @@
 		{/if}
 	</div>
 
+	<h1 class="text-3xl justify-start w-full">Stories</h1>
+	<hr class="border-b border-gray-400 w-full" />
+
 	{#each $stories as story, index}
 		<div class="relative">
 			<a
@@ -158,6 +182,34 @@
 			</ConfirmButton>
 		</div>
 	{/each}
+
+	<h1 class="text-3xl justify-start w-full">Documents</h1>
+	<hr class="border-b border-gray-400 w-full" />
+
+	{#if !$documents.length}
+		<span class="text-slate-400">no document available</span>
+	{/if}
+
+	{#each $documents as document, index}
+		<div class="relative">
+			<a
+				data-test={`a-document-node-${index}`}
+				href={$url(`./document/${document.id}`)}
+				class="gap-2 btn btn-primary relative no-animation"
+			>
+				{document.name}
+			</a>
+
+			<ConfirmButton
+				dataTest="btn-delete-document"
+				on:click={(e) => e.stopImmediatePropagation()}
+				on:confirm={() => removeDoc(index)}
+				classes="cursor-pointer w-auto h-auto p-1 rounded absolute -left-2 -top-2"
+			>
+				<Trash />
+			</ConfirmButton>
+		</div>
+	{/each}
 </div>
 
 <form
@@ -166,7 +218,13 @@
 >
 	<div class="w-full flex items-center justify-center flex-wrap gap-2 mb-2">
 		<button class="btn btn-primary" data-test="btn-create-story" on:click={add}
-			>+ create new</button
+			>+ story</button
+		>
+
+		<button
+			class="btn btn-primary"
+			data-test="btn-create-document"
+			on:click={addDocument}>+ document</button
 		>
 		<button
 			class="btn btn-primary"

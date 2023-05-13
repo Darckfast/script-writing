@@ -22,7 +22,7 @@ describe('home page', () => {
 	it('check buttons', () => {
 		cy.get('button[data-test="btn-create-story"]').should(
 			'have.text',
-			'+ create new'
+			'+ story'
 		)
 		cy.get('button[data-test="btn-import-story"]').should(
 			'have.text',
