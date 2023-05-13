@@ -9,4 +9,5 @@ interface SaveProp {
 	value: any
 	fileExtension?: string
 	rev?: string
+	mode?: WriteMode
 }
