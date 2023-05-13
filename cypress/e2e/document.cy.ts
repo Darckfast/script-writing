@@ -7,8 +7,11 @@ describe('document page', () => {
 	})
 
 	it('create document content', () => {
-		cy.get('.cm-content').clear()
-		cy.get('.cm-content').type('{"test": true}')
+		cy.get('div.cm-content').clear().type('{"test": true}',
+     { 
+      force: true,
+      parseSpecialCharSequences:false 
+    })
 	})
 
 })
