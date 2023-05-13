@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { Dropbox, DropboxAuth } from 'dropbox'
-import { writable } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 import { load, save } from '../loadSave'
 import { globalError } from './globalError'
 
@@ -95,9 +95,9 @@ const createDbxAuth = () => {
 export const dbxAuth = createDbxAuth()
 
 export const isDbxAuth = () => {
-	let token = ''
+  if (!clientId) return false
 
-	dbxAuth.subscribe((val) => (token = val.getAccessToken()))()
+  const token = get(dbxAuth).getAccessToken()
 
 	return !!token
 }
@@ -111,10 +111,12 @@ const loadCloud = async ({ key }: LoadProp) => {
 }
 
 const saveCloud = async ({ key, value, fileExtension, rev, mode = 'update' }: SaveProp) => {
-	return dbx.filesUpload({
+	if (process.env.NODE_ENV === 'development') return 
+  
+  return dbx.filesUpload({
 		path: `/${key}.${fileExtension}`,
 		contents: value,
-		mode: {
+		mode: { 
 			'.tag': mode,
 			update: rev
 		}
