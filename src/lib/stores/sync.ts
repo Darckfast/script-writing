@@ -10,6 +10,8 @@ interface FallBackProps<T = unknown> {
 	afterRun?: Array<() => void>
 	beforeRun?: Array<() => void>
 	afterDone?: Array<() => void>
+	hasFailed?: () => Promise<void>
+	id: string
 }
 
 const createFallback = <T = unknown>({
@@ -17,7 +19,9 @@ const createFallback = <T = unknown>({
 	onFail,
 	afterRun,
 	beforeRun,
-	afterDone
+	afterDone,
+	hasFailed,
+	id
 }: FallBackProps) => {
 	const executionArray = [run, ...onFail]
 	let success = false
@@ -54,7 +58,7 @@ const createFallback = <T = unknown>({
 			success = true
 			return result
 		} catch (err) {
-			console.error('running fallback', err)
+			console.error('running fallback for', id, err)
 			index += 1
 
 			if (!onFail.length || onFail.length < index) {
@@ -66,6 +70,8 @@ const createFallback = <T = unknown>({
 			doRun()
 		} finally {
 			index = 0
+
+			if (!success && hasFailed) await hasFailed()
 
 			if (afterRun && success) afterRun.forEach((func) => execute(func))
 
@@ -102,6 +108,7 @@ export const createSyncable = <T = unknown>({
 		if (!key) throw new Error('key must be informed')
 
 		createFallback<T>({
+			id: `syncable-${key}`,
 			beforeRun: [() => isFetching.set(true)],
 			run: () =>
 				(loadCloud({ key }) as Promise<any>)
@@ -118,6 +125,13 @@ export const createSyncable = <T = unknown>({
 						initialObject.set(savedValue as T)
 					)
 			],
+			hasFailed: () =>
+				saveCloud({
+					key,
+					value: beforeSave(initialSate),
+					fileExtension: 'json',
+					mode: 'add'
+				}).then(() => initialObject.set(initialSate)),
 			afterDone: [() => isFetching.set(false)]
 		})
 	}
