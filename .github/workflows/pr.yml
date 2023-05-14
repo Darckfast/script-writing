@@ -82,6 +82,8 @@ jobs:
   e2e-test:
     name: 🧪 E2E Test
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: testing
     steps:
       - uses: actions/checkout@v3
 
