@@ -24,16 +24,13 @@ describe('home page', () => {
 			'have.text',
 			'+ story'
 		)
-		cy.get('button[data-test="btn-import-story"]').should(
-			'have.text',
-			'+ import from clipboard'
-		)
+
 		cy.get('button[data-test="btn-export-story"]').should(
 			'have.text',
-			'> export all stories'
+			'> generate bundle'
 		)
-		cy.get('a[data-test="a-config"]').should('have.text', '$ configuration')
-		cy.get('button[data-test="btn-sync-story"]').should('have.text', '+ sync')
+		cy.get('a[data-test="a-config"]').should('have.text', '$ configurations')
+		cy.get('button[data-test="btn-sync-story"]').should('have.text', '= sync')
 	})
 
 	it('create new story from button', () => {
@@ -58,12 +55,4 @@ describe('home page', () => {
 		cy.get('button[data-test="btn-export-story"]').click()
 	})
 
-	it('import story', () => {
-		cy.get('input[data-test="input-story-name"]').type('new story')
-		cy.get('button[data-test="btn-create-story"]').click()
-		cy.get('button[data-test="btn-export-story"]').click()
-
-		cy.get('button[data-test="btn-import-story"]').click()
-		cy.get('a[data-test="a-story-node-0"]').should('have.text', 'new story')
-	})
 })

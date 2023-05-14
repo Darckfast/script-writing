@@ -1,29 +1,25 @@
 <script lang="ts">
-	import { url } from '@roxi/routify'
 	import { v4 as uuidv4 } from 'uuid'
+	import Header from '../../components/header/Header.svelte'
 	import NodeCard from '../../components/story/NodeCard.svelte'
 	import ConfigsMenu from '../../components/story/props/ConfigsMenu.svelte'
 	import PropsMenu from '../../components/story/props/PropsMenu.svelte'
 	import { copy } from '../../lib/copy'
 	import { add, remove } from '../../lib/nodesv2'
 	import { config } from '../../lib/stores/configs'
-	import { isDbxAuth } from '../../lib/stores/dbx'
 	import {
 		stories,
 		storiesFetching,
 		storiesSync
 	} from '../../lib/stores/stories'
 	import { EmptyStory, findStory, updateStory } from '../../lib/stores/story'
-	import ArrowLeft from '../../styles/icons/arrow-left.svelte'
-	import Copy from '../../styles/icons/copy.svelte'
 	import Gear from '../../styles/icons/gear.svelte'
 	import Magnet from '../../styles/icons/magnet.svelte'
-	import Spinner from '../../styles/icons/spinner.svelte'
 
 	export let storyId: string
 
 	let selectedIndex = 0
-	let tabOpen = 'props'   
+	let tabOpen = 'props'
 
 	const story = $stories.find(findStory(storyId)) ?? EmptyStory
 
@@ -79,65 +75,18 @@
 	$: if (story?.name) {
 		$stories = { ...$stories.map(updateStory(story)) }
 	}
-
-	const getAsArray = () =>
-		story.passages.map((passage) => {
-			delete passage.links
-			delete passage.parentPid
-
-			if (!passage.pid) passage.pid = uuidv4()
-
-			for (const key in passage) {
-				if (
-					Object.prototype.hasOwnProperty.call(passage, key) &&
-					!passage[key]
-				) {
-					delete passage[key]
-				}
-			}
-
-			return passage
-		})
 </script>
 
-<form on:submit|preventDefault class="w-full h-full">
-	<header class="flex justify-between items-center w-full gap-2 px-2">
-		<a href={$url('../../..')} data-test="btn-return" class="btn btn-primary">
-			<ArrowLeft /> go back</a
-		>
-		<h1 data-test="story-name">{story.storyName}</h1>
+<div class="w-full h-full">
+	<Header
+		headerName={story.storyName}
+		onSync={storiesSync}
+		onCopy={() => copy(story)}
+		isFetching={storiesFetching}
+		id={storyId}
+	/>
 
-		<button
-			class="btn btn-xs gap-2 w-auto text-sm overflow-auto overflow-ellipsis"
-			on:click={() => copy(storyId)}
-			data-test="copy-story-id"
-		>
-			{storyId}<Copy /></button
-		>
-
-		<button
-			class="btn btn-primary w-auto"
-			data-test="export-story"
-			on:click={() => copy(story)}>> copy</button
-		>
-
-		<button
-			class="btn btn-primary w-auto"
-			disabled={!isDbxAuth()}
-			on:click={() => storiesSync()}
-			>{#if $storiesFetching}
-				<Spinner />saving...
-			{:else}
-				> save
-			{/if}</button
-		>
-		<button
-			class="btn btn-primary"
-			data-test="export-story-array"
-			on:click={() => copy(getAsArray())}>> array</button
-		>
-	</header>
-	<div class="flex items-center justify-center w-full h-4/5 gap-2 p-2">
+	<div class="flex items-center justify-center w-full h-4/5 gap-2 px-2">
 		<div
 			class="flex items-center justify-center relative flex-wrap gap-2 p-4 w-1/2 h-auto max-h-full overflow-y-scroll custom-scroll"
 		>
@@ -209,4 +158,4 @@
 			/>
 		</label>
 	</form>
-</form>
+</div>

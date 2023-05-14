@@ -7,9 +7,6 @@ module.exports = {
 		'plugin:@typescript-eslint/recommended',
 		'plugin:svelte/recommended'
 	],
-	parserOptions: {
-		project: ['./tsconfig.json']
-	},
 	overrides: [
 		{
 			files: ['*.svelte'],

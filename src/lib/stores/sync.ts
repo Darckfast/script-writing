@@ -185,7 +185,8 @@ export const createSyncable = <T = unknown>({
 		})
 
 		lastUpdate.set(dayjs())
-		hash.set(cloudMeta.result.rev)
+    
+    if (cloudMeta) hash.set(cloudMeta.result.rev)
 
 		isFetching.set(false)
 	}
