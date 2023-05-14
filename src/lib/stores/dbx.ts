@@ -111,7 +111,7 @@ const loadCloud = async ({ key }: LoadProp) => {
 }
 
 const saveCloud = async ({ key, value, fileExtension, rev, mode = 'update' }: SaveProp) => {
-	if (process.env.NODE_ENV === 'development') return 
+	if (process.env.NODE_ENV === 'testing') return 
   
   return dbx.filesUpload({
 		path: `/${key}.${fileExtension}`,
