@@ -1,18 +1,16 @@
 <script lang="ts">
 	import { url } from '@roxi/routify'
-	import { readText } from '@tauri-apps/api/clipboard'
 	import { save } from '@tauri-apps/api/dialog'
 	import { writeTextFile } from '@tauri-apps/api/fs'
+	import dayjs from 'dayjs'
 	import { v4 as uuidv4 } from 'uuid'
-	import ConfirmButton from '../components/button/ConfirmButton.svelte'
+	import NodeButton from '../components/button/NodeButton.svelte'
 	import { copy } from '../lib/copy'
 	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
 	import { documents } from '../lib/stores/documents'
-	import { globalError } from '../lib/stores/globalError'
 	import { stories, storiesFetching, storiesInit } from '../lib/stores/stories'
 	import Spinner from '../styles/icons/spinner.svelte'
-	import Trash from '../styles/icons/trash.svelte'
 
 	let storyName = ''
 
@@ -78,20 +76,6 @@
 		$stories = [...$stories]
 	}
 
-	const importStory = async () => {
-		try {
-			const story = JSON.parse(await readText())
-
-			if (story.length) {
-				stories.update((prev) => [...prev, ...story])
-			} else {
-				stories.update((prev) => [...prev, story])
-			}
-		} catch (err) {
-			globalError.pushError(err)
-		}
-	}
-
 	const copyStory = async () => {
 		const tempIndex = {}
 
@@ -133,9 +117,12 @@
 			return
 		}
 
+		const fileName = `${dayjs().format('YYYY-MM-DD')}.json`
+
+		// TODO: set default path to Documents folder
 		const filePath = await save({
-			title: 'bundle.json',
-			defaultPath: 'bundle.json',
+			title: fileName,
+			defaultPath: fileName,
 			filters: [
 				{
 					name: 'JSON',
@@ -159,63 +146,40 @@
 		{/if}
 	</div>
 
-	<h1 class="text-3xl justify-start w-full">Stories</h1>
+	<h1 class="text-2xl justify-start w-full">stories</h1>
 	<hr class="border-b border-gray-400 w-full" />
 
 	{#each $stories as story, index}
-		<div class="relative">
-			<a
-				data-test={`a-story-node-${index}`}
-				href={$url(`./story/${story.ifid}`)}
-				class="gap-2 btn btn-primary relative no-animation"
-			>
-				{story.storyName}
-			</a>
-
-			<ConfirmButton
-				dataTest="btn-delete-story"
-				on:click={(e) => e.stopImmediatePropagation()}
-				on:confirm={() => remove(index)}
-				classes="cursor-pointer w-auto h-auto p-1 rounded absolute -left-2 -top-2"
-			>
-				<Trash />
-			</ConfirmButton>
-		</div>
+		<NodeButton
+			id={story.ifid}
+			name={story.storyName}
+			{index}
+			onRemove={() => remove(index)}
+			type="story"
+		/>
 	{/each}
 
-	<h1 class="text-3xl justify-start w-full">Documents</h1>
+	<h1 class="text-2xl justify-start w-full">documents</h1>
 	<hr class="border-b border-gray-400 w-full" />
 
 	{#if !$documents.length}
-		<span class="text-slate-400">no document available</span>
+		<span class="text-slate-400" data-test="empty-doc-placeholder"
+			>no documents available</span
+		>
 	{/if}
 
 	{#each $documents as document, index}
-		<div class="relative">
-			<a
-				data-test={`a-document-node-${index}`}
-				href={$url(`./document/${document.id}`)}
-				class="gap-2 btn btn-primary relative no-animation"
-			>
-				{document.name}
-			</a>
-
-			<ConfirmButton
-				dataTest="btn-delete-document"
-				on:click={(e) => e.stopImmediatePropagation()}
-				on:confirm={() => removeDoc(index)}
-				classes="cursor-pointer w-auto h-auto p-1 rounded absolute -left-2 -top-2"
-			>
-				<Trash />
-			</ConfirmButton>
-		</div>
+		<NodeButton
+			id={document.id}
+			name={document.name}
+			{index}
+			onRemove={() => removeDoc(index)}
+			type="document"
+		/>
 	{/each}
 </div>
 
-<form
-	on:submit|preventDefault
-	class="flex self-end justify-center w-full p-2 gap-1 h-auto flex-wrap"
->
+<div class="flex self-end justify-center w-full p-2 gap-1 h-auto flex-wrap">
 	<div class="w-full flex items-center justify-center flex-wrap gap-2 mb-2">
 		<button class="btn btn-primary" data-test="btn-create-story" on:click={add}
 			>+ story</button
@@ -226,26 +190,21 @@
 			data-test="btn-create-document"
 			on:click={addDocument}>+ document</button
 		>
-		<button
-			class="btn btn-primary"
-			data-test="btn-import-story"
-			on:click={importStory}>+ import from clipboard</button
-		>
 
 		<button
 			class="btn btn-primary"
 			data-test="btn-export-story"
-			on:click={() => copyStory()}>> export all stories</button
+			on:click={() => copyStory()}>> generate bundle</button
 		>
 
 		<button
 			data-test="btn-sync-story"
 			class="btn btn-primary"
 			disabled={!$dbxAuth.getAccessToken()}
-			on:click={() => storiesInit()}>+ sync</button
+			on:click={() => storiesInit()}>= sync</button
 		>
 		<a href={$url(`./config`)} class="btn btn-primary" data-test="a-config"
-			>$ configuration</a
+			>$ configurations</a
 		>
 	</div>
 
@@ -259,4 +218,4 @@
       input input-primary input-lg"
 		/>
 	</label>
-</form>
+</div>
