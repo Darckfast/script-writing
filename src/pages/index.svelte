@@ -9,7 +9,12 @@
 	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
 	import { documents } from '../lib/stores/documents'
-	import { stories, storiesFetching, storiesInit } from '../lib/stores/stories'
+	import {
+		replaceImage,
+		stories,
+		storiesFetching,
+		storiesInit
+	} from '../lib/stores/stories'
 	import Spinner from '../styles/icons/spinner.svelte'
 
 	let storyName = ''
@@ -76,11 +81,12 @@
 		$stories = [...$stories]
 	}
 
-	const copyStory = async () => {
+	const bundleStories = async () => {
 		const tempIndex = {}
 
 		$stories.forEach((story) => {
-			const configs = $config[story.ifid]
+			const newStory = replaceImage(story)
+			const configs = $config[newStory.ifid]
 
 			if (!configs?.group.value) return
 
@@ -89,13 +95,13 @@
 			if (configs?.type?.value === 'array') {
 				tempIndex[configs.group.value] = [
 					...tempIndex[configs.group.value],
-					...story.passages
+					...newStory.passages
 				]
 
 				return
 			}
 
-			tempIndex[configs.group.value].push(story)
+			tempIndex[configs.group.value].push(newStory)
 		})
 
 		$documents.forEach((document) => {
@@ -194,7 +200,7 @@
 		<button
 			class="btn btn-primary"
 			data-test="btn-export-story"
-			on:click={() => copyStory()}>> generate bundle</button
+			on:click={() => bundleStories()}>> generate bundle</button
 		>
 
 		<button

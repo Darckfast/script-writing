@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
 	import { createEventDispatcher } from 'svelte'
-	import { v4 as uuidv4 } from 'uuid'
 	import { genColor } from '../../lib/colorGen'
+	import { getImagePromise } from '../../lib/images/imagePromise'
 	import { config } from '../../lib/stores/configs'
-	import { dbx } from '../../lib/stores/dbx'
-	import { globalError } from '../../lib/stores/globalError'
 	import Trash from '../../styles/icons/trash.svelte'
 	import ConfirmButton from '../button/ConfirmButton.svelte'
 
@@ -14,7 +12,7 @@
 	export let name: string = ''
 	export let placeholder: string = ''
 	export let type = ''
-	export let value: any
+	export let value: string | number | TGetImagePromise | boolean
 	export let isNotRemovable = false
 	export let isAddable = false
 
@@ -26,61 +24,18 @@
 	const remove = () => dispatch('remove')
 
 	const loadImage = () => {
-		value = new Promise<any>((resolve, reject) => {
-			if (!files || !files.length) return reject(new Error('no file selected'))
-
-			const [file] = files
-
-			const reader = new FileReader()
-
-			reader.onload = (event) =>
-				resolve({ imageBuffer: event.target.result, fileName: file.name })
-
-			reader.readAsArrayBuffer(file)
+		value = getImagePromise({
+			config: $config[storyId]?.baseDir ?? {
+				value: '/',
+				enabled: true
+			},
+			file: files[0]
 		})
-			.then((image) => {
-				let { value: configValue, enabled } = $config[storyId]?.baseDir ?? {
-					value: '/',
-					enabled: true
-				}
-
-				if (!enabled) {
-					configValue = '/'
-				}
-
-				const [_, extension] = image.fileName.split('.')
-				image.fileName = [uuidv4(), extension].join('.')
-
-        return {
-					...image,
-					path: `/${configValue}${image.fileName}`
-				}
-			})
-			.then(({ path, imageBuffer }) =>
-				dbx.filesUpload({
-					path,
-					contents: imageBuffer,
-					mode: {
-						'.tag': 'overwrite'
-					}
-				})
-			)
-			.then(({ result: { path_display } }) => path_display)
-			.catch((err) => globalError.pushError(err))
 	}
 </script>
 
 <label
-	class="
-  w-full 
-  gap-2 
-  flex 
-  items-center 
-  justify-start 
-  cursor-pointer 
-  transition-all 
-  hover:text-slate-300
-  "
+	class="w-full gap-2 flex items-center justify-start cursor-pointer transition-all hover:text-slate-300"
 >
 	<slot />
 	{#if isAddable}
@@ -88,7 +43,9 @@
 			data-test={`add-${isAddable ? 'local' : 'node'}-prop-${name}`}
 			class="w-8 rounded-full transition-all hover:scale-105"
 			style={`background-color: ${
-				name === 'sentBy' ? genColor(value) : 'white'
+				name === 'sentBy' && typeof value === 'string'
+					? genColor(value)
+					: 'white'
 			};`}
 			on:click={add}><span class="text-slate-900 font-bold">+</span></button
 		>
@@ -118,7 +75,7 @@
 			type="file"
 			bind:files
 			on:change={loadImage}
-			class="file-input file-input-sm	file-input-bordered file-input-primary w-full"
+			class="file-input file-input-sm file-input-bordered file-input-primary w-full"
 		/>
 	{:else}
 		<input

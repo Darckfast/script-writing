@@ -2,14 +2,16 @@ import { writable } from 'svelte/store'
 
 export const isFetching = writable(false)
 
-export const EmptyStory = {
+export const EmptyStory: Story = {
 	name: null,
-	passages: [{ cleanText: '' }]
-} as Story
+	passages: [
+		{ cleanText: '', name: '', pid: '', links: [], parentPid: 'root' }
+	],
+	ifid: null,
+	storyName: null,
+	createdWith: null
+}
 
-const findStory = (storyId: String) => (story: Story) => story.ifid === storyId
+const findStory = (storyId: string) => (story: Story) => story.ifid === storyId
 
-const updateStory = (newStory: Story) => (story: Story) =>
-	story.ifid === newStory.ifid ? newStory : story
-
-export { findStory, updateStory }
+export { findStory }

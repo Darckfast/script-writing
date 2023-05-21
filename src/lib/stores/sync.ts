@@ -15,7 +15,7 @@ interface FallBackProps<T = unknown> {
 }
 
 const createFallback = <T = unknown>({
-	run = () => {},
+	run = () => null,
 	onFail,
 	afterRun,
 	beforeRun,
@@ -27,7 +27,7 @@ const createFallback = <T = unknown>({
 	let success = false
 	let index = 0
 
-	function is_promise<T = any>(value: any): value is PromiseLike<T> {
+	function is_promise<T = unknown>(value: any): value is PromiseLike<T> {
 		return (
 			!!value &&
 			(typeof value === 'object' || typeof value === 'function') &&
@@ -82,11 +82,11 @@ const createFallback = <T = unknown>({
 	return doRun()
 }
 
-interface Syncable {
-	initialSate: any
+interface Syncable<T> {
+	initialSate: T
 	fileExtension?: string
-	afterLoad?: (self: Writable<any>) => void
-	beforeSave?: (value: any) => any
+	afterLoad?: (self: Writable<T>) => void
+	beforeSave?: (value: T) => string
 	syncEvery?: number
 	key: string
 }
@@ -94,11 +94,11 @@ interface Syncable {
 export const createSyncable = <T = unknown>({
 	initialSate,
 	fileExtension = 'json',
-	afterLoad = () => {},
+	afterLoad = () => null,
 	beforeSave = (value: T) => JSON.stringify(value),
 	syncEvery = 120_000,
 	key
-}: Syncable) => {
+}: Syncable<T>) => {
 	const initialObject = writable<T>(initialSate)
 	const hash = writable('')
 	const lastUpdate = writable<Dayjs>(null)
@@ -185,8 +185,8 @@ export const createSyncable = <T = unknown>({
 		})
 
 		lastUpdate.set(dayjs())
-    
-    if (cloudMeta) hash.set(cloudMeta.result.rev)
+
+		if (cloudMeta) hash.set(cloudMeta.result.rev)
 
 		isFetching.set(false)
 	}
@@ -195,7 +195,7 @@ export const createSyncable = <T = unknown>({
 		setInterval(doSync, syncEvery)
 	}
 
-	const getProp = <T = any>(propKey: string): T => {
+	const getProp = <T = unknown>(propKey: string): T => {
 		return get(initialObject)[propKey]
 	}
 

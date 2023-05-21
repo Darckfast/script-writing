@@ -7,9 +7,5 @@ export default defineConfig({
 	plugins: [tsconfigPaths(), svelte()],
 	server: {
 		port: 5177
-	},
-	test: {
-		reporters: 'junit',
-		outputFile: 'results/report.xml'
 	}
 })

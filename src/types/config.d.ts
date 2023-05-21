@@ -3,7 +3,7 @@ type GlobalConfig = {
 	version: number
 	sync: boolean
 	autoInfer: boolean
-} & Record<string, SubConfigs>
+}
 
 type ConfigType<T = string> = {
 	enabled: boolean
@@ -21,4 +21,23 @@ type DBXToken = {
 	access_token: string
 	refresh_token: string
 	expires_in: number
+}
+
+interface TImagePromise {
+	file: Blob
+	config: TConfig
+}
+
+interface TConfig {
+	value: string
+	enabled: boolean
+}
+
+interface TGetImagePromise {
+	promise: Promise<string>
+	done: boolean
+	error: boolean
+	value: string
+	resolvedLink: string
+	isImagePromise: boolean
 }

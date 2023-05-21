@@ -95,9 +95,9 @@ const createDbxAuth = () => {
 export const dbxAuth = createDbxAuth()
 
 export const isDbxAuth = () => {
-  if (!clientId) return false
+	if (!clientId) return false
 
-  const token = get(dbxAuth).getAccessToken()
+	const token = get(dbxAuth).getAccessToken()
 
 	return !!token
 }
@@ -110,13 +110,19 @@ const loadCloud = async ({ key }: LoadProp) => {
 	return dbx.filesDownload({ path: `/${key}.json` })
 }
 
-const saveCloud = async ({ key, value, fileExtension, rev, mode = 'update' }: SaveProp) => {
-	if (process.env.NODE_ENV === 'testing') return 
-  
-  return dbx.filesUpload({
+const saveCloud = async ({
+	key,
+	value,
+	fileExtension,
+	rev,
+	mode = 'update'
+}: SaveProp) => {
+	if (process.env.NODE_ENV === 'testing') return
+
+	return dbx.filesUpload({
 		path: `/${key}.${fileExtension}`,
 		contents: value,
-		mode: { 
+		mode: {
 			'.tag': mode,
 			update: rev
 		}
