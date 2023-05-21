@@ -3,7 +3,7 @@ type GlobalConfig = {
 	version: number
 	sync: boolean
 	autoInfer: boolean
-} & Record<string, SubConfigs>
+}
 
 type ConfigType<T = string> = {
 	enabled: boolean

@@ -7,6 +7,11 @@ export const {
 	getProp: getConfig,
 	doSync: configSync
 } = createSyncable<GlobalConfig>({
-	initialSate: {},
+	initialSate: {
+		autoInfer: true,
+		sync: true,
+		version: 1,
+		id: 'global-configuration'
+	},
 	key: 'global-configuration'
 })
