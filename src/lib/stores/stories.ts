@@ -1,5 +1,25 @@
+import { copy } from '../copy'
 import { saveV2 } from '../loadSave'
 import { createSyncable } from './sync'
+
+
+export const replaceImage = (story: Story) => {
+  const newStory = { ...story }
+
+	newStory.passages = story.passages.map((passage) => {
+		if (passage.image && passage.image.value) passage.image = passage.image.value
+		
+
+		return passage
+	})
+
+
+  return newStory
+}
+
+export const copyStory = (story: Story) => 
+	copy(replaceImage(story))
+
 
 export const {
 	initialObject: stories,
@@ -39,16 +59,21 @@ const iterateOverPassages = ({ passage, storyId, index }) => {
 		if (Object.prototype.hasOwnProperty.call(passage, key)) {
 			const passageProp = passage[key]
 
-			if (passageProp instanceof Promise) {
-				passageProp.then((resolvedValue) =>
-					updateStoryWithPassage({
-						index,
-						storyId,
-						resolvedValue,
-						key
-					})
-				)
-			}
+			if (
+				!passageProp?.isImagePromise ||
+				passageProp.done ||
+				passageProp.promise === null
+			)
+				continue
+
+			passageProp.promise.then(() =>
+				updateStoryWithPassage({
+					index,
+					storyId,
+					resolvedValue: passageProp,
+					key
+				})
+			)
 		}
 	}
 }

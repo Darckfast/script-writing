@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { genColor } from '../../lib/colorGen'
-	import { dbx } from '../../lib/stores/dbx'
-	import { globalError } from '../../lib/stores/globalError'
+	import { stringToImagePromise } from '../../lib/images/imagePromise'
 	import Spinner from '../../styles/icons/spinner.svelte'
 	import Trash from '../../styles/icons/trash.svelte'
 	import ConfirmButton from '../button/ConfirmButton.svelte'
@@ -11,7 +10,7 @@
 
 	export let cleanText: string
 	export let name: string | number = ''
-	export let image: Promise<string> | string = ''
+	export let image: TGetImagePromise
 	export let isSelected = false
 	export let fetchOnLoad = false
 	export let sentBy = ''
@@ -41,29 +40,11 @@
 	let imagePrm = null
 
 	$: if ((image && canFetch) || (image && fetchOnLoad)) {
-		if (image instanceof Promise) {
-			imagePrm = image.then((path) =>
-				dbx
-					.filesGetTemporaryLink({ path })
-					.then(({ result: { link } }) => link)
-					.catch((err) => {
-						globalError.pushError(err)
-
-						return '/unicorn.svg'
-					})
-			)
-		} else {
-			let path = image
-
-			imagePrm = dbx
-				.filesGetTemporaryLink({ path })
-				.then(({ result: { link } }) => link)
-				.catch((err) => {
-					globalError.pushError(err)
-
-					return '/unicorn.svg'
-				})
+		if (typeof image === 'string') {
+			image = stringToImagePromise(image)
 		}
+
+		imagePrm = !image.done ? image.promise : Promise.resolve(image.resolvedLink)
 	}
 
 	const select = () => dispatch('select')
@@ -73,10 +54,11 @@
 <button
 	bind:this={container}
 	class:!border-cyan-400={isSelected}
-	class="btn   btn-primary  no-animation  flex-col   p-2   relative   h-fit  w-full   border-transparent  border-2  shadow"
+	class="btn btn-primary no-animation flex-col p-2 relative h-fit w-full border-transparent border-2 shadow"
 	on:click={select}
 	on:focus={select}
 	type="button"
+	
 >
 	<span data-test={`node-name-${name}`} class="text-xs self-start">{name}</span>
 	<span data-test={`node-text-${name}`} class="text-sm">{cleanText}</span>
