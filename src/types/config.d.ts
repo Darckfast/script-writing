@@ -22,3 +22,22 @@ type DBXToken = {
 	refresh_token: string
 	expires_in: number
 }
+
+interface TImagePromise {
+	file: Blob
+	config: TConfig
+}
+
+interface TConfig {
+	value: string
+	enabled: boolean
+}
+
+interface TGetImagePromise {
+	promise: Promise<string>
+	done: boolean
+	error: boolean
+	value: string
+	resolvedLink: string
+	isImagePromise: boolean
+}

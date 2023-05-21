@@ -9,10 +9,11 @@
 	import { config } from '../../lib/stores/configs'
 	import {
 		stories,
+		copyStory,
 		storiesFetching,
 		storiesSync
 	} from '../../lib/stores/stories'
-	import { EmptyStory, findStory, updateStory } from '../../lib/stores/story'
+	import { EmptyStory, findStory } from '../../lib/stores/story'
 	import Gear from '../../styles/icons/gear.svelte'
 	import Magnet from '../../styles/icons/magnet.svelte'
 
@@ -23,7 +24,6 @@
 
 	const story = $stories.find(findStory(storyId)) ?? EmptyStory
 
-	$: storyConfigs = $config[storyId]
 	$: selectedNode = story.passages[selectedIndex]
 
 	const addNode = (node = {}) => {
@@ -64,24 +64,13 @@
 			parentPid: null
 		}
 	}
-
-	$: if (
-		(storyConfigs?.reverseOrder?.enabled && story.passages[0].name === '1') ||
-		(!storyConfigs?.reverseOrder?.enabled && story.passages[0].name !== '1')
-	) {
-		story.passages = [...story.passages.reverse()]
-	}
-
-	$: if (story?.name) {
-		$stories = { ...$stories.map(updateStory(story)) }
-	}
 </script>
 
 <div class="w-full h-full">
 	<Header
 		headerName={story.storyName}
 		onSync={storiesSync}
-		onCopy={() => copy(story)}
+		onCopy={() => copyStory(story)}
 		isFetching={storiesFetching}
 		id={storyId}
 	/>
