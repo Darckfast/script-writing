@@ -9,7 +9,7 @@ export const {
 } = createSyncable<GlobalConfig>({
 	initialSate: {
 		autoInfer: true,
-		sync: true,
+		sync: false,
 		version: 1,
 		id: 'global-configuration'
 	},

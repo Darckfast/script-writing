@@ -4,12 +4,11 @@
 	import NodeCard from '../../components/story/NodeCard.svelte'
 	import ConfigsMenu from '../../components/story/props/ConfigsMenu.svelte'
 	import PropsMenu from '../../components/story/props/PropsMenu.svelte'
-	import { copy } from '../../lib/copy'
 	import { add, remove } from '../../lib/nodesv2'
 	import { config } from '../../lib/stores/configs'
 	import {
-		stories,
 		copyStory,
+		stories,
 		storiesFetching,
 		storiesSync
 	} from '../../lib/stores/stories'
@@ -84,8 +83,8 @@
 			>
 				{#each story.passages as node, index}
 					<NodeCard
-						cleanText={node.cleanText}
-						image={node.image}
+						bind:cleanText={node.cleanText}
+						bind:image={node.image}
 						name={node.name}
 						fetchOnLoad={index === 0}
 						sentBy={node.sentBy}

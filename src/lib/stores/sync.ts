@@ -96,7 +96,7 @@ export const createSyncable = <T = unknown>({
 	fileExtension = 'json',
 	afterLoad = () => null,
 	beforeSave = (value: T) => JSON.stringify(value),
-	syncEvery = 120_000,
+	syncEvery = 60 * 2,
 	key
 }: Syncable<T>) => {
 	const initialObject = writable<T>(initialSate)
@@ -192,7 +192,7 @@ export const createSyncable = <T = unknown>({
 	}
 
 	const createInterval = () => {
-		setInterval(doSync, syncEvery)
+		setInterval(doSync, syncEvery * 1000)
 	}
 
 	const getProp = <T = unknown>(propKey: string): T => {

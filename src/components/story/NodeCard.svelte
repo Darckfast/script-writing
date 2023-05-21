@@ -58,7 +58,6 @@
 	on:click={select}
 	on:focus={select}
 	type="button"
-	
 >
 	<span data-test={`node-name-${name}`} class="text-xs self-start">{name}</span>
 	<span data-test={`node-text-${name}`} class="text-sm">{cleanText}</span>
