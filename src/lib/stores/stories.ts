@@ -2,24 +2,20 @@ import { copy } from '../copy'
 import { saveV2 } from '../loadSave'
 import { createSyncable } from './sync'
 
-
 export const replaceImage = (story: Story) => {
-  const newStory = { ...story }
+	const newStory = { ...story }
 
 	newStory.passages = story.passages.map((passage) => {
-		if (passage.image && passage.image.value) passage.image = passage.image.value
-		
+		if (passage.image && passage.image.value)
+			passage.image = passage.image.value
 
 		return passage
 	})
 
-
-  return newStory
+	return newStory
 }
 
-export const copyStory = (story: Story) => 
-	copy(replaceImage(story))
-
+export const copyStory = (story: Story) => copy(replaceImage(story))
 
 export const {
 	initialObject: stories,
