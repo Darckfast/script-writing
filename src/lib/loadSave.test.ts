@@ -12,7 +12,7 @@ describe('loadSave lib', () => {
 			b: true,
 			c: [1, 2, 3, 4],
 			d: 'hello',
-			e: () => {}
+			e: () => null
 		},
 		writeFile: {
 			'success.json': (content: string) => {
@@ -32,17 +32,14 @@ describe('loadSave lib', () => {
 		}
 	}
 	beforeAll(() => {
-		window = {
-			...window,
-			// @ts-ignore
-			crypto: {
-				getRandomValues: function (buffer) {
-					return randomFillSync(buffer as any)
-				}
+		globalThis.crypto = {
+			...globalThis.crypto,
+			getRandomValues: function (buffer) {
+				return randomFillSync(buffer as any)
 			}
 		}
 
-		global.localStorage = {
+		globalThis.localStorage = {
 			state: {},
 			setItem(key, item) {
 				this.state[key] = item
