@@ -161,4 +161,23 @@ const patchUp = (node: StoryNode): StoryNode => {
 	return node
 }
 
-export { props, add, remove, update }
+const fixOrphanNodes = (nodes: StoryNode[]) => {
+	let fixed = 0
+	for (const [index, node] of nodes.entries()) {
+		if (node.links.length > 1) continue
+
+		if (node === nodes.at(-1)) continue
+
+		if (node.links[0].pid === nodes[index + 1].pid) continue
+
+		fixed++
+
+		node.links[0].pid = nodes[index + 1].pid
+	}
+
+	globalError.pushError(`fixed ${fixed} orphan nodes`)
+
+	return nodes
+}
+
+export { props, add, remove, update, fixOrphanNodes }
