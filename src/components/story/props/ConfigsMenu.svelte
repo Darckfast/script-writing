@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { load, save } from '../../../lib/loadSave'
-	import { props } from '../../../lib/nodesv2'
+	import { fixOrphanNodes, props } from '../../../lib/nodesv2'
 	import {
 		config,
 		configFetching,
@@ -82,6 +82,11 @@
 	>
 
 	<button class="btn btn-primary" on:click={inferProps}>+ infer props</button>
+	<button
+		class="btn btn-primary"
+		on:click={() => fixOrphanNodes($stories.find(findStory(storyId)).passages)}
+		>+ fix linear orphan nodes</button
+	>
 </div>
 
 <form

@@ -31,6 +31,8 @@ export const stringToImagePromise = (path: string): TGetImagePromise => {
 	return basePromise
 }
 
+// TODO: add link renew once the same has expired
+
 export const getImagePromise = ({
 	config,
 	file
