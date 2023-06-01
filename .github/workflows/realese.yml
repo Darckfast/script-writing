@@ -1,4 +1,4 @@
-name: Release
+name: 🏷️ Release
 on:
   push:
     tags:
@@ -7,6 +7,7 @@ on:
 
 jobs:
   release:
+    name: 📦 Release executables
     environment: prd
     strategy:
       fail-fast: false

@@ -1,27 +1,27 @@
 import { saveV2 } from '../loadSave'
-import { createSyncable } from './sync'
+import { createSaveable } from './saveable'
 
 interface TDocument {
-	id: string
+  id: string
   name: string
-	content: any
+  content: any
 }
 
 export const {
-	initialObject: documents,
-	objectHash: documentsHash,
-	isFetching: documentsFetching,
-	lastUpdate: documentsLastUpdate,
-	doSync: documentsSync,
-	doInit: documentsInit
-} = createSyncable<TDocument[]>({
-	initialSate: [],
-	key: 'documents',
-	afterLoad: (self) => {
-		self.subscribe((value: TDocument[]) => {
-			if (!value.length) return
+  initialObject: documents,
+  objectHash: documentsHash,
+  isFetching: documentsFetching,
+  lastUpdate: documentsLastUpdate,
+  doSync: documentsSync,
+  doInit: documentsInit,
+} = createSaveable<TDocument[]>({
+  initialSate: [],
+  key: 'documents',
+  afterLoad: (self) => {
+    self.subscribe((value: TDocument[]) => {
+      if (!value.length) return
 
-			saveV2({ key: 'documents', value })
-		})
-	}
+      saveV2({ key: 'documents', value })
+    })
+  },
 })

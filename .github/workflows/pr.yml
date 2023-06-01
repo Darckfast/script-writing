@@ -1,4 +1,4 @@
-name: PR
+name: 🎆 PR
 on: [pull_request]
 
 jobs:
@@ -143,8 +143,9 @@ jobs:
       - name: Test
         run: pnpm check
 
-  eslint:
-    name: 🧹 ESLint
+  lint:
+    name: 🧹 Lint
+    environment: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -159,6 +160,5 @@ jobs:
 
       - run: pnpm install
 
-      - uses: reviewdog/action-eslint@v1
-        with:
-          eslint_flags: 'src/'            
+      - name: Check lint
+        run: pnpm run lint
