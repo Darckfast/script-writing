@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { Dropbox, DropboxAuth } from 'dropbox'
+import type { files } from 'dropbox'
+import { Dropbox, DropboxAuth, DropboxResponse } from 'dropbox'
 import { get, writable } from 'svelte/store'
 import { load, save } from '../loadSave'
 import { globalError } from './globalError'
@@ -12,121 +13,140 @@ export const isFetching = writable(false)
 const localStorageKey = 'dbx-access-token'
 
 const createDbxAuth = () => {
-	const { set, subscribe, update } = writable(
-		new DropboxAuth({
-			clientId
-		})
-	)
+  const { set, subscribe, update } = writable(
+    new DropboxAuth({
+      clientId,
+    })
+  )
 
-	const { access_token, refresh_token, expires_in } = load<DBXToken>({
-		key: localStorageKey,
-		defaultValue: {}
-	})
+  const { access_token, refresh_token, expires_in } = load<DBXToken>({
+    key: localStorageKey,
+    defaultValue: {
+      access_token: null,
+      expires_in: null,
+      refresh_token: null,
+    },
+  })
 
-	if (access_token) {
-		set(
-			new DropboxAuth({
-				clientId,
-				accessToken: access_token,
-				refreshToken: refresh_token,
-				accessTokenExpiresAt: dayjs(expires_in).toDate()
-			})
-		)
-	}
+  if (access_token) {
+    set(
+      new DropboxAuth({
+        clientId,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        accessTokenExpiresAt: dayjs(expires_in).toDate(),
+      })
+    )
+  }
 
-	subscribe((state) => {
-		state.checkAndRefreshAccessToken()
+  subscribe((state) => {
+    state.checkAndRefreshAccessToken()
 
-		dbx = new Dropbox({ auth: state })
-	})
+    dbx = new Dropbox({ auth: state })
+  })
 
-	const setToken = (accessCode: string) => {
-		isFetching.set(true)
+  const setToken = (accessCode: string) => {
+    isFetching.set(true)
 
-		update((state) => {
-			state.setCodeVerifier(localStorage.getItem('codeVerifier'))
-			state
-				.getAccessTokenFromCode(undefined, accessCode)
-				.then(
-					({ result: { access_token, refresh_token, expires_in } }: any) => {
-						save({
-							key: localStorageKey,
-							value: {
-								access_token,
-								refresh_token,
-								expires_in: dayjs().add(expires_in, 'second').unix()
-							}
-						})
+    update((state) => {
+      state.setCodeVerifier(localStorage.getItem('codeVerifier'))
+      state
+        .getAccessTokenFromCode(undefined, accessCode)
+        .then(
+          ({ result: { access_token, refresh_token, expires_in } }: any) => {
+            save({
+              key: localStorageKey,
+              value: {
+                access_token,
+                refresh_token,
+                expires_in: dayjs().add(expires_in, 'second').unix(),
+              },
+            })
 
-						state.setAccessToken(access_token)
-						state.setRefreshToken(refresh_token)
-						state.setAccessTokenExpiresAt(
-							dayjs().add(expires_in, 'second').toDate()
-						)
+            state.setAccessToken(access_token)
+            state.setRefreshToken(refresh_token)
+            state.setAccessTokenExpiresAt(
+              dayjs().add(expires_in, 'second').toDate()
+            )
 
-						set(state)
-					}
-				)
-				.catch((err) => globalError.pushError(err))
-				.finally(() => {
-					isFetching.set(false)
-				})
+            set(state)
+          }
+        )
+        .catch((err) => globalError.pushError(err))
+        .finally(() => {
+          isFetching.set(false)
+        })
 
-			return state
-		})
-	}
+      return state
+    })
+  }
 
-	const resetToken = () =>
-		set(
-			new DropboxAuth({
-				clientId
-			})
-		)
+  const resetToken = () =>
+    set(
+      new DropboxAuth({
+        clientId,
+      })
+    )
 
-	return {
-		set,
-		subscribe,
-		update,
-		setToken,
-		resetToken
-	}
+  return {
+    set,
+    subscribe,
+    update,
+    setToken,
+    resetToken,
+  }
 }
 
 export const dbxAuth = createDbxAuth()
 
 export const isDbxAuth = () => {
-	if (!clientId) return false
+  if (!clientId) return false
 
-	const token = get(dbxAuth).getAccessToken()
+  const token = get(dbxAuth).getAccessToken()
 
-	return !!token
+  return !!token
+}
+
+interface DropboxMetadata extends files.FileMetadataReference {
+  rev: string
+}
+
+const getCloudMetadata = async ({ key }: LoadProp) =>
+  dbx.filesGetMetadata({ path: `/${key}.json` }) as Promise<
+    DropboxResponse<DropboxMetadata>
+  >
+
+interface FileMetadataBlob extends files.FileMetadata {
+  fileBlob: Blob
 }
 
 const loadCloud = async ({ key }: LoadProp) => {
-	if (!isDbxAuth()) {
-		throw new Error('not authenticated')
-	}
+  if (!isDbxAuth()) {
+    throw new Error('not authenticated')
+  }
 
-	return dbx.filesDownload({ path: `/${key}.json` })
+  return dbx.filesDownload({
+    path: `/${key}.json`,
+  }) as Promise<DropboxResponse<FileMetadataBlob>>
 }
 
 const saveCloud = async ({
-	key,
-	value,
-	fileExtension,
-	rev,
-	mode = 'update'
+  key,
+  value,
+  fileExtension,
+  rev,
+  mode = 'update',
 }: SaveProp) => {
-	if (process.env.NODE_ENV === 'testing') return
+  if (process.env.NODE_ENV === 'testing') return
 
-	return dbx.filesUpload({
-		path: `/${key}.${fileExtension}`,
-		contents: value,
-		mode: {
-			'.tag': mode,
-			update: rev
-		}
-	})
+  return dbx.filesUpload({
+    path: `/${key}.${fileExtension}`,
+    contents: value,
+    mode: {
+      '.tag': mode,
+      update: rev,
+    },
+  })
 }
 
-export { saveCloud, loadCloud }
+export { saveCloud, loadCloud, getCloudMetadata }

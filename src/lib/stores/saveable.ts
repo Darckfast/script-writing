@@ -70,7 +70,7 @@ const createFallback = <T = unknown>({
       if (
         onNotFound &&
         err instanceof DropboxResponseError &&
-        err.error.error_summary.includes('not_found')
+        err.error?.error_summary?.includes('not_found')
       ) {
         console.log(`creating first entry for ${id}`)
 
@@ -121,7 +121,9 @@ export const createSaveable = <T = unknown>({
   localOnly,
 }: Saveable<T>) => {
   const initialObject = writable<T>(initialSate)
-  const hash = writable(load({ key: `${key}-hash`, defaultValue: null }))
+  const hash = writable<string>(
+    load({ key: `${key}-hash`, defaultValue: null })
+  )
   const lastUpdate = writable<Dayjs>(null)
   const isFetching = writable(false)
 
