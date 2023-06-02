@@ -1,5 +1,4 @@
 import { copy } from '../copy'
-import { saveV2 } from '../loadSave'
 import { createSaveable } from './saveable'
 
 export const replaceImage = (story: Story) => {
@@ -31,8 +30,6 @@ export const {
       if (!value.length) return
 
       resolvePromises(value)
-
-      saveV2({ key: 'stories', value })
     })
   },
 })

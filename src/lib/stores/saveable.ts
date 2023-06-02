@@ -60,7 +60,11 @@ const createFallback = <T = unknown>({
 
     try {
       const hasToRefetchResult = await hasToRefetch()
-      if (!hasToRefetchResult) return
+
+      if (!hasToRefetchResult) {
+        success = true
+        return
+      }
 
       const result = await execute<T>(executionArray[index] as () => T)
 
@@ -118,7 +122,7 @@ export const createSaveable = <T = unknown>({
   beforeSave = (value: T) => JSON.stringify(value),
   syncEvery = 60 * 2,
   key,
-  localOnly,
+  localOnly = false,
 }: Saveable<T>) => {
   const initialObject = writable<T>(initialSate)
   const hash = writable<string>(
