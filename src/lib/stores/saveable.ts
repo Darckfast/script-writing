@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs'
 import { DropboxResponseError } from 'dropbox'
 import { get, writable, type Writable } from 'svelte/store'
+import { calculateFileHash } from '../dbx/contentHash'
 import { load, loadV2, save, saveV2 } from '../loadSave'
 import { getCloudMetadata, isDbxAuth, loadCloud, saveCloud } from './dbx'
 import { globalError } from './globalError'
@@ -125,20 +126,20 @@ export const createSaveable = <T = unknown>({
   localOnly = false,
 }: Saveable<T>) => {
   const initialObject = writable<T>(initialSate)
-  const hash = writable<string>(
-    load({ key: `${key}-hash`, defaultValue: null })
+  const revStore = writable(
+    load<string>({ key: `${key}-rev`, defaultValue: null })
   )
   const lastUpdate = writable<Dayjs>(null)
   const isFetching = writable(false)
 
-  hash.subscribe((value) => {
-    save({ key: `${key}-hash`, value })
+  revStore.subscribe((value) => {
+    save({ key: `${key}-rev`, value })
   })
 
   const defaultLoad = () =>
     loadCloud({ key })
       .then(({ result: { fileBlob, rev } }) => {
-        hash.set(rev)
+        revStore.set(rev)
 
         return fileBlob.text()
       })
@@ -151,26 +152,32 @@ export const createSaveable = <T = unknown>({
       value: beforeSave(initialSate),
       fileExtension: 'json',
       mode: 'add',
+    }).then(({ result: { rev } }) => {
+      lastUpdate.set(dayjs())
+      revStore.set(rev)
     })
 
   const defaultHasTo = async () => {
-    const currentHash = get(hash)
+    const currentHash = await calculateFileHash(get(initialObject))
     const metadata = await getCloudMetadata({ key })
 
-    // TODO: this can create a gap between the local and cloud version
-    // the content_hash should be used instead
-    return currentHash !== metadata.result.rev
+    return currentHash !== metadata.result.content_hash
   }
 
   const defaultCache = () =>
-    loadV2<T>({ key, defaultValue: initialSate }).then((savedValue) => {
+    loadV2<T>({ key, defaultValue: null }).then((savedValue) => {
+      if (
+        (Array.isArray(savedValue) && savedValue.length === 0) ||
+        (!Array.isArray(savedValue) && !savedValue)
+      ) {
+        console.log('no value cached for', key)
+
+        return
+      }
+
       initialObject.set(savedValue)
 
-      if (!localOnly) {
-        initialObject.subscribe((value) => {
-          saveV2({ key, value })
-        })
-      }
+      if (localOnly) return
     })
 
   const doInit = () => {
@@ -203,15 +210,21 @@ export const createSaveable = <T = unknown>({
 
     isFetching.set(true)
 
-    const localHash = get(hash)
+    const localHash = get(revStore)
     const currValue = beforeSave(get(initialObject))
+    const localContentHash = await calculateFileHash(get(initialObject))
 
     const {
-      result: { rev: cloudHash },
+      result: { rev: cloudHash, content_hash: cloudContentHash },
     } = await getCloudMetadata({ key })
 
-    if (cloudHash && cloudHash !== localHash) {
-      // TODO: add a force load option
+    if (localContentHash === cloudContentHash) {
+      isFetching.set(false)
+
+      return
+    }
+
+    if (cloudHash && localHash && cloudHash !== localHash) {
       globalError.pushError(
         new Error('version conflict, it is necessary to overwrite local'),
         {
@@ -225,12 +238,12 @@ export const createSaveable = <T = unknown>({
       key,
       value: currValue,
       fileExtension,
-      rev: localHash,
+      rev: localHash === null ? cloudHash : localHash,
     })
 
     lastUpdate.set(dayjs())
 
-    if (cloudMeta) hash.set(cloudMeta.result.rev)
+    if (cloudMeta) revStore.set(cloudMeta.result.rev)
 
     isFetching.set(false)
   }
@@ -247,7 +260,7 @@ export const createSaveable = <T = unknown>({
 
   return {
     initialObject,
-    objectHash: hash,
+    objectHash: revStore,
     lastUpdate,
     isFetching,
     doSync,
