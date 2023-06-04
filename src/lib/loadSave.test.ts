@@ -14,29 +14,22 @@ describe('loadSave lib', () => {
       d: 'hello',
       e: () => null,
     },
-    writeFile: {
-      'success.json': (content: string) => {
-        global.localStorage.setItem('success', content)
-      },
-      'error.json'() {
-        throw new Error('error')
-      },
+    writeFile: (content: string) => {
+      global.localStorage.setItem('success', content)
     },
-    readFile: {
-      'success.json': (content: string) => {
-        return global.localStorage.getItem('success')
-      },
-      'error.json'() {
-        throw new Error('error')
-      },
+    readFile: () => {
+      return global.localStorage.getItem('success')
+    },
+    createDir: () => {
+      return true
+    },
+    readTextFile: () => {
+      return global.localStorage.getItem('success')
     },
   }
   beforeAll(() => {
-    globalThis.crypto = {
-      ...globalThis.crypto,
-      getRandomValues: function (buffer) {
-        return randomFillSync(buffer as any)
-      },
+    globalThis.crypto.getRandomValues = function (buffer) {
+      return randomFillSync(buffer as any)
     }
 
     globalThis.localStorage = {
@@ -63,12 +56,14 @@ describe('loadSave lib', () => {
   beforeEach(() => {
     mockIPC((_, args) => {
       const {
-        message: { cmd, path, contents, options },
+        message: { cmd, contents, options },
       } = args as any
 
       expect(options.dir).toBe(22)
 
-      return fixtures[cmd][path](String.fromCharCode(...contents))
+      if (contents) return fixtures[cmd](String.fromCharCode(...contents))
+
+      return fixtures[cmd]()
     })
   })
 
