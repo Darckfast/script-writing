@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/Darckfast/script-writing/compare/v0.3.0...v0.3.1) (2023-06-04)
+
+
+### Bug Fixes
+
+* fixed cloning of proxy objects ([43688c2](https://github.com/Darckfast/script-writing/commit/43688c2efa07877ba7c45c0b44e02c56bc47a61b))
+
 ## [0.3.0](https://github.com/Darckfast/script-writing/compare/v0.2.0...v0.3.0) (2023-06-04)
 
 
