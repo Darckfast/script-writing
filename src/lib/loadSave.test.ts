@@ -28,6 +28,10 @@ describe('loadSave lib', () => {
     },
   }
   beforeAll(() => {
+    globalThis.crypto ||= {
+      ...globalThis.crypto,
+    }
+
     globalThis.crypto.getRandomValues = function (buffer) {
       return randomFillSync(buffer as any)
     }
