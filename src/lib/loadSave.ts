@@ -27,6 +27,10 @@ const load = <T = unknown>({
   }
 }
 
+const deleteEntry = ({ key }: LoadProp) => {
+  localStorage.removeItem(key)
+}
+
 const loadV2 = async <T = unknown>({
   defaultValue,
   key,
@@ -81,5 +85,4 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
     return save({ key, value })
   }
 }
-
-export { save, load, loadV2, saveV2 }
+export { save, load, loadV2, saveV2, deleteEntry }
