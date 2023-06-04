@@ -2,19 +2,14 @@
 	import { params } from '@roxi/routify'
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { get } from 'svelte/store'
-	import {
-		Anchor,
-		Node,
-		generateInput,
-		generateOutput,
-		type Connections
-	} from 'svelvet'
+	import { Anchor, Node, generateInput, generateOutput } from 'svelvet'
 	import { v4 as uuidv4 } from 'uuid'
 	import { genColor } from '../../lib/colorGen'
 	import { getFromPathOrPromise } from '../../lib/images/imagePromise'
-	import { isRoot, props } from '../../lib/nodes.utils'
+	import { getConnections, isRoot, props } from '../../lib/nodes.utils'
 	import { config } from '../../lib/stores/configs'
 	import { stories } from '../../lib/stores/stories'
+	import LinkSlashSolid from '../../styles/icons/link-slash-solid.svelte'
 	import Spinner from '../../styles/icons/spinner.svelte'
 	import Trash from '../../styles/icons/trash.svelte'
 	import AddButton from '../button/AddButton.svelte'
@@ -41,10 +36,8 @@
 	$: node = $output
 	$: anchors = props(node)
 	$: configs = $config[$params.storyId]
-	$: linkConnections = $output.links?.map((link) => [
-		`node-${link.pid}`,
-		`link-out-${link.pid}`
-	]) as Connections
+	$: linkConnections = getConnections(node)
+
 	$: if (
 		((node.image && canFetch) || (node.image && fetchOnLoad)) &&
 		configs?.baseDir
@@ -170,7 +163,12 @@
 
 {#if node}
 	<div bind:this={container}>
-		<Node id={`node-${$output.pid}`} bind:position={node.position} let:destroy>
+		<Node
+			id={`node-${$output.pid}`}
+			bind:position={node.position}
+			let:destroy
+			let:disconnect
+		>
 			<div
 				class:!border-cyan-400={isSelected}
 				class="btn btn-primary no-animation flex-col p-2 relative h-fit w-80 border-transparent border-2 shadow"
@@ -239,7 +237,15 @@
 				</ConfirmButton>
 			{/if}
 
-			<div class="absolute flex flex-col -bottom-5 right-1/2 gap-2 z-0">
+			<div
+				class="absolute flex justify-center items-center -bottom-8 right-1/2 gap-2 z-0"
+			>
+				<button
+					class="btn btn-square btn-outline btn-accent btn-xs"
+					on:click={() => linkConnections.forEach(disconnect)}
+				>
+					<LinkSlashSolid class="w-4" />
+				</button>
 				<Anchor
 					id={`link-${$output.pid}`}
 					input
@@ -247,7 +253,7 @@
 					direction="south"
 					nodeConnect
 					multiple
-					connections={linkConnections}
+					bind:connections={linkConnections}
 					on:connection={onLink}
 					on:disconnection={onLink}
 					key="link"

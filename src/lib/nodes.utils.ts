@@ -1,3 +1,5 @@
+import type { Connections } from 'svelvet'
+
 interface AddNode {
   nodeToAdd: StoryNode
   nodes: StoryNode[]
@@ -92,4 +94,13 @@ const isRoot = (node) => {
   return node.pid === 'root' || node.pid === 1
 }
 
-export { props, add, remove, update, isRoot }
+const getConnections = (passage: StoryNode): Connections => {
+  const passageClone: StoryNode = structuredClone(passage)
+
+  return passageClone.links?.map((link) => [
+    `node-${link.pid}`,
+    `link-out-${link.pid}`,
+  ])
+}
+
+export { props, add, remove, update, isRoot, getConnections }
