@@ -9,11 +9,18 @@
 	import { readText } from '@tauri-apps/api/clipboard'
 	import { config } from '../../lib/stores/configs'
 	import { globalError } from '../../lib/stores/globalError'
+	import {
+		formatStoryPIDs,
+		removeLegacyProps,
+		stories
+	} from '../../lib/stores/stories'
+	import EraserSolid from '../../styles/icons/eraser-solid.svelte'
 	import Spinner from '../../styles/icons/spinner.svelte'
+	import TextSlashSolid from '../../styles/icons/text-slash-solid.svelte'
 
 	let accessCode = ''
 
-  // TODO: wrap this in a function
+	// TODO: wrap this in a function
 	const dbxAuthUrl = $dbxAuth
 		.getAuthenticationUrl(
 			undefined,
@@ -42,6 +49,14 @@
 
 	const saveSession = () => {
 		dbxAuth.setToken(accessCode)
+	}
+
+	const formatStories = () => {
+		$stories = $stories.map(formatStoryPIDs)
+	}
+
+	const removeLegacy = () => {
+		$stories = $stories.map(removeLegacyProps)
 	}
 </script>
 
@@ -116,6 +131,24 @@
 					class="toggle toggle-primary"
 					bind:checked={$config.autoInfer}
 				/>
+			</label>
+		</div>
+
+		<div class="flex gap-2 items-center">
+			<label class="cursor-pointer label gap-2">
+				Parse number PIDs
+				<button class="btn btn-primary" on:click={formatStories}>
+					<TextSlashSolid class="w-6" />
+				</button>
+			</label>
+		</div>
+
+		<div class="flex gap-2 items-center">
+			<label class="cursor-pointer label gap-2">
+				Remove legacy props
+				<button class="btn btn-primary" on:click={removeLegacy}>
+					<EraserSolid class="w-6" />
+				</button>
 			</label>
 		</div>
 	</div>
