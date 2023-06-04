@@ -154,7 +154,7 @@
 	}
 
 	const removeAndDestroy = (destroy) => {
-		if ($output.pid === 'root') return
+		if (isRoot(node)) return
 
 		remove()
 		destroy()
