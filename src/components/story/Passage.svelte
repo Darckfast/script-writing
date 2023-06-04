@@ -241,6 +241,7 @@
 				class="absolute flex justify-center items-center -bottom-8 right-1/2 gap-2 z-0"
 			>
 				<button
+					data-test={`node-unlink-${node.pid}`}
 					class="btn btn-square btn-outline btn-accent btn-xs"
 					on:click={() => linkConnections.forEach(disconnect)}
 				>

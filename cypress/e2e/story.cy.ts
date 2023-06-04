@@ -9,7 +9,7 @@ describe('story page', () => {
     getComponent('a-story-node-0').click()
   })
 
-  it('create new node', () => {
+  it('should create new node in the story', () => {
     getComponent('node-input-1', 'textarea').type('first node')
     getComponent('node-input-1', 'textarea').should('have.value', 'first node')
 
@@ -19,7 +19,7 @@ describe('story page', () => {
     getComponent('node-input-2', 'textarea').should('have.value', 'second node')
   })
 
-  it('add prop of type text', () => {
+  it('should add prop of type text in the story node', () => {
     getComponent('input-prop', 'input').type('testProp')
     getComponent('add-prop').click()
     getComponent('node-prop-menu-1').click()
@@ -34,7 +34,7 @@ describe('story page', () => {
     )
   })
 
-  it('add prop of type number', () => {
+  it('should add prop of type number in the story node', () => {
     getComponent('input-prop', 'input').type('testProp')
     getComponent('radio-prop-number', 'input').click()
     getComponent('add-prop').click()
@@ -47,7 +47,7 @@ describe('story page', () => {
     getComponent('node-prop-1-testProp', 'input').should('have.value', '12.34')
   })
 
-  it('add prop of type boolean', () => {
+  it('should add prop of type boolean in the story node', () => {
     getComponent('input-prop', 'input').type('testProp')
     getComponent('radio-prop-boolean', 'input').click()
     getComponent('add-prop').click()
@@ -57,7 +57,7 @@ describe('story page', () => {
     getComponent('node-prop-1-testProp', 'input').should('have.been.checked')
   })
 
-  it('remove prop', () => {
+  it('should remove prop from the story node', () => {
     getComponent('input-prop', 'input').type('testProp')
     getComponent('radio-prop-boolean', 'input').click()
     getComponent('add-prop').click()
@@ -67,5 +67,17 @@ describe('story page', () => {
     getComponent('node-prop-remove-1-testProp').click({ force: true })
     getComponent('node-prop-remove-1-testProp').click({ force: true })
     getComponent('node-prop-1-testProp', 'input').should('not.exist')
+  })
+
+  it('should unlink a child node, when clicked on the unlink btn', () => {
+    getComponent('node-input-1', 'textarea').type('first node')
+
+    getComponent('node-add-1', 'button').click()
+
+    getComponent('node-input-2', 'textarea').type('second node')
+
+    getComponent('node-unlink-1').click()
+
+    cy.get('.svelvet-anchor.input.connected').should('not.exist')
   })
 })
