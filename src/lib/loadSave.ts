@@ -16,25 +16,29 @@ const save = ({ key, value }: SaveProp): string => {
 
 const load = <T = unknown>({
   key,
-  defaultValue = [],
-}: LoadProp): T | undefined => {
+  defaultValue,
+}: LoadProp<T>): typeof defaultValue => {
   try {
     return JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
   } catch (err) {
     globalError.pushError(err)
 
-    return defaultValue as T
+    return defaultValue
   }
 }
 
+const deleteEntry = ({ key }: LoadProp) => {
+  localStorage.removeItem(key)
+}
+
 const loadV2 = async <T = unknown>({
-  defaultValue = [],
+  defaultValue,
   key,
-}: LoadProp): Promise<T | undefined> => {
+}: LoadProp<T>): Promise<typeof defaultValue> => {
   const isTauri = !!(window as any).__TAURI_IPC__
 
   if (!isTauri) {
-    return load<T>({ key, defaultValue }) ?? (defaultValue as T)
+    return load<T>({ key, defaultValue })
   }
 
   try {
@@ -48,7 +52,7 @@ const loadV2 = async <T = unknown>({
   } catch (err) {
     globalError.pushError(err)
 
-    return load<T>({ key, defaultValue }) ?? (defaultValue as T)
+    return load<T>({ key, defaultValue })
   }
 }
 
@@ -81,5 +85,4 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
     return save({ key, value })
   }
 }
-
-export { save, load, loadV2, saveV2 }
+export { save, load, loadV2, saveV2, deleteEntry }

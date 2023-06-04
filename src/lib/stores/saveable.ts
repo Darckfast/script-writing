@@ -176,14 +176,12 @@ export const createSaveable = <T = unknown>({
       }
 
       initialObject.set(savedValue)
-
-      if (localOnly) return
     })
 
   const doInit = () => {
     if (!key) throw new Error('key must be informed')
 
-    if (localOnly) {
+    if (localOnly || !isDbxAuth()) {
       initialObject.set(load<T>({ key, defaultValue: initialSate }))
 
       initialObject.subscribe((value) => {

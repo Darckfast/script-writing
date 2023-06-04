@@ -8,12 +8,12 @@
 	import { copy } from '../lib/copy'
 	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
-	import { documents } from '../lib/stores/documents'
+	import { documents, documentsSync } from '../lib/stores/documents'
 	import {
 		replaceImage,
 		stories,
 		storiesFetching,
-		storiesInit
+		storiesSync
 	} from '../lib/stores/stories'
 	import Spinner from '../styles/icons/spinner.svelte'
 
@@ -42,12 +42,17 @@
 
 		$stories.push({
 			ifid,
+			latestPid: 1,
 			passages: [
 				{
 					cleanText: '',
 					links: [],
 					name: 1,
-					pid: 'root'
+					pid: 1,
+					position: {
+						x: 150,
+						y: 60
+					}
 				}
 			],
 			createdWith: import.meta.env.VITE_VERSION,
@@ -157,7 +162,10 @@
 
 	{#each $stories as story, index}
 		<NodeButton
-			id={story.ifid}
+			href={$url(`./story/:storyIndex/node`, {
+				storyIndex: index,
+				storyId: story.ifid
+			})}
 			name={story.storyName}
 			{index}
 			onRemove={() => remove(index)}
@@ -176,7 +184,10 @@
 
 	{#each $documents as document, index}
 		<NodeButton
-			id={document.id}
+			href={$url(`./document/:documentIndex`, {
+				documentIndex: index,
+				documentId: document.id
+			})}
 			name={document.name}
 			{index}
 			onRemove={() => removeDoc(index)}
@@ -207,7 +218,10 @@
 			data-test="btn-sync-story"
 			class="btn btn-primary"
 			disabled={!$dbxAuth.getAccessToken()}
-			on:click={() => storiesInit()}>= sync</button
+			on:click={() => {
+				storiesSync()
+				documentsSync()
+			}}>= sync</button
 		>
 		<a href={$url(`./config`)} class="btn btn-primary" data-test="a-config"
 			>$ configurations</a

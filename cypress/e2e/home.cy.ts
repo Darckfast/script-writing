@@ -1,3 +1,5 @@
+import { getComponent } from './utils'
+
 const mockStory = {
   ifid: '5e3d4e94-7462-4313-b823-094b088fa052',
   passages: [
@@ -20,38 +22,30 @@ describe('home page', () => {
   })
 
   it('check buttons', () => {
-    cy.get('button[data-test="btn-create-story"]').should(
-      'have.text',
-      '+ story'
-    )
-
-    cy.get('button[data-test="btn-export-story"]').should(
-      'have.text',
-      '> generate bundle'
-    )
-    cy.get('a[data-test="a-config"]').should('have.text', '$ configurations')
-    cy.get('button[data-test="btn-sync-story"]').should('have.text', '= sync')
+    getComponent('btn-create-story').should('have.text', '+ story')
+    getComponent('btn-export-story').should('have.text', '> generate bundle')
+    getComponent('a-config', 'a').should('have.text', '$ configurations')
+    getComponent('btn-sync-story').should('have.text', '= sync')
   })
 
   it('create new story from button', () => {
-    cy.get('input[data-test="input-story-name"]').type('new story')
-    cy.get('button[data-test="btn-create-story"]').click()
-    cy.get('a[data-test="a-story-node-0"]').should('have.text', 'new story')
+    getComponent('input-story-name', 'input').type('new story')
+    getComponent('btn-create-story').click()
+    getComponent('a-story-node-0').should('have.text', 'new story')
   })
 
   it('delete story', () => {
-    cy.get('input[data-test="input-story-name"]').type('new story')
-    cy.get('button[data-test="btn-create-story"]').click()
+    getComponent('input-story-name', 'input').type('new story')
+    getComponent('btn-create-story').click()
 
-    cy.get('button[data-test="btn-delete-story"]').click()
-    cy.get('button[data-test="btn-delete-story"]').click()
-
-    cy.get('a[data-test="a-story-node-0"]').should('not.exist')
+    getComponent('btn-delete-story').click()
+    getComponent('btn-delete-story').click()
+    getComponent('a-story-node-0').should('not.exist')
   })
 
   it('copy story', () => {
-    cy.get('input[data-test="input-story-name"]').type('new story')
-    cy.get('button[data-test="btn-create-story"]').click()
-    cy.get('button[data-test="btn-export-story"]').click()
+    getComponent('input-story-name', 'input').type('new story')
+    getComponent('btn-create-story').click()
+    getComponent('btn-export-story').click()
   })
 })

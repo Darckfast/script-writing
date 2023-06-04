@@ -4,9 +4,7 @@ export const isFetching = writable(false)
 
 export const EmptyStory: Story = {
   name: null,
-  passages: [
-    { cleanText: '', name: '', pid: '', links: [], parentPid: 'root' },
-  ],
+  passages: [{ cleanText: '', name: '', pid: 1, links: [] }],
   ifid: null,
   storyName: null,
   createdWith: null,

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
 	import { createEventDispatcher } from 'svelte'
-	import { genColor } from '../../lib/colorGen'
 	import { getImagePromise } from '../../lib/images/imagePromise'
 	import { config } from '../../lib/stores/configs'
 	import Trash from '../../styles/icons/trash.svelte'
+	import AddButton from '../button/AddButton.svelte'
 	import ConfirmButton from '../button/ConfirmButton.svelte'
 
 	const dispatch = createEventDispatcher()
@@ -12,7 +12,7 @@
 	export let name: string = ''
 	export let placeholder: string = ''
 	export let type = ''
-	export let value: string | number | TGetImagePromise | boolean
+	export let value: string | number | TGetImagePromise | boolean | undefined
 	export let isNotRemovable = false
 	export let isAddable = false
 
@@ -20,7 +20,7 @@
 
 	let files: FileList = null
 
-	const add = () => dispatch('add', { name, value })
+	const add = () => dispatch('add', { name, value, type })
 	const remove = () => dispatch('remove')
 
 	const loadImage = () => {
@@ -34,56 +34,56 @@
 	}
 </script>
 
-<label
-	class="w-full gap-2 flex items-center justify-start cursor-pointer transition-all hover:text-slate-300"
+<span
+	class="w-full gap-2 flex items-center justify-between cursor-pointer transition-all hover:text-slate-300"
 >
 	<slot />
-	{#if isAddable}
-		<button
-			data-test={`add-${isAddable ? 'local' : 'node'}-prop-${name}`}
-			class="w-8 rounded-full transition-all hover:scale-105"
-			style={`background-color: ${
-				name === 'sentBy' && typeof value === 'string'
-					? genColor(value)
-					: 'white'
-			};`}
-			on:click={add}><span class="text-slate-900 font-bold">+</span></button
-		>
-	{/if}
 
-	{name}
+	<span class="flex gap-2 items-center">
+		{#if isAddable}
+			<AddButton
+				class="w-6"
+				type="prop"
+				on:click={add}
+				data-test={`node-prop-add-${name}`}
+			/>
+		{/if}
+		{name}
+	</span>
 
-	{#if typeof value === 'boolean'}
-		<input
-			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
-			type="checkbox"
-			bind:checked={value}
-			class="toggle toggle-primary ml-auto"
-		/>
-	{:else if type === 'number'}
-		<input
-			{placeholder}
-			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
-			type="number"
-			step="any"
-			bind:value
-			class="input w-full input-primary input-sm"
-		/>
-	{:else if type === 'file'}
-		<input
-			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
-			type="file"
-			bind:files
-			on:change={loadImage}
-			class="file-input file-input-sm file-input-bordered file-input-primary w-full"
-		/>
-	{:else}
-		<input
-			{placeholder}
-			data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
-			bind:value
-			class="input w-full input-primary input-sm"
-		/>
+	{#if value !== undefined}
+		{#if typeof value === 'boolean'}
+			<input
+				data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
+				type="checkbox"
+				bind:checked={value}
+				class="toggle toggle-primary ml-auto"
+			/>
+		{:else if type === 'number'}
+			<input
+				{placeholder}
+				data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
+				type="number"
+				step="any"
+				bind:value
+				class="input w-full input-primary input-sm"
+			/>
+		{:else if type === 'file'}
+			<input
+				data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
+				type="file"
+				bind:files
+				on:change={loadImage}
+				class="file-input file-input-sm file-input-bordered file-input-primary w-full"
+			/>
+		{:else}
+			<input
+				{placeholder}
+				data-test={`input-${isAddable ? 'local' : 'node'}-prop-${name}`}
+				bind:value
+				class="input w-full input-primary input-sm"
+			/>
+		{/if}
 	{/if}
 
 	{#if !isNotRemovable}
@@ -95,4 +95,4 @@
 			<Trash />
 		</ConfirmButton>
 	{/if}
-</label>
+</span>

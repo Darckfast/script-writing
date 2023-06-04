@@ -29,6 +29,7 @@
         "open": true
       },
       "window": {
+        "create": true,
         "minimize": true,
         "unminimize": true,
         "maximize": true,
