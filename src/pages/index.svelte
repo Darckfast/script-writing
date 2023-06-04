@@ -8,12 +8,12 @@
 	import { copy } from '../lib/copy'
 	import { config } from '../lib/stores/configs'
 	import { dbxAuth } from '../lib/stores/dbx'
-	import { documents } from '../lib/stores/documents'
+	import { documents, documentsSync } from '../lib/stores/documents'
 	import {
 		replaceImage,
 		stories,
 		storiesFetching,
-		storiesInit
+		storiesSync
 	} from '../lib/stores/stories'
 	import Spinner from '../styles/icons/spinner.svelte'
 
@@ -207,7 +207,10 @@
 			data-test="btn-sync-story"
 			class="btn btn-primary"
 			disabled={!$dbxAuth.getAccessToken()}
-			on:click={() => storiesInit()}>= sync</button
+			on:click={() => {
+				storiesSync()
+				documentsSync()
+			}}>= sync</button
 		>
 		<a href={$url(`./config`)} class="btn btn-primary" data-test="a-config"
 			>$ configurations</a
