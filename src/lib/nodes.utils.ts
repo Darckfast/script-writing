@@ -95,7 +95,7 @@ const isRoot = (node) => {
 }
 
 const getConnections = (passage: StoryNode): Connections => {
-  const passageClone: StoryNode = structuredClone(passage)
+  const passageClone: StoryNode = structuredClone({ ...passage })
 
   return passageClone.links?.map((link) => [
     `node-${link.pid}`,
