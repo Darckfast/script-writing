@@ -3,7 +3,8 @@ describe('document page', () => {
   const getDeleteBtn = () => cy.get('button[data-test="btn-delete-document"]')
   const createDoc = () =>
     cy.get('button[data-test="btn-create-document"]').click()
-  const accessDoc = () => cy.get('a[data-test="a-document-node-0"]').click()
+  const accessDoc = () =>
+    cy.get('button[data-test="a-document-node-0"]').click()
 
   beforeEach(() => {
     cy.visit('http://localhost:5177')
