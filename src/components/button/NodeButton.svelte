@@ -1,23 +1,42 @@
 <script lang="ts">
-	import { url } from '@roxi/routify'
+	import { goto } from '@roxi/routify'
+	import { WebviewWindow, appWindow } from '@tauri-apps/api/window'
 	import Trash from '../../styles/icons/trash.svelte'
 	import ConfirmButton from './ConfirmButton.svelte'
 
 	export let onRemove: () => void
 	export let index: number
-	export let id: string
 	export let name: string
 	export let type: 'story' | 'document'
+	export let href
+
+	const navigate = async (e: MouseEvent) => {
+		if (e.button === 1) {
+			const size = await appWindow.innerSize()
+
+			new WebviewWindow('story', {
+				url: href,
+				width: size.width,
+				height: size.height,
+				decorations: false
+			})
+
+			return
+		}
+
+		$goto(href)
+	}
 </script>
 
 <div class="relative">
-	<a
+	<button
 		data-test={`a-${type}-node-${index}`}
-		href={$url(`./${type}/${id}`)}
+		on:mousedown={navigate}
+		on:click={navigate}
 		class="gap-2 btn btn-primary relative no-animation"
 	>
 		{name}
-	</a>
+	</button>
 
 	<ConfirmButton
 		dataTest={`btn-delete-${type}`}
