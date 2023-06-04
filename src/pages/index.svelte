@@ -42,12 +42,17 @@
 
 		$stories.push({
 			ifid,
+			latestPid: 1,
 			passages: [
 				{
 					cleanText: '',
 					links: [],
 					name: 1,
-					pid: 'root'
+					pid: 1,
+					position: {
+						x: 150,
+						y: 60
+					}
 				}
 			],
 			createdWith: import.meta.env.VITE_VERSION,
@@ -157,7 +162,10 @@
 
 	{#each $stories as story, index}
 		<NodeButton
-			id={story.ifid}
+			href={$url(`./story/:storyIndex/node`, {
+				storyIndex: index,
+				storyId: story.ifid
+			})}
 			name={story.storyName}
 			{index}
 			onRemove={() => remove(index)}
@@ -176,7 +184,10 @@
 
 	{#each $documents as document, index}
 		<NodeButton
-			id={document.id}
+			href={$url(`./document/:documentIndex`, {
+				documentIndex: index,
+				documentId: document.id
+			})}
 			name={document.name}
 			{index}
 			onRemove={() => removeDoc(index)}
