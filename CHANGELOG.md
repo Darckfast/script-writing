@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/Darckfast/script-writing/compare/v0.2.0...v0.3.0) (2023-06-04)
+
+
+### Features
+
+* add node disconnections btn ([43b8ed6](https://github.com/Darckfast/script-writing/commit/43b8ed6ce125346b830f4a7f27a1eac561a0f8e7))
+
+
+### Bug Fixes
+
+* fixed root node validation ([cd31261](https://github.com/Darckfast/script-writing/commit/cd31261036852d40f4b33501a85f5befad4ca297))
+
 ## [0.2.0](https://github.com/Darckfast/script-writing/compare/v0.1.17...v0.2.0) (2023-06-04)
 
 
