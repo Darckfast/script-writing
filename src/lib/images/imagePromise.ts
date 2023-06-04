@@ -1,22 +1,15 @@
+import dayjs from 'dayjs'
 import { dbx } from '../stores/dbx'
 import { globalError } from '../stores/globalError'
 
 import { v4 as uuidv4 } from 'uuid'
 
-export const stringToImagePromise = (path: string): TGetImagePromise => {
-  const basePromise = {
-    promise: null,
-    done: false,
-    error: false,
-    value: path,
-    resolvedLink: null,
-    isImagePromise: true,
-  }
-
-  basePromise.promise = dbx
-    .filesGetTemporaryLink({ path })
+const basicFetch = (basePromise) =>
+  dbx
+    .filesGetTemporaryLink({ path: basePromise.value })
     .then(({ result: { link } }) => {
       basePromise.resolvedLink = link
+      basePromise.fetchedOn = dayjs().toJSON()
 
       return link
     })
@@ -30,10 +23,51 @@ export const stringToImagePromise = (path: string): TGetImagePromise => {
       basePromise.done = true
     })
 
+export const getFromPathOrPromise = (pathOrPromise, baseDir?: string) => {
+  if (pathOrPromise.isImagePromise) {
+    if (
+      !pathOrPromise.fetchedOn ||
+      dayjs().diff(pathOrPromise.fetchedOn, 'h') > 1
+    ) {
+      pathOrPromise.done = false
+      pathOrPromise.promise = basicFetch(pathOrPromise)
+    }
+
+    return pathOrPromise
+  }
+
+  return stringToImagePromise(pathOrPromise, baseDir)
+}
+
+export const stringToImagePromise = (
+  path: string,
+  baseDir?: string
+): TGetImagePromise => {
+  const pathValue = path.includes('/') ? path : `${formatPath(baseDir)}${path}`
+
+  const basePromise = {
+    promise: null,
+    done: false,
+    error: false,
+    fetchedOn: null,
+    value: pathValue,
+    resolvedLink: null,
+    isImagePromise: true,
+  }
+
+  basePromise.promise = basicFetch(basePromise)
+
   return basePromise
 }
 
-// TODO: add link renew once the same has expired
+export const formatPath = (path: string) => {
+  let newPath = path
+
+  if (!path.startsWith('/')) newPath = `/${newPath}`
+  if (!path.endsWith('/')) newPath = `${newPath}/`
+
+  return newPath
+}
 
 export const getImagePromise = ({
   config,
@@ -44,6 +78,7 @@ export const getImagePromise = ({
     done: false,
     error: false,
     value: null,
+    fetchedOn: dayjs().toJSON(),
     resolvedLink: null,
     isImagePromise: true,
   }
@@ -58,11 +93,14 @@ export const getImagePromise = ({
 
       if (!enabled) configValue = '/'
 
+      if (!configValue.endsWith('/')) configValue += '/'
+      if (!configValue.startsWith('/')) configValue = `/${configValue}`
+
       const [, extension] = image.fileName.split('.')
 
       image.fileName = [uuidv4(), extension].join('.')
 
-      const path = `/${configValue}${image.fileName}`
+      const path = `${configValue}${image.fileName}`
 
       dbx
         .filesUpload({
