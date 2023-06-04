@@ -20,7 +20,7 @@
 
 			confirm()
 
-			clearInterval(timeout)
+			clearTimeout(timeout)
 		} else {
 			text = 'btn-warning'
 			state = true
@@ -36,7 +36,7 @@
 </script>
 
 <button
-	data-test={dataTest}
+	data-test={$$props['data-test'] || dataTest}
 	class={['transition-all', classes, text].join(' ')}
 	on:click={checkConfirmation}
 	tabindex="-1"
