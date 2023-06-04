@@ -3,25 +3,45 @@ interface Story {
   storyName: string
   ifid: string
   passages: StoryNode[]
+  latestPid?: number
   createdWith?: string
 }
 
 interface StoryNode {
-  parentPid?: string
-  pid: string
+  pid: string | number
   name: string | number
   cleanText: string
-  links: Link[]
+  links: TLink[]
+  position?: TPosition
 
   [key: string]: any
 }
 
-interface Props {
+interface TLink {
+  pid: string | number
+}
+interface TPosition {
+  x: number
+  y: number
+}
+
+interface TProp {
   name: string
   value: any
   type: string
+  pid?: string | number
+  id?: string
+  position?: {
+    x: number
+    y: number
+  }
 }
 
-interface Link {
-  pid: string
+interface AnchorStore<T = any> {
+  anchor: {
+    store: CustomWritable<T>
+  }
 }
+
+type TLinkCustom = { link: CustomWritable<TLink> }
+type TOnLink = CustomEvent<AnchorStore<TLinkCustom>>
