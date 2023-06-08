@@ -29,8 +29,8 @@ devDependencies:
     specifier: ^12.13.0
     version: 12.13.0
   daisyui:
-    specifier: ^3.0.3
-    version: 3.0.3(postcss@8.4.24)
+    specifier: ^3.0.20
+    version: 3.0.20(postcss@8.4.24)
   dayjs:
     specifier: ^1.11.8
     version: 1.11.8
@@ -1518,8 +1518,9 @@ packages:
       yauzl: 2.10.0
     dev: true
 
-  /daisyui@3.0.3(postcss@8.4.24):
-    resolution: {integrity: sha512-RSbXsEBj2LonvjOKEI0I64F5xFJrFrthPgxRNeAZKmACQ3NoIoP45lO6UXLW3bm8PVOUGpKf1Br2SWwc1NqnHQ==}
+  /daisyui@3.0.20(postcss@8.4.24):
+    resolution: {integrity: sha512-EQ0ryTM/+YfkTaRPdUvolsA8pThYnrjjvj2IEXQg31dRVxrEh+ovx5iBknKPXO6XJh2auYYfPonHBN7P88DNeQ==}
+    engines: {node: '>=16.9.0'}
     peerDependencies:
       postcss: ^8
     dependencies:
