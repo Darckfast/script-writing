@@ -71,8 +71,8 @@ devDependencies:
     specifier: ^3.4.3
     version: 3.4.3(postcss@8.4.24)(svelte@3.59.1)
   svelte-jsoneditor:
-    specifier: ^0.17.4
-    version: 0.17.4(@lezer/common@1.0.3)
+    specifier: ^0.17.5
+    version: 0.17.5(@lezer/common@1.0.3)
   svelte-preprocess:
     specifier: ^5.0.4
     version: 5.0.4(postcss@8.4.24)(svelte@3.59.1)(typescript@5.1.3)
@@ -3986,8 +3986,8 @@ packages:
       svelte: 3.59.1
     dev: true
 
-  /svelte-jsoneditor@0.17.4(@lezer/common@1.0.3):
-    resolution: {integrity: sha512-XuITcreh6L/b6JsCXgH1B8ZUdOL8znHPH3XLgh/QXNucqsieKS9hBkcUnBPdYvixQWHNR8po3WWM9lyPuirRPg==}
+  /svelte-jsoneditor@0.17.5(@lezer/common@1.0.3):
+    resolution: {integrity: sha512-19rjTHMEMK+IzBO7IUMzi7e92GWEo7WrNSRvhlg6tlO3IcKgj8LCAKNEs0QYT0MukBeULHhkBClU9FEihI0Uww==}
     dependencies:
       '@codemirror/commands': 6.2.4
       '@codemirror/lang-json': 6.0.1

@@ -43,7 +43,7 @@
     "start-server-and-test": "^2.0.0",
     "svelte": "^3.59.1",
     "svelte-check": "^3.4.3",
-    "svelte-jsoneditor": "^0.17.4",
+    "svelte-jsoneditor": "^0.17.5",
     "svelte-preprocess": "^5.0.4",
     "svelvet": "^8.0.1",
     "tailwind-scrollbar": "^3.0.4",
