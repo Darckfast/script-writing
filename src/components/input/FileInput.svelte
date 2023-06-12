@@ -7,7 +7,7 @@
 
 	let files: FileList = null
 
-	let value = $parameterStore.value
+	let value = $parameterStore?.value
 	const loadImage = () => {
 		if (files.length === 0) return
 
