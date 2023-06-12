@@ -6,7 +6,7 @@
 	import { v4 as uuidv4 } from 'uuid'
 	import { genColor } from '../../lib/colorGen'
 	import { getFromPathOrPromise } from '../../lib/images/imagePromise'
-	import { getConnections, isRoot, props } from '../../lib/nodes.utils'
+	import { getConnections, props } from '../../lib/nodes.utils'
 	import { config } from '../../lib/stores/configs'
 	import { stories } from '../../lib/stores/stories'
 	import LinkSlashSolid from '../../styles/icons/link-slash-solid.svelte'
@@ -22,6 +22,7 @@
 	export let node: StoryNode
 	export let isSelected = false
 	export let fetchOnLoad = false
+  export let isRoot = false
 
 	let container: HTMLDivElement
 	let canFetch = false
@@ -69,6 +70,7 @@
 	})
 
 	const remove = () => dispatch('remove', { pid: $output.pid })
+	const changeRoot = () => dispatch('changeRoot')
 	const addNode = () => {
 		const { latestPid } = $stories[$params.storyIndex]
 
@@ -154,7 +156,7 @@
 	}
 
 	const removeAndDestroy = (destroy) => {
-		if (isRoot(node)) return
+		if (isRoot) return
 
 		remove()
 		destroy()
@@ -218,7 +220,7 @@
 				/>
 			</div>
 
-			{#if !isRoot(node)}
+			{#if !isRoot}
 				<div class="absolute flex -top-5 right-1/2 z-0">
 					<Anchor
 						id={`link-out-${$output.pid}`}
@@ -235,6 +237,15 @@
 				>
 					<Trash />
 				</ConfirmButton>
+
+				<button
+					class="btn btn-xs absolute left-0 -top-8 btn-secondary"
+					on:click={changeRoot}>make root</button
+				>
+			{:else}
+				<button class="btn btn-xs btn-accent absolute left-0 -top-8">
+					root
+				</button>
 			{/if}
 
 			<div

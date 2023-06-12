@@ -6,11 +6,9 @@ interface AddNode {
 }
 
 const add = ({ nodeToAdd, nodes }: AddNode): StoryNode[] => {
-  const nodesClone = structuredClone(nodes)
+  nodes.push(nodeToAdd)
 
-  nodesClone.push(nodeToAdd)
-
-  return nodesClone
+  return nodes
 }
 
 const remove = ({
@@ -20,9 +18,7 @@ const remove = ({
   removeNode: StoryNode
   nodes: StoryNode[]
 }): StoryNode[] => {
-  const nodesClone = structuredClone(nodes)
-
-  return nodesClone.filter((node) => {
+  return nodes.filter((node) => {
     node.links = node.links.filter((link) => link.pid !== removeNode.pid)
 
     return node.pid !== removeNode.pid
@@ -36,9 +32,9 @@ const update = ({
   update: { pid: string | number; [key: string]: any }
   nodes: StoryNode[]
 }): StoryNode[] => {
-  const nodesClone = structuredClone(nodes)
+  // const nodesClone = structuredClone({...nodes})
 
-  return nodesClone.map((node) => {
+  return nodes.map((node) => {
     if (node.pid === update.pid) {
       return {
         ...node,
@@ -95,9 +91,9 @@ const isRoot = (node) => {
 }
 
 const getConnections = (passage: StoryNode): Connections => {
-  const passageClone: StoryNode = structuredClone({ ...passage })
+  // const passageClone: StoryNode = structuredClone({ ...passage })
 
-  return passageClone.links?.map((link) => [
+  return passage.links?.map((link) => [
     `node-${link.pid}`,
     `link-out-${link.pid}`,
   ])

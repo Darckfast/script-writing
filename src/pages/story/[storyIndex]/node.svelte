@@ -7,10 +7,10 @@
 	import PropsMenuV2 from '../../../components/story/PropsMenu.svelte'
 	import { props, remove } from '../../../lib/nodes.utils'
 	import {
-	  copyStory,
-	  stories,
-	  storiesFetching,
-	  storiesSync
+		copyStory,
+		stories,
+		storiesFetching,
+		storiesSync
 	} from '../../../lib/stores/stories'
 
 	export let storyIndex
@@ -59,6 +59,14 @@
 			pid: 1
 		}
 	}
+
+	const changeRoot = (index: number) => {
+		const current = story.passages[index]
+		story.passages.splice(index, 1, story.passages[0])
+		story.passages[0] = current
+
+		story.passages = [...story.passages]
+	}
 </script>
 
 <!-- TODO: add duplicate node function -->
@@ -79,7 +87,9 @@
 				<Passage
 					bind:node
 					fetchOnLoad={index === 0}
+					isRoot={index === 0}
 					on:addNode={addNode}
+					on:changeRoot={() => changeRoot(index)}
 					on:remove={() => deleteNode(node)}
 				/>
 			{/each}
