@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0](https://github.com/Darckfast/script-writing/compare/v0.3.1...v0.4.0) (2023-06-12)
+
+
+### Features
+
+* add function to change the root node ([a5714d3](https://github.com/Darckfast/script-writing/commit/a5714d3a8497549a51aacd1ee94d86de902d1c36))
+
+
+### Bug Fixes
+
+* fixed error when image has no value ([4653a04](https://github.com/Darckfast/script-writing/commit/4653a04570ee984f3b2b1c647d76e7d7deeb5413))
+* removed structuredClone because of proxy obj ([f3ea62f](https://github.com/Darckfast/script-writing/commit/f3ea62fa805ed98135435c6447b86a4f741b1e8f))
+
 ## [0.3.1](https://github.com/Darckfast/script-writing/compare/v0.3.0...v0.3.1) (2023-06-04)
 
 
