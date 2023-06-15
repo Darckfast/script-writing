@@ -1,13 +1,16 @@
 <script lang="ts">
+	import { slide } from 'svelte/transition'
 	import { Background, Svelvet } from 'svelvet'
+	import ShowHideButton from '../../../components/button/ShowHideButton.svelte'
 	import Header from '../../../components/header/Header.svelte'
 	import Passage from '../../../components/story/Passage.svelte'
 	import PropAnchor from '../../../components/story/PropAnchor.svelte'
-	import PropsConfigsV2 from '../../../components/story/PropsConfigs.svelte'
-	import PropsMenuV2 from '../../../components/story/PropsMenu.svelte'
-	import { props, remove } from '../../../lib/nodes.utils'
+	import PropsMenu from '../../../components/story/PropsMenu.svelte'
+	import { remove } from '../../../lib/nodes.utils'
 	import {
+		calculateLeafPositions,
 		copyStory,
+		organizePropsPosition,
 		stories,
 		storiesFetching,
 		storiesSync
@@ -15,27 +18,10 @@
 
 	export let storyIndex
 
+	let sorting = false
+	let showPropMenu = false
+
 	$: story = $stories[storyIndex]
-
-	$: storyProps = story?.passages
-		.map((passage) => {
-			const basePosition = { ...passage.position } ?? { x: 0, y: 0 }
-			basePosition.x = basePosition.x - 350
-
-			const propArray = props(passage).map((prop, index) => {
-				const defaultValue = {
-					x: basePosition.x,
-					y: basePosition.y + index * 50
-				}
-				prop.id = `${prop.pid}-${prop.name}`
-				prop.position = defaultValue
-
-				return prop
-			})
-
-			return propArray
-		})
-		.flat()
 
 	const addNode = ({ detail: nodeToAdd }: CustomEvent<StoryNode>) => {
 		nodeToAdd.name = story.passages.length + 1
@@ -67,48 +53,74 @@
 
 		story.passages = [...story.passages]
 	}
+
+	const organizeNodes = () => {
+		sorting = true
+		calculateLeafPositions(story.passages, story.ifid)
+
+		story.passages = [...story.passages]
+
+		setTimeout(() => {
+			sorting = false
+		}, 1)
+	}
 </script>
 
 <!-- TODO: add duplicate node function -->
-<div class="w-full h-full overflow-hidden">
+<div class="w-full h-full overflow-hidden flex flex-wrap">
 	<Header
-		floatHeader
 		onSync={storiesSync}
 		isFetching={storiesFetching}
 		onCopy={() => copyStory(story)}
+		onOrganize={organizeNodes}
 		headerName={story?.storyName}
 		onReturn={() => ($stories = [...$stories])}
 		id={story?.ifid}
 	/>
 
-	<Svelvet theme="dark" controls minimap>
-		{#if story}
-			{#each story.passages as node, index (`${node.pid}`)}
-				<Passage
-					bind:node
-					fetchOnLoad={index === 0}
-					isRoot={index === 0}
-					on:addNode={addNode}
-					on:changeRoot={() => changeRoot(index)}
-					on:remove={() => deleteNode(node)}
-				/>
-			{/each}
+	<div
+		class={`${showPropMenu ? 'w-2/3' : 'w-full'} relative transition-all`}
+		style="height: 93%;"
+	>
+		<Svelvet theme="dark">
+			{#if story && !sorting}
+				{#each story.passages as node, index (`${node.pid}`)}
+					<Passage
+						let:showProps
+						bind:node
+						fetchOnLoad={index === 0}
+						isRoot={index === 0}
+						on:addNode={addNode}
+						on:changeRoot={() => changeRoot(index)}
+						on:remove={() => deleteNode(node)}
+					>
+						{#if showProps}
+							{#each organizePropsPosition(node, story.ifid) as prop (prop.id)}
+								<PropAnchor {prop} />
+							{/each}
+						{/if}
+					</Passage>
+				{/each}
+			{/if}
 
-			<PropsMenuV2 />
+			<Background
+				dotColor="#fff"
+				bgColor="transparent"
+				gridWidth={40}
+				dotSize={3}
+				slot="background"
+			/>
+		</Svelvet>
 
-			<PropsConfigsV2 />
-
-			{#each storyProps as { value, name, type, pid, position, id } (id)}
-				<PropAnchor {value} propName={name} {type} {pid} {position} />
-			{/each}
-		{/if}
-
-		<Background
-			dotColor="#fff"
-			bgColor="transparent"
-			gridWidth={40}
-			dotSize={3}
-			slot="background"
+		<ShowHideButton
+			class="absolute right-4 bottom-1/2 w-6"
+			bind:show={showPropMenu}
 		/>
-	</Svelvet>
+	</div>
+
+	{#if showPropMenu}
+		<div class="w-1/3" style="height: 93%;" transition:slide={{ axis: 'x' }}>
+			<PropsMenu />
+		</div>
+	{/if}
 </div>
