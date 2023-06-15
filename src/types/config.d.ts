@@ -2,6 +2,7 @@ type GlobalConfig = {
   id: string
   version: number
   sync: boolean
+  alwaysFromCloud: boolean
   autoInfer: boolean
 }
 
