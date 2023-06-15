@@ -1,5 +1,6 @@
 interface LoadProp<T = unknown> {
   key: string
+  saveOnDefault?: boolean
   defaultValue?: T
   shouldUpdate?: (value: T) => boolean
 }
