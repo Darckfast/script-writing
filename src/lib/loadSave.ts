@@ -17,9 +17,17 @@ const save = ({ key, value }: SaveProp): string => {
 const load = <T = unknown>({
   key,
   defaultValue,
+  saveOnDefault = false,
 }: LoadProp<T>): typeof defaultValue => {
   try {
-    return JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
+    const savedValue =
+      JSON.parse(localStorage.getItem(key) ?? 'null') ?? defaultValue
+
+    if (savedValue === defaultValue && saveOnDefault) {
+      save({ key, value: defaultValue })
+    }
+
+    return savedValue
   } catch (err) {
     globalError.pushError(err)
 
@@ -57,6 +65,7 @@ const loadV2 = async <T = unknown>({
 }
 
 const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
+  console.log('saving', key)
   const strValue = JSON.stringify(value)
 
   const isTauri = !!(window as any).__TAURI_IPC__
@@ -85,4 +94,4 @@ const saveV2 = async ({ key, value }: SaveProp): Promise<string> => {
     return save({ key, value })
   }
 }
-export { save, load, loadV2, saveV2, deleteEntry }
+export { deleteEntry, load, loadV2, save, saveV2 }
