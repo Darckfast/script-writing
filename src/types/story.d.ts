@@ -25,7 +25,7 @@ interface TPosition {
   y: number
 }
 
-interface TProp {
+interface TProp extends Record<string, any> {
   name: string
   value: any
   type: string
@@ -45,3 +45,8 @@ interface AnchorStore<T = any> {
 
 type TLinkCustom = { link: CustomWritable<TLink> }
 type TOnLink = CustomEvent<AnchorStore<TLinkCustom>>
+
+interface TAddNode {
+  nodeToAdd: StoryNode
+  nodes: StoryNode[]
+}

@@ -1,11 +1,22 @@
 import type { Connections } from 'svelvet'
 
-interface AddNode {
-  nodeToAdd: StoryNode
-  nodes: StoryNode[]
-}
+const EXCLUDED_PROPS = [
+  'passages',
+  'links',
+  'row',
+  'pid',
+  'ifid',
+  'col',
+  'isTrusted',
+  'text',
+  'cleanText',
+  'position',
+  'name',
+  'parentPid',
+  'version',
+]
 
-const add = ({ nodeToAdd, nodes }: AddNode): StoryNode[] => {
+const add = ({ nodeToAdd, nodes }: TAddNode): StoryNode[] => {
   nodes.push(nodeToAdd)
 
   return nodes
@@ -32,8 +43,6 @@ const update = ({
   update: { pid: string | number; [key: string]: any }
   nodes: StoryNode[]
 }): StoryNode[] => {
-  // const nodesClone = structuredClone({...nodes})
-
   return nodes.map((node) => {
     if (node.pid === update.pid) {
       return {
@@ -46,7 +55,7 @@ const update = ({
   })
 }
 
-const props = (object: any): TProp[] => {
+const props = (object: any, localProps: TProp[] = null): TProp[] => {
   if (object === undefined) {
     return []
   }
@@ -56,29 +65,22 @@ const props = (object: any): TProp[] => {
   const { pid } = object
 
   for (const [key, value] of Object.entries<any>(object)) {
-    if (
-      [
-        'passages',
-        'links',
-        'row',
-        'pid',
-        'ifid',
-        'col',
-        'isTrusted',
-        'text',
-        'cleanText',
-        'position',
-        'name',
-        'parentPid',
-        'version',
-      ].includes(key)
-    )
-      continue
+    if (EXCLUDED_PROPS.includes(key)) continue
+
+    let type = 'text'
+
+    if (localProps !== null) {
+      const localProp = localProps.find((prop) => prop.name === key)
+
+      if (localProp) {
+        type = localProp.type
+      }
+    }
 
     passageProps.push({
       name: key,
       value,
-      type: 'text',
+      type,
       pid,
     })
   }
@@ -91,12 +93,10 @@ const isRoot = (node) => {
 }
 
 const getConnections = (passage: StoryNode): Connections => {
-  // const passageClone: StoryNode = structuredClone({ ...passage })
-
   return passage.links?.map((link) => [
     `node-${link.pid}`,
     `link-out-${link.pid}`,
   ])
 }
 
-export { props, add, remove, update, isRoot, getConnections }
+export { add, getConnections, isRoot, props, remove, update }
