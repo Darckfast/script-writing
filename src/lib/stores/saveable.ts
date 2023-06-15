@@ -1,6 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs'
 import { DropboxResponseError } from 'dropbox'
 import { get, writable, type Writable } from 'svelte/store'
+import { getConfig } from '../configs/getConfig'
 import { calculateFileHash } from '../dbx/contentHash'
 import { load, loadV2, save, saveV2 } from '../loadSave'
 import { getCloudMetadata, isDbxAuth, loadCloud, saveCloud } from './dbx'
@@ -125,6 +126,11 @@ export const createSaveable = <T = unknown>({
   key,
   localOnly = false,
 }: Saveable<T>) => {
+  const alwaysFromCloud = getConfig({
+    configName: 'alwaysFromCloud',
+    defaultValue: false,
+  })
+
   const initialObject = writable<T>(initialSate)
   const revStore = writable(
     load<string>({ key: `${key}-rev`, defaultValue: null })
@@ -136,15 +142,20 @@ export const createSaveable = <T = unknown>({
     save({ key: `${key}-rev`, value })
   })
 
-  const defaultLoad = () =>
-    loadCloud({ key })
-      .then(({ result: { fileBlob, rev } }) => {
-        revStore.set(rev)
+  const defaultLoad = () => {
+    if (alwaysFromCloud) {
+      return loadCloud({ key })
+        .then(({ result: { fileBlob, rev } }) => {
+          revStore.set(rev)
 
-        return fileBlob.text()
-      })
-      .then((fileText: string) => initialObject.set(JSON.parse(fileText)))
-      .then(() => saveV2({ key, value: initialSate }))
+          return fileBlob.text()
+        })
+        .then((fileText: string) => initialObject.set(JSON.parse(fileText)))
+        .then(() => saveV2({ key, value: initialSate }))
+    }
+
+    return null
+  }
 
   const defaultSave = () =>
     saveCloud({
@@ -158,25 +169,38 @@ export const createSaveable = <T = unknown>({
     })
 
   const defaultHasTo = async () => {
+    if (!alwaysFromCloud) return false
+
     const currentHash = await calculateFileHash(get(initialObject))
     const metadata = await getCloudMetadata({ key })
 
     return currentHash !== metadata.result.content_hash
   }
 
-  const defaultCache = () =>
-    loadV2<T>({ key, defaultValue: null }).then((savedValue) => {
-      if (
-        (Array.isArray(savedValue) && savedValue.length === 0) ||
-        (!Array.isArray(savedValue) && !savedValue)
-      ) {
-        console.log('no value cached for', key)
+  const defaultCache = () => {
+    if (alwaysFromCloud) {
+      return loadV2<T>({ key, defaultValue: null }).then((savedValue) => {
+        if (
+          (Array.isArray(savedValue) && savedValue.length === 0) ||
+          (!Array.isArray(savedValue) && !savedValue)
+        ) {
+          console.log('no value cached for', key)
 
-        return
-      }
+          return
+        }
 
+        initialObject.set(savedValue)
+      })
+    }
+
+    return loadV2<T>({ key, defaultValue: initialSate }).then((savedValue) => {
       initialObject.set(savedValue)
+
+      initialObject.subscribe((value) => {
+        saveV2({ key, value })
+      })
     })
+  }
 
   const doInit = () => {
     if (!key) throw new Error('key must be informed')
@@ -222,7 +246,7 @@ export const createSaveable = <T = unknown>({
       return
     }
 
-    if (cloudHash && localHash && cloudHash !== localHash) {
+    if (alwaysFromCloud && cloudHash && localHash && cloudHash !== localHash) {
       globalError.pushError(
         new Error('version conflict, it is necessary to overwrite local'),
         {
@@ -232,11 +256,16 @@ export const createSaveable = <T = unknown>({
       return
     }
 
+    // TODO: extract this condtiuons
     const cloudMeta = await saveCloud({
       key,
       value: currValue,
       fileExtension,
-      rev: localHash === null ? cloudHash : localHash,
+      rev: !alwaysFromCloud
+        ? cloudHash
+        : localHash === null
+        ? cloudHash
+        : localHash,
     })
 
     lastUpdate.set(dayjs())

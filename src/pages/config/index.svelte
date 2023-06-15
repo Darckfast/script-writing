@@ -125,6 +125,17 @@
 
 		<div class="flex gap-2 items-center">
 			<label class="cursor-pointer label gap-2">
+				Always source from cloud
+				<input
+					type="checkbox"
+					class="toggle toggle-primary"
+					bind:checked={$config.alwaysFromCloud}
+				/>
+			</label>
+		</div>
+
+		<div class="flex gap-2 items-center">
+			<label class="cursor-pointer label gap-2">
 				Auto infer story props
 				<input
 					type="checkbox"
