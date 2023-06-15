@@ -10,6 +10,7 @@
 	export let headerName: string
 	export let onCopy: () => void = undefined
 	export let onSync: () => void = undefined
+	export let onOrganize: () => void = undefined
 	export let isFetching: Readable<boolean> = undefined
 	export let id: string
 	export let floatHeader = false
@@ -42,6 +43,14 @@
 	>
 		{id}</button
 	>
+
+	{#if onOrganize}
+		<button
+			class="btn btn-primary w-auto"
+			data-test="btn-organize-content"
+			on:click={onOrganize}>- organize</button
+		>
+	{/if}
 
 	{#if onCopy}
 		<button
