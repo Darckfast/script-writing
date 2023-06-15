@@ -8,8 +8,13 @@
     "allowJs": true,
     "checkJs": true,
     "types": [
-      "@testing-library/jest-dom"
-    ]
+      "@testing-library/jest-dom",
+    ],
+    "paths": {
+      "@/*": [
+        "./src/lib/*"
+      ],
+    }
   },
   "exclude": [
     "**/*.spec.ts"
