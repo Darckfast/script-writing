@@ -10,8 +10,10 @@ export const {
   initialSate: {
     autoInfer: true,
     sync: false,
+    alwaysFromCloud: false,
     version: 1,
     id: 'global-configuration',
   },
   key: 'global-configuration',
+  localOnly: true,
 })
