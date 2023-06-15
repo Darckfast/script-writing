@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
+
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { get } from 'svelte/store'
 	import { Anchor, Node, generateInput, generateOutput } from 'svelvet'
@@ -14,6 +15,7 @@
 	import Trash from '../../styles/icons/trash.svelte'
 	import AddButton from '../button/AddButton.svelte'
 	import ConfirmButton from '../button/ConfirmButton.svelte'
+	import ShowHideButton from '../button/ShowHideButton.svelte'
 	import TextareaInput from '../input/TextareaInput.svelte'
 	import PassagePropMenu from './PassagePropMenu.svelte'
 
@@ -22,12 +24,13 @@
 	export let node: StoryNode
 	export let isSelected = false
 	export let fetchOnLoad = false
-  export let isRoot = false
+	export let isRoot = false
 
 	let container: HTMLDivElement
 	let canFetch = false
 	let showPropsAvailable = false
 	let imagePrm = null
+	let showProps = false
 
 	const inputs = generateInput(node)
 	const output = generateOutput(inputs, (input) => input)
@@ -38,7 +41,6 @@
 	$: anchors = props(node)
 	$: configs = $config[$params.storyId]
 	$: linkConnections = getConnections(node)
-
 	$: if (
 		((node.image && canFetch) || (node.image && fetchOnLoad)) &&
 		configs?.baseDir
@@ -207,6 +209,12 @@
 					class="w-5 h-5 bg-white absolute rounded-full -left-2 -bottom-2"
 					style={`background-color: ${genColor($output.sentBy)};`}
 				/>
+
+				<ShowHideButton
+					bind:show={showProps}
+					class="w-4 absolute -bottom-7 left-5 hover:scale-105 transition-all"
+				/>
+
 				<AddButton
 					data-test={`node-add-${node.pid}`}
 					class="absolute -right-16 bottom-0 w-8"
@@ -272,17 +280,19 @@
 				/>
 			</div>
 
-			<div class="flex flex-col absolute -left-5 top-0 gap-2 z-0">
-				{#each anchors as { name: key } (key)}
-					<Anchor
-						id={key}
-						input
-						inputsStore={inputs}
-						{key}
-						on:disconnection={removeProp}
-					/>
-				{/each}
-			</div>
+			{#if showProps}
+				<div class="flex flex-col absolute -left-4 top-0 gap-2 z-0">
+					{#each anchors as { name: key } (key)}
+						<Anchor
+							id={key}
+							input
+							inputsStore={inputs}
+							{key}
+							on:disconnection={removeProp}
+						/>
+					{/each}
+				</div>
+			{/if}
 
 			{#if showPropsAvailable}
 				<PassagePropMenu
@@ -292,4 +302,6 @@
 			{/if}
 		</Node>
 	</div>
+
+	<slot {showProps} />
 {/if}
