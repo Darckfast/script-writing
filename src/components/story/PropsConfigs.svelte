@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
-	import { Node } from 'svelvet'
 	import { load, save } from '../../lib/loadSave'
 	import { props } from '../../lib/nodes.utils'
 	import { config, configFetching, configSync } from '../../lib/stores/configs'
@@ -63,55 +62,51 @@
 	}
 </script>
 
-<Node bind:position>
-	<div
-		class="flex rounded shadow-md justify-between items-center p-1 gap-2 flex-wrap overflow-y-scroll custom-scroll w-80 bg-slate-900"
-	>
-		{#each props($config[$params.storyId]) as { name }}
-			<PropInput
-				{name}
-				bind:value={$config[$params.storyId][name].value}
-				on:remove={() => remove(name)}
-			>
-				<input
-					type="checkbox"
-					bind:checked={$config[$params.storyId][name].enabled}
-					class="toggle toggle-primary"
-				/>
-			</PropInput>
-		{/each}
-
-		<div>
-			<button
-				class="btn btn-primary w-auto"
-				disabled={!isDbxAuth()}
-				on:click={() => configSync()}
-				>{#if $configFetching}
-					<Spinner />saving...
-				{:else}
-					> save
-				{/if}</button
-			>
-
-			<button class="btn btn-primary" on:click={inferProps}
-				>+ infer props</button
-			>
-		</div>
-
-		<form
-			on:submit|preventDefault={addProp}
-			class="mt-2 w-full flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded"
+<div
+	class="flex rounded shadow-md justify-between items-center p-1 gap-2 flex-wrap overflow-y-scroll custom-scroll w-full bg-slate-900"
+>
+	{#each props($config[$params.storyId]) as { name }}
+		<PropInput
+			{name}
+			bind:value={$config[$params.storyId][name].value}
+			on:remove={() => remove(name)}
 		>
-			<label class="p-1 w-1/2">
-				<input
-					type="text"
-					placeholder="name"
-					class="input input-primary input-sm w-full"
-					bind:value={prop.name}
-				/>
-			</label>
+			<input
+				type="checkbox"
+				bind:checked={$config[$params.storyId][name].enabled}
+				class="toggle toggle-primary"
+			/>
+		</PropInput>
+	{/each}
 
-			<button type="submit" class="btn btn-primary">add</button>
-		</form>
+	<div>
+		<button
+			class="btn btn-primary w-auto"
+			disabled={!isDbxAuth()}
+			on:click={() => configSync()}
+			>{#if $configFetching}
+				<Spinner />saving...
+			{:else}
+				> save
+			{/if}</button
+		>
+
+		<button class="btn btn-primary" on:click={inferProps}>+ infer props</button>
 	</div>
-</Node>
+
+	<form
+		on:submit|preventDefault={addProp}
+		class="mt-2 w-full flex justify-center items-center flex-wrap ring-1 ring-primary p-2 rounded"
+	>
+		<label class="p-1 w-1/2">
+			<input
+				type="text"
+				placeholder="name"
+				class="input input-primary input-sm w-full"
+				bind:value={prop.name}
+			/>
+		</label>
+
+		<button type="submit" class="btn btn-primary">add</button>
+	</form>
+</div>
