@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { params } from '@roxi/routify'
 	import { Anchor, Node, generateInput, generateOutput } from 'svelvet'
-	import { v4 as uuidv4 } from 'uuid'
 	import { save } from '../../lib/loadSave'
 	import { config } from '../../lib/stores/configs'
 	import Trash from '../../styles/icons/trash.svelte'
@@ -13,67 +12,65 @@
 	} from '../input/TextInput.svelte'
 	import Toggle from '../input/Toggle.svelte'
 
-	export let propName: string = ''
-	export let type = ''
-	export let value: string | number | TGetImagePromise | boolean
+	export let prop: TProp
 	export let isAddable = false
-	export let pid: string | number = ''
-	export let position = { x: 0, y: 0 }
 
-	const id = uuidv4()
+	const dataTest = `node-prop-${prop.pid}-${prop.name}`
 
 	$: configs = $config[$params.storyId]
 
-	const inputs = generateInput({ value })
+	const inputs = generateInput(prop)
 	const output = generateOutput(inputs, (input) => input.value)
 
+	$: ({ position, pid, name, id, type, value } = $inputs)
+
 	$: {
-		save({ key: `${pid}-${propName}`, value: position })
+		save({ key: `prop-position-${$pid}-${$name}`, value: $position })
 	}
 </script>
 
-<Node {id} bind:position let:destroy>
+<Node id={$id} bind:position={$position} let:destroy>
 	<span
 		class="w-full gap-2 flex items-center justify-start cursor-pointer transition-all hover:text-slate-300"
 	>
 		<slot />
 		<span class="flex gap-2 items-center">
-			{propName}
+			{$name}
 		</span>
 
 		{#if typeof $output === 'boolean'}
 			<Toggle
 				parameterStore={$inputs.value}
 				{isAddable}
-				{propName}
-				data-test={`node-prop-${pid}-${propName}`}
+				propName={name}
+				data-test={dataTest}
 			/>
-		{:else if type === 'number'}
+		{:else if $type === 'number'}
 			<NumberInput
 				parameterStore={$inputs.value}
 				{isAddable}
-				{propName}
-				data-test={`node-prop-${pid}-${propName}`}
+				propName={name}
+				data-test={dataTest}
 			/>
-		{:else if type === 'file' || propName === 'image'}
+		{:else if $type === 'file' || $name === 'image'}
 			<FileInput
-				data-test={`node-prop-${pid}-${propName}`}
+				data-test={dataTest}
 				parameterStore={$inputs.value}
 				baseDir={configs?.baseDir.value}
 				{isAddable}
-				{propName}
+				propName={name}
 			/>
-		{:else if value !== undefined}
+		{:else if $value !== undefined}
 			<TextInput
-				data-test={`node-prop-${pid}-${propName}`}
+				data-test={dataTest}
 				parameterStore={$inputs.value}
 				{isAddable}
-				{propName}
+				propName={name}
 			/>
 		{/if}
 
 		<ConfirmButton
-			data-test={`node-prop-remove-${pid}-${propName}`}
+			data-test={`node-prop-remove-${$pid}-${$name}`}
 			on:confirm={destroy}
 			classes="cursor-pointer w-auto h-auto p-1 rounded"
 		>
@@ -83,7 +80,7 @@
 		<Anchor
 			output
 			outputStore={output}
-			connections={[[`node-${pid}`, propName]]}
+			connections={[[`node-${$pid}`, $name]]}
 		/>
 	</span>
 </Node>
