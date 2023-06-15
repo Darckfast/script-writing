@@ -1,5 +1,9 @@
+import { get } from 'svelte/store'
+import { v4 as uuidv4 } from 'uuid'
 import { copy } from '../copy'
-import { saveV2 } from '../loadSave'
+import { load, saveV2 } from '../loadSave'
+import { props } from '../nodes.utils'
+import { localPropsStore } from './localProps'
 import { createSaveable } from './saveable'
 
 export const replaceImage = (story: Story) => {
@@ -81,35 +85,68 @@ const resolvePromises = (stories: Story[]) => {
   }
 }
 
-export function calculateLeafPositions(story: Story): void {
-  const root = story.passages[0]
+export const organizePropsPosition = (passage: StoryNode, storyId = '') => {
+  const basePosition = { ...passage.position } ?? { x: 0, y: 0 }
+  basePosition.x = basePosition.x - 350
+
+  const localProps = []
+
+  if (storyId !== '') {
+    localProps.push(...get(localPropsStore)[storyId])
+  }
+
+  return props(passage, localProps).reduce((acc, prop, index) => {
+    prop.position = {
+      x: basePosition.x,
+      y: basePosition.y + index * 50,
+    }
+
+    if (acc.length > 0 && acc.at(index - 1).type === 'file') {
+      prop.position.y += index * 50
+    }
+
+    prop.id = load({
+      key: `prop-id-${passage.pid}-${prop.name}`,
+      defaultValue: uuidv4(),
+      saveOnDefault: true,
+    })
+
+    acc.push(prop)
+
+    return acc
+  }, [])
+}
+
+export function calculateLeafPositions(passages: StoryNode[], storyId: string) {
+  const root = passages[0]
 
   traverse(root, 0, 0)
 
   function traverse(node: StoryNode, x: number, y: number): void {
-    node.position ||= { x, y }
+    node.position = { x, y }
     node.pid = keepPIDinUUIDorNumber(node.pid)
 
-    if (!node.links) {
+    organizePropsPosition(node, storyId)
+
+    if (node.links === undefined) {
       node.links = []
       return
     }
 
-    node.links = node.links.map((link) => {
-      link.pid = keepPIDinUUIDorNumber(link.pid)
-      return link
-    })
+    const links = node.links
 
-    const children = node.links.map((link) =>
-      story.passages.find((passage) => passage.pid === link.pid)
-    )
+    const children = links
+      .map((link) => passages.find((passage) => passage.pid === link.pid))
+      .filter((child) => child !== undefined)
 
     const width = children.length * 600
     const xOffset = width / (children.length + 1)
     let childX = x - width / 2 + xOffset
 
+    const nodeHasImage = node.image !== undefined
+
     children.forEach((child) => {
-      traverse(child, childX, child.image !== undefined ? y + 550 : y + 100) // Adjust the y offset as needed
+      traverse(child, childX, nodeHasImage ? y + 650 : y + 200)
       childX += xOffset
     })
   }
@@ -157,9 +194,6 @@ const keepPIDinUUIDorNumber = (nodePid: string | number) => {
 
 export const removeLegacyProps = (story: Story) => {
   story.passages = story.passages.map((passage) => {
-    // rome-ignore lint/performance/noDelete: this props need to be removed from the JSON file
-    delete passage.text
-
     if (!passage.position || typeof passage.position.x === 'string') {
       passage.position = {
         x: 0,
@@ -168,9 +202,6 @@ export const removeLegacyProps = (story: Story) => {
     }
 
     if (!passage.links) passage.links = []
-
-    // rome-ignore lint/performance/noDelete: this props need to be removed from the JSON file
-    delete passage.isTrusted
 
     return passage
   })
