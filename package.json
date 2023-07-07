@@ -29,7 +29,7 @@
     "@types/uuid": "^9.0.2",
     "autoprefixer": "^10.4.14",
     "cypress": "^12.14.0",
-    "daisyui": "^3.1.0",
+    "daisyui": "^3.2.1",
     "dayjs": "^1.11.8",
     "dropbox": "^10.34.0",
     "husky": "^8.0.3",
