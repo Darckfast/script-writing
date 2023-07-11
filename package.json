@@ -28,7 +28,7 @@
     "@types/node-fetch": "^2.6.4",
     "@types/uuid": "^9.0.2",
     "autoprefixer": "^10.4.14",
-    "cypress": "^12.14.0",
+    "cypress": "^12.17.1",
     "daisyui": "^3.2.1",
     "dayjs": "^1.11.8",
     "dropbox": "^10.34.0",
