@@ -18,8 +18,8 @@ devDependencies:
     specifier: ^1.4.0
     version: 1.4.0
   '@tsconfig/svelte':
-    specifier: ^4.0.1
-    version: 4.0.1
+    specifier: ^5.0.2
+    version: 5.0.2
   '@types/node-fetch':
     specifier: ^2.6.4
     version: 2.6.4
@@ -815,8 +815,8 @@ packages:
     engines: {node: '>= 6'}
     dev: true
 
-  /@tsconfig/svelte@4.0.1:
-    resolution: {integrity: sha512-B+XlGpmuAQzJqDoBATNCvEPqQg0HkO7S8pM14QDI5NsmtymzRexQ1N+nX2H6RTtFbuFgaZD4I8AAi8voGg0GLg==}
+  /@tsconfig/svelte@5.0.2:
+    resolution: {integrity: sha512-BRbo1fOtyVbhfLyuCWw6wAWp+U8UQle+ZXu84MYYWzYSEB28dyfnRBIE99eoG+qdAC0po6L2ScIEivcT07UaMA==}
     dev: true
 
   /@types/chai-subset@1.3.3:
