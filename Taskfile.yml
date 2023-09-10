@@ -1,0 +1,46 @@
+version: 3
+
+tasks:
+  frontend:install:
+    dir: frontend
+    cmds:
+      - pnpm install
+  frontend:check:ci:
+    dir: frontend
+    cmds:
+      - pnpm run check:ci
+  frontend:lint:
+    dir: frontend
+    cmds:
+      - pnpm lint
+  go:test:unit:
+    deps: [frontend:build]
+    cmds:
+      - go test -v ./...
+  go:build:
+    cmds:
+      - wails build
+  frontend:test:unit:
+    dir: frontend
+    cmds:
+      - pnpm test:unit
+  frontend:test:e2e:
+    dir: frontend
+    cmds:
+      - pnpm test:e2e
+  frontend:vitest:
+    dir: frontend
+    cmds:
+      - pnpm vitest
+  frontend:build:
+    dir: frontend
+    cmds:
+      - pnpm build
+  frontend:check:bundle:
+    dir: frontend
+    cmds:
+      - pnpm run check:bundle
+  frontend:update:
+    dir: frontend
+    cmds:
+      - pnpm update -L

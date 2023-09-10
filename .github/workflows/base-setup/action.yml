@@ -1,0 +1,25 @@
+name: 🖇️ Base setup
+
+inputs:
+  token:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v2
+      with:
+        version: latest
+
+    - uses: actions/setup-node@v3
+      with:
+        cache: 'pnpm'
+        cache-dependency-path: '**/pnpm-lock.yaml'
+
+    - uses: arduino/setup-task@v1
+      with:
+        version: 3.x
+        repo-token: ${{ inputs.token }}     
+
+    - run: task frontend:install
+      shell: bash
