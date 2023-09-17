@@ -1,4 +1,3 @@
-import { calculateFileHash } from '@/functions/hash/contentHash'
 import {
   loadV2,
   saveV2
@@ -8,7 +7,7 @@ import {
   GetMetadata,
   IsAuthenticated,
   UploadFile
-} from '@/functions/wailsjs/go/sync/DBXSync'
+} from '@/functions/wailsjs/go/syncs/DBXSync'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, writable } from 'svelte/store'
 import { globalError } from './globalError'
@@ -73,9 +72,6 @@ export const createSaveable = <T = unknown>({
     isFetching.set(true)
 
     const objectString = JSON.stringify(object)
-    const localContentHash = await calculateFileHash(
-      get(saveableObject)
-    )
     const { err, rev } = await GetMetadata(key)
 
     if (err) {
@@ -85,7 +81,6 @@ export const createSaveable = <T = unknown>({
 
     const cloudMeta = await UploadFile({
       content: objectString,
-      contentHash: localContentHash,
       rev: rev,
       fileName: key
     })

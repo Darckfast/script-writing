@@ -2,25 +2,8 @@ import { get } from 'svelte/store'
 import { v4 as uuidv4 } from 'uuid'
 import { load } from '../../lib/functions/loadSave/loadSave'
 import { props } from '../../lib/functions/node.utils/nodes.utils'
-import { copy } from '../functions/copy/copy'
 import { localPropsStore } from './localProps'
 import { createSaveable } from './saveable'
-
-export const replaceImage = (story: Story) => {
-  const newStory = { ...story }
-
-  newStory.passages = story.passages.map((passage) => {
-    if (passage.image?.value)
-      passage.image = passage.image.value
-
-    return passage
-  })
-
-  return newStory
-}
-
-export const copyStory = (story: Story) =>
-  copy(replaceImage(story))
 
 export const {
   initialObject: stories,
@@ -33,67 +16,7 @@ export const {
   key: 'stories'
 })
 
-const updateStoryWithPassage = ({
-  index,
-  storyId,
-  resolvedValue,
-  key
-}) => {
-  stories.update((currStories) =>
-    currStories.map((currStory) => {
-      if (currStory.ifid === storyId) {
-        currStory.passages[index][key] = resolvedValue
-      }
-
-      return currStory
-    })
-  )
-}
-
-const iterateOverPassages = ({
-  passage,
-  storyId,
-  index
-}) => {
-  for (const key in passage) {
-    if (
-      Object.prototype.hasOwnProperty.call(passage, key)
-    ) {
-      const passageProp = passage[key]
-
-      if (
-        !passageProp?.isImagePromise ||
-        passageProp.done ||
-        passageProp.promise === null ||
-        passageProp.promise.then === undefined
-      )
-        continue
-
-      passageProp.promise.then(() =>
-        updateStoryWithPassage({
-          index,
-          storyId,
-          resolvedValue: passageProp,
-          key
-        })
-      )
-    }
-  }
-}
-
-const resolvePromises = (stories: Story[]) => {
-  for (const story of stories) {
-    story.passages.forEach((passage, index) =>
-      iterateOverPassages({
-        passage,
-        storyId: story.ifid,
-        index
-      })
-    )
-  }
-}
-
-export const organizePropsPosition = (
+export const getPropsAsObject = (
   passage: StoryNode,
   storyId = ''
 ) => {
@@ -101,29 +24,23 @@ export const organizePropsPosition = (
     x: 0,
     y: 0
   }
-  basePosition.x = basePosition.x - 350
+  basePosition.x = basePosition?.x ?? 0 - 350
 
   const localProps = []
 
   if (storyId !== '') {
     const savedLocalProps = get(localPropsStore)[storyId]
 
-    if (savedLocalProps)
+    if (savedLocalProps !== undefined) {
       localProps.push(savedLocalProps[storyId])
+    }
   }
 
-  return props(passage, localProps).reduce(
+  return props(passage).reduce(
     (acc, prop, index) => {
       prop.position = {
-        x: basePosition.x,
-        y: basePosition.y + index * 50
-      }
-
-      if (
-        acc.length > 0 &&
-        acc.at(index - 1).type === 'file'
-      ) {
-        prop.position.y += index * 50
+        x: basePosition.x ?? 0,
+        y: basePosition.y ?? 0 + index * 50
       }
 
       prop.id = load({
@@ -136,7 +53,7 @@ export const organizePropsPosition = (
 
       return acc
     },
-    []
+    [] as any[]
   )
 }
 
@@ -154,9 +71,6 @@ export function calculateLeafPositions(
     y: number
   ): void {
     node.position = { x, y }
-    node.pid = keepPIDinUUIDorNumber(node.pid)
-
-    organizePropsPosition(node, storyId)
 
     if (node.links === undefined) {
       node.links = []
@@ -186,72 +100,4 @@ export function calculateLeafPositions(
       childX += xOffset
     })
   }
-}
-
-export const formatStoryPIDs = (story: Story) => {
-  let latestPid = -1
-
-  story.passages = story.passages.map((passage) => {
-    passage.pid = keepPIDinUUIDorNumber(passage.pid)
-
-    if (
-      typeof passage.pid === 'number' &&
-      passage.pid > latestPid
-    ) {
-      latestPid = passage.pid
-    }
-
-    if (!passage.links) return passage
-
-    passage.links = passage.links.map((link) => {
-      link.pid = keepPIDinUUIDorNumber(link.pid)
-      return link
-    })
-
-    return passage
-  })
-
-  if (latestPid > 0) {
-    story.latestPid = latestPid
-  }
-
-  return story
-}
-
-export const containsOnlyNumbers = (str: string) => {
-  const reg = /^\d+$/
-  return reg.test(str)
-}
-
-const keepPIDinUUIDorNumber = (
-  nodePid: string | number
-) => {
-  if (
-    typeof nodePid === 'string' &&
-    containsOnlyNumbers(nodePid)
-  ) {
-    return parseInt(nodePid)
-  }
-
-  return nodePid
-}
-
-export const removeLegacyProps = (story: Story) => {
-  story.passages = story.passages.map((passage) => {
-    if (
-      !passage.position ||
-      typeof passage.position.x === 'string'
-    ) {
-      passage.position = {
-        x: 0,
-        y: 0
-      }
-    }
-
-    if (!passage.links) passage.links = []
-
-    return passage
-  })
-
-  return story
 }

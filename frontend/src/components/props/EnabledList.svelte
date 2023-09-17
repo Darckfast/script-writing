@@ -5,24 +5,7 @@
   import ConfirmButton from "../buttons/ConfirmButton.svelte";
 
   $: propsStore = $localPropsStore[$params.storyId];
-  $: propTypes = [
-    {
-      type: "text",
-      enabled: true,
-    },
-    {
-      type: "boolean",
-      enabled: true,
-    },
-    {
-      type: "number",
-      enabled: true,
-    },
-    {
-      type: "file",
-      enabled: true,
-    },
-  ];
+  $: propTypes = ['text', 'number', 'file', 'boolean']
 
   const prop = {
     name: "",
@@ -31,8 +14,6 @@
   };
 
   const createProp = () => {
-    if (isPropNotEnabled(prop.type)) return;
-
     if (prop.type === "boolean") prop.value = true;
 
     $localPropsStore[$params.storyId].push(structuredClone(prop));
@@ -41,9 +22,6 @@
     prop.name = "";
     prop.value = null;
   };
-
-  const isPropNotEnabled = (pType) =>
-    !propTypes.find(({ type, enabled }) => type === pType && enabled);
 
   const remove = (index: number): void => {
     $localPropsStore[$params.storyId].splice(index, 1);
@@ -114,18 +92,16 @@
     <button
       type="submit"
       data-test="add-prop"
-      class="btn btn-primary"
-      disabled={isPropNotEnabled(prop.type)}>add</button
+      class="btn btn-primary">add</button
     >
   </div>
 
   <div class="w-full h-auto flex flex-wrap gap-4">
-    {#each propTypes as { enabled, type }}
+    {#each propTypes as type}
       <label class="flex items-center gap-2">
         <input
           data-test={`radio-prop-${type}`}
           bind:group={prop.type}
-          disabled={!enabled}
           value={type}
           type="radio"
           name="radio-2"

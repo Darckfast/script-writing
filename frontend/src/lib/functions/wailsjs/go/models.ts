@@ -1,5 +1,17 @@
-export namespace sync {
+export namespace syncs {
 	
+	export class AuthResult {
+	    err?: any;
+	
+	    static createFrom(source: any = {}) {
+	        return new AuthResult(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.err = source["err"];
+	    }
+	}
 	export class MetadataResult {
 	    contentHash?: string;
 	    rev?: string;

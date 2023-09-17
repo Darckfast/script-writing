@@ -2,8 +2,6 @@
   import { params } from "@roxi/routify";
 
   import { genColor } from "@/functions/colors/colorGen";
-  import { getFromPathOrPromise } from "@/functions/images/imagePromise";
-  // import { getConnections, props } from "@/functions/nodes.utils/node.utils";
   import { getConnections, props } from "@/functions/node.utils/nodes.utils";
   import { localPropsStore } from "@/stores/localProps";
   import { createEventDispatcher, onMount } from "svelte";
@@ -19,6 +17,7 @@
   import ShowHideButton from "../buttons/ShowHideButton.svelte";
   import TextareaInput from "../inputs/TextareaInput.svelte";
   import PassagePropMenu from "./AddMenu.svelte";
+  import { GetTemporaryLink } from "@/functions/wailsjs/go/syncs/DBXSync";
 
   const dispatch = createEventDispatcher();
 
@@ -28,7 +27,7 @@
   let container: HTMLDivElement;
   let canFetch = false;
   let showPropsAvailable = false;
-  let imagePrm = null;
+  let imagePrm: Promise<Result> | undefined;
   let showProps = false;
 
   const inputs = generateInput(node);
@@ -36,15 +35,22 @@
   const linkInputs = generateInput({});
   const outputLink = generateOutput(inputs, (input) => ({ pid: input.pid }));
 
+  let anchors: TProp[] = [];
+
   $: node = $output;
   $: ({ storyId } = $params);
   $: localProps = $localPropsStore[storyId];
-  $: anchors = props(node, localProps);
   $: linkConnections = getConnections(node);
-  $: if (node.baseDir && node.image && canFetch) {
-    node.image = getFromPathOrPromise($output.image, node.baseDir);
+  $: if (node.image && canFetch) {
+    imagePrm ||= GetTemporaryLink(node.image);
+  }
 
-    imagePrm = node.image.promise;
+  $: {
+    if (showProps) {
+      anchors = props(node, localProps);
+    } else {
+      anchors = [];
+    }
   }
 
   onMount(() => {
@@ -71,7 +77,10 @@
   const addNode = () => {
     let { latestPid } = $stories[$params.storyIndex];
 
-    latestPid ||= 0;
+    if (latestPid === undefined) {
+      latestPid = $stories[$params.storyIndex].passages.length;
+      $stories[$params.storyIndex].latestPid = latestPid;
+    }
 
     const newNode = {
       pid: latestPid + 1,
@@ -79,8 +88,8 @@
       cleanText: "",
       links: [],
       position: {
-        x: $output.position.x,
-        y: $output.position.y + 300,
+        x: $output.position?.x ?? 0,
+        y: $output.position?.y ?? 0 + 300,
       },
     };
 
@@ -122,13 +131,11 @@
     return $inputs.links;
   };
 
-  const removeProp = ({ detail }) => {
-    const { inputKey } = detail.anchor;
-
-    if (!inputKey) return;
+  const removeProp = (propName) => {
+    if (!propName) return;
 
     inputs.update((state) => {
-      delete state[inputKey];
+      delete state[propName];
 
       return state;
     });
@@ -198,14 +205,14 @@
           parameterStore={$inputs.cleanText}
         />
 
-        {#if node.image}
+        {#if node.image && imagePrm}
           {#await imagePrm}
             <div class="flex h-96">
               <Spinner />
             </div>
-          {:then src}
+          {:then result}
             <img
-              {src}
+              src={result.content}
               alt="message"
               style="width: 20rem;"
               loading="lazy"
@@ -303,19 +310,11 @@
         />
       </div>
 
-      {#if showProps}
-        <div class="flex flex-col absolute -left-4 top-0 gap-2 z-0">
-          {#each anchors as { name: key } (key)}
-            <Anchor
-              id={key}
-              input
-              inputsStore={inputs}
-              {key}
-              on:disconnection={removeProp}
-            />
-          {/each}
-        </div>
-      {/if}
+      <div class="flex flex-col absolute -left-4 top-0 gap-2 z-0">
+        {#each anchors as { name: key } (key)}
+          <Anchor id={key} input inputsStore={inputs} {key} />
+        {/each}
+      </div>
 
       {#if showPropsAvailable}
         <PassagePropMenu
@@ -326,5 +325,5 @@
     </Node>
   </div>
 
-  <slot {showProps} />
+  <slot {showProps} {removeProp} />
 {/if}
