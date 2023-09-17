@@ -1,4 +1,4 @@
-mport { writable } from 'svelte/store'
+import { writable } from 'svelte/store'
 interface ErrorStore {
   type: string
   message: string
@@ -38,7 +38,6 @@ export const globalError = {
   set,
   subscribe,
   update,
-  clearCurrent,
   clearAll,
   pushError
 }
