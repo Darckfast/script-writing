@@ -13,6 +13,10 @@ tasks:
     dir: frontend
     cmds:
       - pnpm run check:ci
+  front:format:
+    dir: frontend
+    cmds:
+      - pnpm format
   front:lint:
     dir: frontend
     cmds:

@@ -36,25 +36,22 @@ export const getPropsAsObject = (
     }
   }
 
-  return props(passage).reduce(
-    (acc, prop, index) => {
-      prop.position = {
-        x: basePosition.x ?? 0,
-        y: basePosition.y ?? 0 + index * 50
-      }
+  return props(passage).reduce((acc, prop, index) => {
+    prop.position = {
+      x: basePosition.x ?? 0,
+      y: basePosition.y ?? 0 + index * 50
+    }
 
-      prop.id = load({
-        key: `prop-id-${passage.pid}-${prop.name}`,
-        defaultValue: uuidv4(),
-        saveOnDefault: true
-      })
+    prop.id = load({
+      key: `prop-id-${passage.pid}-${prop.name}`,
+      defaultValue: uuidv4(),
+      saveOnDefault: true
+    })
 
-      acc.push(prop)
+    acc.push(prop)
 
-      return acc
-    },
-    [] as any[]
-  )
+    return acc
+  }, [] as any[])
 }
 
 export function calculateLeafPositions(

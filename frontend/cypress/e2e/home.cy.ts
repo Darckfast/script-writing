@@ -9,11 +9,11 @@ const mockStory = {
       pid: '8f5557c7-921c-45fe-8f1e-83719816a375',
       name: 1,
       cleanText: '',
-      links: [],
-    },
+      links: []
+    }
   ],
   createdWith: 'dev',
-  storyName: 'Test',
+  storyName: 'Test'
 }
 
 describe('home page', () => {
@@ -22,20 +22,39 @@ describe('home page', () => {
   })
 
   it('check buttons', () => {
-    getComponent('btn-create-story').should('have.text', '+ story')
-    getComponent('btn-export-story').should('have.text', '> generate bundle')
-    getComponent('a-config', 'a').should('have.text', '$ configurations')
-    getComponent('btn-sync-story').should('have.text', '= sync')
+    getComponent('btn-create-story').should(
+      'have.text',
+      '+ story'
+    )
+    getComponent('btn-export-story').should(
+      'have.text',
+      '> generate bundle'
+    )
+    getComponent('a-config', 'a').should(
+      'have.text',
+      '$ configurations'
+    )
+    getComponent('btn-sync-story').should(
+      'have.text',
+      '= sync'
+    )
   })
 
   it('create new story from button', () => {
-    getComponent('input-story-name', 'input').type('new story')
+    getComponent('input-story-name', 'input').type(
+      'new story'
+    )
     getComponent('btn-create-story').click()
-    getComponent('a-story-node-0').should('have.text', 'new story')
+    getComponent('a-story-node-0').should(
+      'have.text',
+      'new story'
+    )
   })
 
   it('delete story', () => {
-    getComponent('input-story-name', 'input').type('new story')
+    getComponent('input-story-name', 'input').type(
+      'new story'
+    )
     getComponent('btn-create-story').click()
 
     getComponent('btn-delete-story').click()
@@ -44,7 +63,9 @@ describe('home page', () => {
   })
 
   it('copy story', () => {
-    getComponent('input-story-name', 'input').type('new story')
+    getComponent('input-story-name', 'input').type(
+      'new story'
+    )
     getComponent('btn-create-story').click()
     getComponent('btn-export-story').click()
   })

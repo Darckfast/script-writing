@@ -11,8 +11,8 @@ export const {
   updateLocal: updateLocalDocuments,
   isFetching: documentsFetching,
   lastUpdate: documentsLastUpdate,
-  doSync: documentsSync,
+  doSync: documentsSync
 } = createSaveable<TDocument[]>({
   initialSate: [],
-  key: 'documents',
+  key: 'documents'
 })

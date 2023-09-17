@@ -9,8 +9,8 @@ export const EmptyStory: Story = {
   passages: [
     { cleanText: '', name: '', pid: 1, links: [] }
   ],
-  ifid: "",
-  storyName: "",
+  ifid: '',
+  storyName: ''
 }
 
 const findStory = (storyId: string) => (story: Story) =>

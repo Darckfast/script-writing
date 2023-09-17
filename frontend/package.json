@@ -17,6 +17,7 @@
     "cy:open": "cypress open",
     "test:unit": "vitest run --coverage",
     "lint": "biome ci .",
+    "format": "biome format --write .",
     "test:e2e": "start-server-and-test dev http://localhost:5177 cy:run",
     "check:bundle": "pnpm run build && pnpm bundlewatch"
   },

@@ -45,7 +45,7 @@ const update = ({
   update,
   nodes
 }: {
-  update: { pid: string | number;[key: string]: any }
+  update: { pid: string | number; [key: string]: any }
   nodes: StoryNode[]
 }): StoryNode[] => {
   return nodes.map((node) => {
@@ -62,20 +62,26 @@ const update = ({
 
 // TODO: need to check for new props type, that do not have value yet
 const getPropType = (value: any) => {
-  if (typeof value === 'boolean' || value === 'true' || value === 'false') {
+  if (
+    typeof value === 'boolean' ||
+    value === 'true' ||
+    value === 'false'
+  ) {
     return 'boolean'
   }
 
   if (`${value}`.includes('public')) return 'file'
   if (value === null) return 'text'
-  if (!Number.isNaN(parseInt(value)) && !Number.isNaN(+value)) return 'number'
+  if (
+    !Number.isNaN(parseInt(value)) &&
+    !Number.isNaN(+value)
+  )
+    return 'number'
 
   return 'text'
 }
 
-const props = (
-  object: any,
-): TProp[] => {
+const props = (object: any): TProp[] => {
   if (object === undefined) {
     return []
   }

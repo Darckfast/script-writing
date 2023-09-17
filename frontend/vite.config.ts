@@ -6,6 +6,6 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [tsconfigPaths(), svelte()],
   server: {
-    port: 5177,
-  },
+    port: 5177
+  }
 })

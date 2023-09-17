@@ -5,7 +5,9 @@ interface ErrorStore {
   options?: OnErrorOptions[]
 }
 
-const { set, subscribe, update } = writable<ErrorStore | undefined>()
+const { set, subscribe, update } = writable<
+  ErrorStore | undefined
+>()
 
 interface OnErrorOptions {
   name: string

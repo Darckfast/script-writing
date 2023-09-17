@@ -85,9 +85,9 @@ export const createSaveable = <T = unknown>({
 
     const cloudMeta = await UploadFile({
       content: objectString,
-      rev: rev ?? "",
+      rev: rev ?? '',
       fileName: key,
-      contentHash: "" // TODO: remove this field
+      contentHash: '' // TODO: remove this field
     })
 
     isFetching.set(false)

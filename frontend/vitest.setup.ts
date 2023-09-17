@@ -17,21 +17,21 @@ const LocalStorageMock = {
   },
   clear() {
     this.state = {}
-  },
+  }
 }
 
 globalThis.localStorage = LocalStorageMock
 globalThis.window = Object.create({})
 Object.defineProperty(window, 'location', {
   value: {
-    pathname: '',
-  },
+    pathname: ''
+  }
 })
 
 globalThis.crypto ||= Object.create({
-  randomUUID: () => 'test',
+  randomUUID: () => 'test'
 })
 
 globalThis.window.crypto ||= Object.create({
-  getRandomValues: (buffer: any) => randomFillSync(buffer),
+  getRandomValues: (buffer: any) => randomFillSync(buffer)
 })
