@@ -6,16 +6,25 @@ import (
 	"testing"
 
 	"script-writing/pkg/logger"
+	"script-writing/pkg/saveload"
+	"script-writing/pkg/store"
 	"script-writing/pkg/syncs"
+	"script-writing/pkg/utils"
 )
 
 var DBX *syncs.DBXSync
 
 func TestMain(m *testing.M) {
-	DBX = syncs.New()
 	logger := logger.New()
-
 	defer logger.LogFile.Close()
+
+	saveLoad := saveload.New()
+	randomString := utils.GetRandString(32)
+
+	os.Setenv("STORE_ENC_KEY", string(randomString))
+
+	store.Init(saveLoad)
+	DBX = syncs.New()
 
 	code := m.Run()
 

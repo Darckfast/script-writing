@@ -22,26 +22,35 @@ func TestMain(m *testing.M) {
 
 	store.Init(saveLoad)
 
+	saveLoad.ExcludeLocal("dbx.store")
+
 	code := m.Run()
 	os.Exit(code)
 }
 
+type StoreType struct {
+	A bool   `json:"a"`
+	B int    `json:"b"`
+	C string `json:"c"`
+}
+
 func TestCreatingNewStore(t *testing.T) {
-	content := map[string]any{"a": true, "b": 1, "c": "string"}
+	content := StoreType{A: true, B: 1, C: "string"}
 
-	store.SaveStore("test.store", content)
+	randStoreName := string(utils.GetRandString(5)) + ".store"
+	store.SaveStore(randStoreName, content)
 
-	storedContent := store.LoadStore("test.store")
+	storedContent := store.LoadStore(randStoreName)
 
-	var parseStore map[string]any
+	var parseStore StoreType
 
 	json.Unmarshal([]byte(storedContent), &parseStore)
 
-	if parseStore["a"] != content["a"] {
-		t.Errorf("Stored value loaded incorrectly, expected %s got %s", content["a"], parseStore["a"])
+	if parseStore.A != content.A {
+		t.Errorf("Stored value loaded incorrectly, expected %t got %t", content.A, parseStore.A)
 	}
 
-	if parseStore["b"] != content["b"] {
-		t.Errorf("Stored value loaded incorrectly, expected %s got %s", content["b"], parseStore["b"])
+	if parseStore.B != content.B {
+		t.Errorf("Stored value loaded incorrectly, expected %d got %d", content.B, parseStore.B)
 	}
 }

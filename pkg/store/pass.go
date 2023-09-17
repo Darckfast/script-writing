@@ -63,9 +63,7 @@ func LoadStore(storeName string) string {
 		return ""
 	}
 
-	block, err := aes.NewCipher([]byte(encryptionKey))
-	logger.Error.Println(err)
-
+	block, _ := aes.NewCipher([]byte(encryptionKey))
 	gcm, _ := cipher.NewGCM(block)
 	nonce := cipherString[:gcm.NonceSize()]
 	cipherText := cipherString[gcm.NonceSize():]

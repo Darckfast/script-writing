@@ -18,12 +18,14 @@ type CustomLogger struct {
 	LogFile *os.File
 }
 
-var colorReset = string("\033[0m")
-var bgRed = string("\033[101m")
-var bgYellow = string("\033[103m")
-var bgBlue = string("\033[104m")
-var colorWhite = string("\033[97m")
-var bold = string("\033[1m")
+var (
+	colorReset = string("\033[0m")
+	bgRed      = string("\033[101m")
+	bgYellow   = string("\033[103m")
+	bgBlue     = string("\033[104m")
+	textColor  = string("\033[30m")
+	bold       = string("\033[1m")
+)
 
 func New() *CustomLogger {
 	cacheDir, _ := os.UserCacheDir()
@@ -38,9 +40,9 @@ func New() *CustomLogger {
 		writer = os.Stdout
 	}
 
-	Info = log.New(writer, bgBlue+colorWhite+bold+" INFO "+colorReset+" ", log.Ldate|log.Ltime)
-	Warn = log.New(writer, bgYellow+colorWhite+bold+" WARN "+colorReset+" ", log.Ldate|log.Ltime)
-	Error = log.New(writer, bgRed+colorWhite+bold+" ERROR "+colorReset+" ", log.Ldate|log.Ltime)
+	Info = log.New(writer, bgBlue+textColor+bold+" INFO "+colorReset+" ", log.Ldate|log.Ltime)
+	Warn = log.New(writer, bgYellow+textColor+bold+" WARN "+colorReset+" ", log.Ldate|log.Ltime)
+	Error = log.New(writer, bgRed+textColor+bold+" ERROR "+colorReset+" ", log.Ldate|log.Ltime)
 
 	return &CustomLogger{
 		LogFile: logFile,
