@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
 	"script-writing/pkg/logger"
 )
 
@@ -48,7 +49,6 @@ func (_ *SaveLoad) SaveLocal(fileName, fileContent string) {
 	filePath := filepath.Join(gameStateDir, fileName)
 
 	err := os.WriteFile(filePath, []byte(fileContent), os.ModePerm)
-
 	if err != nil {
 		logger.Error.Fatal("Error on save ", err)
 	}
