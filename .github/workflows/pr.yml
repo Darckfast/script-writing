@@ -14,7 +14,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        run: task frontend:build
+        run: task front:build
 
   unit-test-go:
     name: 🧪 Go:Unit Test
@@ -47,7 +47,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
  
       - name: Test
-        run: task frontend:test:unit
+        run: task front:test:unit
 
       - name: Test Report
         uses: dorny/test-reporter@v1
@@ -89,7 +89,7 @@ jobs:
   #         token: ${{ secrets.GITHUB_TOKEN }}
  
   #     - name: Test E2E
-  #       run: task frontend:test:e2e
+  #       run: task front:test:e2e
 
   #     - name: Test Report
   #       uses: dorny/test-reporter@v1
@@ -114,7 +114,7 @@ jobs:
         run: echo "::add-matcher::.github/actions/problemMatcher.json"
 
       - name: Check
-        run: task frontend:check:ci
+        run: task front:check:ci
 
   lint:
     name: 🧹 Lint
@@ -128,7 +128,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
  
       - name: Check lint
-        run: task frontend:lint
+        run: task front:lint
   
   bundle-size:
     name: 📦 Bundle size
@@ -142,4 +142,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
  
       - name: Check bundle size
-        run: task frontend:check:bundle
+        run: task front:check:bundle
