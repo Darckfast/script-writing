@@ -4,7 +4,9 @@ go 1.18
 
 require (
 	github.com/dropbox/dropbox-sdk-go-unofficial/v6 v6.0.5
+	github.com/joho/godotenv v1.5.1
 	github.com/wailsapp/wails/v2 v2.5.1
+	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 )
 
 require (
@@ -30,7 +32,6 @@ require (
 	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
 	google.golang.org/appengine v1.6.6 // indirect

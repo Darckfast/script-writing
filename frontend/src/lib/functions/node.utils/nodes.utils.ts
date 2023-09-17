@@ -60,38 +60,28 @@ const update = ({
   })
 }
 
-interface TGepPropType {
-  name: string
-  value: any
-  localProps: TProp[]
-}
-
-const getPropType = ({
-  name,
-  localProps,
-  value
-}: TGepPropType) => {
-  if (localProps) {
-    const localProp = localProps.find(
-      (prop) => prop?.name === name
-    )
-
-    if (localProp) return localProp.type
+// TODO: need to check for new props type, that do not have value yet
+const getPropType = (value: any) => {
+  if (
+    typeof value === 'boolean' ||
+    value === 'true' ||
+    value === 'false'
+  ) {
+    return 'boolean'
   }
 
-  if (value === 'true' || value === 'false')
-    return 'boolean'
-  // if (containsOnlyNumbers(value)) return 'number'
-  if (typeof value === 'object') return 'file'
+  if (`${value}`.includes('public')) return 'file'
   if (value === null) return 'text'
+  if (
+    !Number.isNaN(parseInt(value)) &&
+    !Number.isNaN(+value)
+  )
+    return 'number'
 
   return 'text'
 }
 
-const props = (
-  object: any,
-  localProps: TProp[] = null
-): TProp[] => {
+const props = (object: any): TProp[] => {
   if (object === undefined) {
     return []
   }
@@ -100,14 +90,10 @@ const props = (
 
   const { pid } = object
 
-  for (const [key, value] of Object.entries<any>(object)) {
+  for (const [key, value] of Object.entries(object)) {
     if (EXCLUDED_PROPS.includes(key)) continue
 
-    const type = getPropType({
-      name: key,
-      localProps,
-      value
-    })
+    const type = getPropType(value)
 
     passageProps.push({
       name: key,
@@ -122,7 +108,7 @@ const props = (
   )
 }
 
-const isRoot = (node) => {
+const isRoot = (node: StoryNode) => {
   return node.pid === 'root' || node.pid === 1
 }
 

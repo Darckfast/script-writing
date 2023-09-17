@@ -1,8 +1,12 @@
 describe('document page', () => {
-  const getCopyBtn = () => cy.get('button[data-test="btn-copy-content"]')
-  const getDeleteBtn = () => cy.get('button[data-test="btn-delete-document"]')
+  const getCopyBtn = () =>
+    cy.get('button[data-test="btn-copy-content"]')
+  const getDeleteBtn = () =>
+    cy.get('button[data-test="btn-delete-document"]')
   const createDoc = () =>
-    cy.get('button[data-test="btn-create-document"]').click()
+    cy
+      .get('button[data-test="btn-create-document"]')
+      .click()
   const accessDoc = () =>
     cy.get('button[data-test="a-document-node-0"]').click()
 
@@ -15,10 +19,12 @@ describe('document page', () => {
     createDoc()
     accessDoc()
 
-    cy.get('div.cm-content').clear().type('{"test": true}', {
-      force: true,
-      parseSpecialCharSequences: false,
-    })
+    cy.get('div.cm-content')
+      .clear()
+      .type('{"test": true}', {
+        force: true,
+        parseSpecialCharSequences: false
+      })
 
     getCopyBtn().click()
   })
@@ -27,9 +33,8 @@ describe('document page', () => {
     createDoc()
     getDeleteBtn().dblclick()
 
-    cy.get('span[data-test="empty-doc-placeholder"]').should(
-      'have.text',
-      'no documents available'
-    )
+    cy.get(
+      'span[data-test="empty-doc-placeholder"]'
+    ).should('have.text', 'no documents available')
   })
 })

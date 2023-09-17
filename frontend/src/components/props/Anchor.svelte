@@ -7,6 +7,7 @@
   import PropInput from "../inputs/PropInput.svelte";
 
   export let prop: TProp;
+  export let onRemove: (key: string) => any;
 
   $: story = $stories.find((story) => story.ifid === $params.storyId);
 
@@ -34,7 +35,10 @@
 
     <ConfirmButton
       data-test={`node-prop-remove-${$pid}-${$name}`}
-      on:confirm={destroy}
+      on:confirm={() => {
+        onRemove($name);
+        destroy();
+      }}
       classes="cursor-pointer w-auto h-auto p-1 rounded"
     >
       <Trash />

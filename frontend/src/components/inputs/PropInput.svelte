@@ -5,8 +5,9 @@
 	import TextInput from './TextInput.svelte'
 	import Toggle from './Toggle.svelte'
 
-	export let parameterStore: CustomWritable<any> = null
-	export let type = ''
+	export let parameterStore: CustomWritable<any>
+  export let baseDir = ''
+  export let type = ''
 </script>
 
 {#if type === 'boolean'}
@@ -17,7 +18,7 @@
 	<FileInput
 		data-test={$$props['data-test']}
 		{parameterStore}
-		baseDir={$$props.baseDir}
+		baseDir={baseDir}
 	/>
 {:else}
 	<TextInput data-test={$$props['data-test']} {parameterStore} />

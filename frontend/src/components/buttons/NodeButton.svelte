@@ -7,9 +7,9 @@
   export let index: number;
   export let name: string;
   export let type: "story" | "document";
-  export let href;
+  export let href: string;
 
-  const navigate = async (e: MouseEvent) => {
+  const navigate = async () => {
     $goto(href);
   };
 </script>

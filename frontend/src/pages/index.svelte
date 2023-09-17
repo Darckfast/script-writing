@@ -3,7 +3,6 @@
   import { url } from "@roxi/routify";
   import { v4 as uuidv4 } from "uuid";
   import NodeButton from "../components/buttons/NodeButton.svelte";
-  import { dbxAuth } from "../lib/stores/dbx";
   import {
     documents,
     documentsSync,
@@ -144,26 +143,26 @@
       data-test="btn-export-story"
       on:click={() => bundleStories()}>> generate bundle</button
     >
-
-    <button
-      data-test="btn-sync-story"
-      class="btn btn-primary"
-      disabled={!$dbxAuth.getAccessToken()}
-      on:click={() => {
-        storiesSync();
-        documentsSync();
-      }}>= sync</button
-    >
-
-    <button
-      data-test="btn-sync-story"
-      class="btn btn-primary"
-      disabled={!$dbxAuth.getAccessToken()}
-      on:click={() => {
-        updateLocalStories();
-        updateLocalDocuments();
-      }}>= upd</button
-    >
+  <!---->
+  <!-- <buttoc> -->
+  <!--   data-test="btn-sync-story" -->
+  <!--   class="btn btn-primary" -->
+  <!--   disabled={!$dbxAuth.getAccessToken()} -->
+  <!--   on:click={() => { -->
+  <!--     storiesSync(); -->
+  <!--     documentsSync(); -->
+  <!--   }}>= sync</button -->
+  <!-- > -->
+  <!---->
+  <!-- <button -->
+  <!--   data-test="btn-sync-story" -->
+  <!--   class="btn btn-primary" -->
+  <!--   disabled={!$dbxAuth.getAccessToken()} -->
+  <!--   on:click={() => { -->
+  <!--     updateLocalStories(); -->
+  <!--     updateLocalDocuments(); -->
+  <!--   }}>= upd</button -->
+  <!-- > -->
     <a href={$url(`./config`)} class="btn btn-primary" data-test="a-config"
       >$ configurations</a
     >

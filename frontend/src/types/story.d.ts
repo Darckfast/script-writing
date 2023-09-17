@@ -60,5 +60,10 @@ interface TPropForm {
   placeholder?: string
   baseDir?: string
   type: 'boolean' | 'text' | 'number' | 'file'
-  value: string | number | TGetImagePromise | boolean | undefined
+  value:
+    | string
+    | number
+    | TGetImagePromise
+    | boolean
+    | undefined
 }

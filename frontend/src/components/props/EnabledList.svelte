@@ -1,57 +1,41 @@
 <script lang="ts">
   import { params } from "@roxi/routify";
-  import { localPropsStore } from "../../lib/stores/localProps";
+  import { localProps } from "../../lib/stores/localProps";
   import Trash from "../../styles/icons/trash.svelte";
   import ConfirmButton from "../buttons/ConfirmButton.svelte";
 
-  $: propsStore = $localPropsStore[$params.storyId];
-  $: propTypes = [
-    {
-      type: "text",
-      enabled: true,
-    },
-    {
-      type: "boolean",
-      enabled: true,
-    },
-    {
-      type: "number",
-      enabled: true,
-    },
-    {
-      type: "file",
-      enabled: true,
-    },
-  ];
+  $: propsStore = $localProps[$params.storyId] as TPropForm[];
+  $: propTypes = ["text", "number", "file", "boolean"];
 
-  const prop = {
+  interface TAvailableProp {
+    name: string;
+    value: boolean | number | string | undefined;
+    type: string;
+  }
+
+  const prop: TAvailableProp = {
     name: "",
-    value: null,
+    value: undefined,
     type: "text",
   };
 
   const createProp = () => {
-    if (isPropNotEnabled(prop.type)) return;
-
     if (prop.type === "boolean") prop.value = true;
 
-    $localPropsStore[$params.storyId].push(structuredClone(prop));
-    localPropsStore.update((props) => props);
+    $localProps[$params.storyId].push(structuredClone(prop));
+    $localProps[$params.storyId] = [...$localProps[$params.storyId]];
 
     prop.name = "";
-    prop.value = null;
+    prop.value = undefined;
   };
-
-  const isPropNotEnabled = (pType) =>
-    !propTypes.find(({ type, enabled }) => type === pType && enabled);
 
   const remove = (index: number): void => {
-    $localPropsStore[$params.storyId].splice(index, 1);
-    $localPropsStore[$params.storyId] = [...$localPropsStore[$params.storyId]];
+    $localProps[$params.storyId].splice(index, 1);
+    $localProps[$params.storyId] = [...$localProps[$params.storyId]];
   };
 
-  $: if (!$localPropsStore[$params.storyId]) {
-    $localPropsStore[$params.storyId] = [];
+  $: if (!$localProps[$params.storyId]) {
+    $localProps[$params.storyId] = [];
   }
 </script>
 
@@ -111,21 +95,17 @@
       />
     </label>
 
-    <button
-      type="submit"
-      data-test="add-prop"
-      class="btn btn-primary"
-      disabled={isPropNotEnabled(prop.type)}>add</button
+    <button type="submit" data-test="add-prop" class="btn btn-primary"
+      >add</button
     >
   </div>
 
   <div class="w-full h-auto flex flex-wrap gap-4">
-    {#each propTypes as { enabled, type }}
+    {#each propTypes as type}
       <label class="flex items-center gap-2">
         <input
           data-test={`radio-prop-${type}`}
           bind:group={prop.type}
-          disabled={!enabled}
           value={type}
           type="radio"
           name="radio-2"

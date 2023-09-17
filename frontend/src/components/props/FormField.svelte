@@ -1,29 +1,20 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { getImagePromise } from "../../lib/functions/images/imagePromise";
   import Trash from "../../styles/icons/trash.svelte";
   import AddButton from "../buttons/AddButton.svelte";
-  import ConfirmButton from "../buttons/ConfirmButton.svelte";
+
+  let files: FileList;
 
   const dispatch = createEventDispatcher();
 
   export let formValue: TPropForm;
   export let isRemovable = false;
   export let isAddable = false;
-  export let baseDir: string = "";
 
-  let files: FileList = null;
   let checked = false;
 
   const add = () => dispatch("add", formValue);
   const remove = () => dispatch("remove", formValue);
-
-  const loadImage = () => {
-    formValue.value = getImagePromise({
-      baseDir,
-      file: files[0],
-    });
-  };
 
   $: if (typeof formValue.value === "boolean") {
     formValue.value = checked;
@@ -64,13 +55,13 @@
       class="input w-full input-primary input-sm"
     />
   {:else if formValue.type === "file"}
-    <input
-      data-test={`input-${isAddable ? "local" : "node"}-prop-${formValue.name}`}
-      type="file"
-      bind:files
-      on:change={loadImage}
-      class="file-input file-input-sm file-input-bordered file-input-primary w-full"
-    />
+    <!-- <inpuc> -->
+    <!--   data-test={`input-${isAddable ? "local" : "node"}-prop-${formValue.name}`} -->
+    <!--   type="file" -->
+    <!--   bind:files -->
+    <!--   on:change={loadImage} -->
+    <!--   class="file-input file-input-sm file-input-bordered file-input-primary w-full" -->
+    <!-- /> -->
   {:else}
     <input
       placeholder={formValue.placeholder}

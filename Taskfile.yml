@@ -1,46 +1,59 @@
 version: 3
 
 tasks:
-  frontend:install:
+  front:install:
     dir: frontend
     cmds:
       - pnpm install
-  frontend:check:ci:
+  front:check:
+    dir: frontend
+    cmds:
+      - pnpm run check
+  front:check:ci:
     dir: frontend
     cmds:
       - pnpm run check:ci
-  frontend:lint:
+  front:format:
+    dir: frontend
+    cmds:
+      - pnpm format
+  front:lint:
     dir: frontend
     cmds:
       - pnpm lint
   go:test:unit:
-    deps: [frontend:build]
     cmds:
-      - go test -v ./...
+      - go test -v ./test/...
   go:build:
     cmds:
       - wails build
-  frontend:test:unit:
+  front:test:unit:
     dir: frontend
     cmds:
       - pnpm test:unit
-  frontend:test:e2e:
+  front:test:e2e:
     dir: frontend
     cmds:
       - pnpm test:e2e
-  frontend:vitest:
+  front:vitest:
     dir: frontend
     cmds:
       - pnpm vitest
-  frontend:build:
+  front:build:
     dir: frontend
     cmds:
       - pnpm build
-  frontend:check:bundle:
+  front:check:bundle:
     dir: frontend
     cmds:
       - pnpm run check:bundle
-  frontend:update:
+  front:update:
     dir: frontend
     cmds:
       - pnpm update -L
+  dev:
+    cmds:
+      - wails dev
+  gen-module:
+    cmds:
+      - wails generate module

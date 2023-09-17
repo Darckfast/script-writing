@@ -3,16 +3,14 @@ import { writable } from 'svelte/store'
 export const isFetching = writable(false)
 
 export const EmptyStory: Story = {
-  name: null,
   baseDir: '',
   group: '',
   type: '',
   passages: [
     { cleanText: '', name: '', pid: 1, links: [] }
   ],
-  ifid: null,
-  storyName: null,
-  createdWith: null
+  ifid: '',
+  storyName: ''
 }
 
 const findStory = (storyId: string) => (story: Story) =>

@@ -2,8 +2,11 @@ package saveload
 
 import (
 	"encoding/json"
+	"errors"
+	"io/fs"
 	"os"
 	"path/filepath"
+
 	"script-writing/pkg/logger"
 )
 
@@ -18,6 +21,10 @@ func New() *SaveLoad {
 func GetDir() string {
 	cacheDir, _ := os.UserCacheDir()
 	dir := filepath.Join(cacheDir, "script-writing", "gameState")
+
+	if os.Getenv("NODE_ENV") != "production" {
+		dir = filepath.Join(dir, "dev")
+	}
 
 	_, err := os.Stat(dir)
 
@@ -37,6 +44,16 @@ func (sv *SaveLoad) SaveAnyLocal(fileName string, source any) {
 	sv.SaveLocal(fileName, string(sourceJsonBytes))
 }
 
+func (*SaveLoad) ExcludeLocal(filenName string) {
+	gameStateDir := GetDir()
+	filePath := filepath.Join(gameStateDir, filenName)
+
+	err := os.Remove(filePath)
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
+		logger.Error.Println("Error while trying to remove", filenName, err)
+	}
+}
+
 func (_ *SaveLoad) SaveLocal(fileName, fileContent string) {
 	if fileName == "" || fileContent == "" {
 		logger.Warn.Println("Attempt to write empty file", fileName)
@@ -48,9 +65,8 @@ func (_ *SaveLoad) SaveLocal(fileName, fileContent string) {
 	filePath := filepath.Join(gameStateDir, fileName)
 
 	err := os.WriteFile(filePath, []byte(fileContent), os.ModePerm)
-
 	if err != nil {
-		logger.Error.Fatal("Error on save ", err)
+		logger.Error.Println("Error on save ", err)
 	}
 }
 

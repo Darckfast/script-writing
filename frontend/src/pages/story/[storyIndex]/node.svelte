@@ -9,19 +9,18 @@
   import Passage from "../../../components/props/Passage.svelte";
   import {
     calculateLeafPositions,
-    copyStory,
-    organizePropsPosition,
+    getPropsAsObject,
     stories,
     storiesFetching,
     storiesSync,
   } from "../../../lib/stores/stories";
 
-  export let storyIndex;
+  export let storyIndex: string;
 
   let sorting = false;
   let showAddMenu = false;
 
-  $: story = $stories[storyIndex];
+  $: story = $stories[storyIndex] as StoryNode;
 
   const addNode = ({ detail: nodeToAdd }: CustomEvent<StoryNode>) => {
     nodeToAdd.name = story.passages.length + 1;
@@ -70,7 +69,6 @@
   <Header
     onSync={storiesSync}
     isFetching={storiesFetching}
-    onCopy={() => copyStory(story)}
     onOrganize={organizeNodes}
     headerName={story?.storyName}
     onReturn={() => ($stories = [...$stories])}
@@ -86,6 +84,7 @@
         {#each story.passages as node, index (node.pid)}
           <Passage
             let:showProps
+            let:removeProp
             bind:node
             isRoot={index === 0}
             on:addNode={addNode}
@@ -94,8 +93,8 @@
             on:remove={() => deleteNode(node)}
           >
             {#if showProps}
-              {#each organizePropsPosition(node, story.ifid) as prop (prop.id)}
-                <PropAnchor {prop} />
+              {#each getPropsAsObject(node, story.ifid) as prop}
+                <PropAnchor onRemove={removeProp} {prop} />
               {/each}
             {/if}
           </Passage>
