@@ -14,7 +14,6 @@ tasks:
     cmds:
       - pnpm lint
   go:test:unit:
-    deps: [frontend:build]
     cmds:
       - go test -v ./...
   go:build:
@@ -44,3 +43,9 @@ tasks:
     dir: frontend
     cmds:
       - pnpm update -L
+  dev:
+    cmds:
+      - wails dev
+  gen-module:
+    cmds:
+      - wails generate module
