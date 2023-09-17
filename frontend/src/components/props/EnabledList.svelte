@@ -1,35 +1,41 @@
 <script lang="ts">
   import { params } from "@roxi/routify";
-  import { localPropsStore } from "../../lib/stores/localProps";
+  import { localProps } from "../../lib/stores/localProps";
   import Trash from "../../styles/icons/trash.svelte";
   import ConfirmButton from "../buttons/ConfirmButton.svelte";
 
-  $: propsStore = $localPropsStore[$params.storyId];
-  $: propTypes = ['text', 'number', 'file', 'boolean']
+  $: propsStore = $localProps[$params.storyId] as TPropForm[];
+  $: propTypes = ["text", "number", "file", "boolean"];
 
-  const prop = {
+  interface TAvailableProp {
+    name: string;
+    value: boolean | number | string | undefined;
+    type: string;
+  }
+
+  const prop: TAvailableProp = {
     name: "",
-    value: null,
+    value: undefined,
     type: "text",
   };
 
   const createProp = () => {
     if (prop.type === "boolean") prop.value = true;
 
-    $localPropsStore[$params.storyId].push(structuredClone(prop));
-    localPropsStore.update((props) => props);
+    $localProps[$params.storyId].push(structuredClone(prop));
+    $localProps[$params.storyId] = [...$localProps[$params.storyId]];
 
     prop.name = "";
-    prop.value = null;
+    prop.value = undefined;
   };
 
   const remove = (index: number): void => {
-    $localPropsStore[$params.storyId].splice(index, 1);
-    $localPropsStore[$params.storyId] = [...$localPropsStore[$params.storyId]];
+    $localProps[$params.storyId].splice(index, 1);
+    $localProps[$params.storyId] = [...$localProps[$params.storyId]];
   };
 
-  $: if (!$localPropsStore[$params.storyId]) {
-    $localPropsStore[$params.storyId] = [];
+  $: if (!$localProps[$params.storyId]) {
+    $localProps[$params.storyId] = [];
   }
 </script>
 
@@ -89,10 +95,8 @@
       />
     </label>
 
-    <button
-      type="submit"
-      data-test="add-prop"
-      class="btn btn-primary">add</button
+    <button type="submit" data-test="add-prop" class="btn btn-primary"
+      >add</button
     >
   </div>
 

@@ -3,7 +3,8 @@
 
   import { genColor } from "@/functions/colors/colorGen";
   import { getConnections, props } from "@/functions/node.utils/nodes.utils";
-  import { localPropsStore } from "@/stores/localProps";
+  import type { syncs } from "@/functions/wailsjs/go/models";
+  import { GetTemporaryLink } from "@/functions/wailsjs/go/syncs/DBXSync";
   import { createEventDispatcher, onMount } from "svelte";
   import { get } from "svelte/store";
   import { Anchor, Node, generateInput, generateOutput } from "svelvet";
@@ -17,7 +18,6 @@
   import ShowHideButton from "../buttons/ShowHideButton.svelte";
   import TextareaInput from "../inputs/TextareaInput.svelte";
   import PassagePropMenu from "./AddMenu.svelte";
-  import { GetTemporaryLink } from "@/functions/wailsjs/go/syncs/DBXSync";
 
   const dispatch = createEventDispatcher();
 
@@ -27,7 +27,7 @@
   let container: HTMLDivElement;
   let canFetch = false;
   let showPropsAvailable = false;
-  let imagePrm: Promise<Result> | undefined;
+  let imagePrm: Promise<syncs.Result> | undefined;
   let showProps = false;
 
   const inputs = generateInput(node);
@@ -39,7 +39,7 @@
 
   $: node = $output;
   $: ({ storyId } = $params);
-  $: localProps = $localPropsStore[storyId];
+  $: storyProps = $storyProps[storyId];
   $: linkConnections = getConnections(node);
   $: if (node.image && canFetch) {
     imagePrm ||= GetTemporaryLink(node.image);
@@ -47,7 +47,7 @@
 
   $: {
     if (showProps) {
-      anchors = props(node, localProps);
+      anchors = props(node);
     } else {
       anchors = [];
     }
@@ -95,9 +95,11 @@
 
     const links = getOrCreateEmptyLink();
 
-    links.update((state) => {
-      return [...state, { pid: newNode.pid }];
-    });
+    if (links.update !== null) {
+      links.update((state) => {
+        return [...state, { pid: newNode.pid }];
+      });
+    }
 
     dispatch("addNode", newNode);
   };
@@ -131,7 +133,7 @@
     return $inputs.links;
   };
 
-  const removeProp = (propName) => {
+  const removeProp = (propName: string) => {
     if (!propName) return;
 
     inputs.update((state) => {
@@ -141,7 +143,7 @@
     });
   };
 
-  const addProp = ({ detail: { name, value, type } }) => {
+  const addProp = ({ detail: { name, value } }: any) => {
     if (name in $inputs) {
       console.log("key already exists", $inputs, name);
       return;
@@ -162,6 +164,8 @@
     const links = getOrCreateEmptyLink();
 
     if (type === "connection") {
+      if (links.update === null) return;
+
       links.update((state) => {
         const pidLink = get<TLink>(get<TLinkCustom>(anchor.store).link);
 
@@ -174,6 +178,8 @@
     }
 
     if (type === "disconnection") {
+      if (links.update === null) return;
+
       links.update((state) => {
         const { pid } = get<TLink>(get<TLinkCustom>(anchor.store).link);
         return state.filter((link) => link.pid !== pid);
@@ -181,7 +187,7 @@
     }
   };
 
-  const removeAndDestroy = (destroy) => {
+  const removeAndDestroy = (destroy: () => any) => {
     if (isRoot) return;
 
     remove();

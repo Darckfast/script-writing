@@ -25,7 +25,7 @@ const load = <T = unknown>({
       JSON.parse(localStorage.getItem(key) ?? 'null') ??
       defaultValue
     )
-  } catch (err) {
+  } catch (err: any) {
     globalError.pushError(err)
 
     return defaultValue
@@ -40,7 +40,7 @@ const loadV2 = async <T = unknown>({
     const fileString = await LoadLocal(`${key}.json`)
 
     return JSON.parse(fileString) ?? defaultValue
-  } catch (err) {
+  } catch (err: any) {
     globalError.pushError(err)
 
     return load<T>({ key, defaultValue })
@@ -50,7 +50,7 @@ const loadV2 = async <T = unknown>({
 const saveV2 = async ({ key, value }: SaveProp) => {
   try {
     await SaveLocal(`${key}.json`, JSON.stringify(value))
-  } catch (err) {
+  } catch (err: any) {
     globalError.pushError(err)
 
     return save({ key, value })

@@ -24,7 +24,7 @@ export const createSaveable = <T = unknown>({
   key
 }: Saveable<T>) => {
   const saveableObject = writable<T>(initialSate)
-  const lastUpdate = writable<Dayjs>(null)
+  const lastUpdate = writable<Dayjs>()
   const isFetching = writable(false)
 
   async function updateLocal() {
@@ -46,19 +46,23 @@ export const createSaveable = <T = unknown>({
   loadV2<T>({
     key
   }).then((result) => {
-    saveableObject.set(result)
-    lastUpdate.set(dayjs())
+    if (result) {
+      saveableObject.set(result)
+      lastUpdate.set(dayjs())
+    }
   })
 
   const doSync = async () => {
     const object = get(saveableObject)
 
     if (
+      object === null ||
       (typeof object === 'object' &&
         Object.keys(object).length === 0) ||
       (Array.isArray(object) && object.length === 0)
-    )
+    ) {
       return
+    }
 
     await saveV2({
       key,
@@ -81,8 +85,9 @@ export const createSaveable = <T = unknown>({
 
     const cloudMeta = await UploadFile({
       content: objectString,
-      rev: rev,
-      fileName: key
+      rev: rev ?? "",
+      fileName: key,
+      contentHash: "" // TODO: remove this field
     })
 
     isFetching.set(false)

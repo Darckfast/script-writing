@@ -66,7 +66,7 @@ const getPropType = (value: any) => {
     return 'boolean'
   }
 
-  if (value.includes('public')) return 'file'
+  if (`${value}`.includes('public')) return 'file'
   if (value === null) return 'text'
   if (!Number.isNaN(parseInt(value)) && !Number.isNaN(+value)) return 'number'
 

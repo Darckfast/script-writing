@@ -15,12 +15,12 @@
     storiesSync,
   } from "../../../lib/stores/stories";
 
-  export let storyIndex;
+  export let storyIndex: string;
 
   let sorting = false;
   let showAddMenu = false;
 
-  $: story = $stories[storyIndex];
+  $: story = $stories[storyIndex] as StoryNode;
 
   const addNode = ({ detail: nodeToAdd }: CustomEvent<StoryNode>) => {
     nodeToAdd.name = story.passages.length + 1;

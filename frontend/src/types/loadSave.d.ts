@@ -12,3 +12,9 @@ interface SaveProp {
   rev?: string
   mode?: WriteMode
 }
+
+interface TStoryProps {
+  [storyKey: string]: {
+    [propKey: string]: boolean | string | number
+  }
+}

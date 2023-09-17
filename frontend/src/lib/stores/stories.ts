@@ -2,7 +2,7 @@ import { get } from 'svelte/store'
 import { v4 as uuidv4 } from 'uuid'
 import { load } from '../../lib/functions/loadSave/loadSave'
 import { props } from '../../lib/functions/node.utils/nodes.utils'
-import { localPropsStore } from './localProps'
+import { localProps } from './localProps'
 import { createSaveable } from './saveable'
 
 export const {
@@ -26,13 +26,13 @@ export const getPropsAsObject = (
   }
   basePosition.x = basePosition?.x ?? 0 - 350
 
-  const localProps = []
+  const storyProps = []
 
   if (storyId !== '') {
-    const savedLocalProps = get(localPropsStore)[storyId]
+    const savedProps = get(localProps)[storyId]
 
-    if (savedLocalProps !== undefined) {
-      localProps.push(savedLocalProps[storyId])
+    if (savedProps !== undefined) {
+      storyProps.push(savedProps[storyId])
     }
   }
 

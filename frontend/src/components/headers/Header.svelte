@@ -6,13 +6,13 @@
   import Spinner from "../../styles/icons/spinner.svelte";
 
   export let headerName: string;
-  export let onCopy: () => void = undefined;
-  export let onSync: () => void = undefined;
-  export let onOrganize: () => void = undefined;
-  export let isFetching: Readable<boolean> = undefined;
+  export let onCopy: () => any | undefined;
+  export let onSync: () => any | undefined;
+  export let onOrganize: () => any | undefined;
+  export let isFetching: Readable<boolean> | undefined;
   export let id: string;
   export let floatHeader = false;
-  export let onReturn: () => void = undefined;
+  export let onReturn: () => any | undefined;
 
   const goBack = () => {
     if (onReturn) onReturn();
