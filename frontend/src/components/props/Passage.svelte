@@ -194,6 +194,13 @@
     remove();
     destroy();
   };
+
+  $: if (node.position === undefined) {
+    node.position = {
+      x: 0,
+      y: 0,
+    };
+  }
 </script>
 
 {#if node}

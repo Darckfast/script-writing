@@ -20,38 +20,31 @@ export const getPropsAsObject = (
   passage: StoryNode,
   storyId = ''
 ) => {
-  const basePosition = { ...passage.position } ?? {
-    x: 0,
-    y: 0
+  let basePosition = { x: 0, y: 0 }
+
+  if (passage.position?.x !== undefined) {
+    basePosition = structuredClone(passage.position)
   }
-  basePosition.x = basePosition?.x ?? 0 - 350
+
+  basePosition.x = basePosition.x - 350
 
   const storyProps = []
 
-  if (storyId !== '') {
-    const savedProps = get(localProps)[storyId]
-
-    if (savedProps !== undefined) {
-      storyProps.push(savedProps[storyId])
+  const nodeProps = props(passage)
+  const convProps = []
+  for (let i = 0; i < nodeProps.length; i++) {
+    nodeProps[i].position = {
+      x: basePosition.x ?? 0,
+      y: basePosition.y ?? 0 + i * 50
     }
+
+    nodeProps[i].id = uuidv4()
+
+    convProps.push(nodeProps[i])
   }
 
-  return props(passage).reduce((acc, prop, index) => {
-    prop.position = {
-      x: basePosition.x ?? 0,
-      y: basePosition.y ?? 0 + index * 50
-    }
-
-    prop.id = load({
-      key: `prop-id-${passage.pid}-${prop.name}`,
-      defaultValue: uuidv4(),
-      saveOnDefault: true
-    })
-
-    acc.push(prop)
-
-    return acc
-  }, [] as any[])
+  console.log(convProps)
+  return convProps
 }
 
 export function calculateLeafPositions(
