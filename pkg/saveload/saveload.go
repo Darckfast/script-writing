@@ -87,7 +87,6 @@ func (local *SaveLoad) LoadLocal(fileName string) (string, error) {
 
 	if os.IsNotExist(err) {
 		local.SaveLocal(fileName, "[]")
-
 		return "[]", nil
 	}
 
