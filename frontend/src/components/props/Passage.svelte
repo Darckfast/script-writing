@@ -5,6 +5,7 @@
   import { getConnections, props } from "@/functions/node.utils/nodes.utils";
   import type { syncs } from "@/functions/wailsjs/go/models";
   import { GetTemporaryLink } from "@/functions/wailsjs/go/syncs/DBXSync";
+  import { localProps } from "@/stores/localProps";
   import { createEventDispatcher, onMount } from "svelte";
   import { get } from "svelte/store";
   import { Anchor, Node, generateInput, generateOutput } from "svelvet";
@@ -39,7 +40,7 @@
 
   $: node = $output;
   $: ({ storyId } = $params);
-  $: storyProps = $storyProps[storyId];
+  $: storyProps = $localProps[storyId];
   $: linkConnections = getConnections(node);
   $: if (node.image && canFetch) {
     imagePrm ||= GetTemporaryLink(node.image);

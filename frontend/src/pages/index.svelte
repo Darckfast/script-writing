@@ -143,26 +143,25 @@
       data-test="btn-export-story"
       on:click={() => bundleStories()}>> generate bundle</button
     >
-  <!---->
-  <!-- <buttoc> -->
-  <!--   data-test="btn-sync-story" -->
-  <!--   class="btn btn-primary" -->
-  <!--   disabled={!$dbxAuth.getAccessToken()} -->
-  <!--   on:click={() => { -->
-  <!--     storiesSync(); -->
-  <!--     documentsSync(); -->
-  <!--   }}>= sync</button -->
-  <!-- > -->
-  <!---->
-  <!-- <button -->
-  <!--   data-test="btn-sync-story" -->
-  <!--   class="btn btn-primary" -->
-  <!--   disabled={!$dbxAuth.getAccessToken()} -->
-  <!--   on:click={() => { -->
-  <!--     updateLocalStories(); -->
-  <!--     updateLocalDocuments(); -->
-  <!--   }}>= upd</button -->
-  <!-- > -->
+    <!---->
+    <!-- <buttoc> -->
+    <!--   data-test="btn-sync-story" -->
+    <!--   class="btn btn-primary" -->
+    <!--   disabled={!$dbxAuth.getAccessToken()} -->
+    <!--   on:click={() => { -->
+    <!--     storiesSync(); -->
+    <!--     documentsSync(); -->
+    <!--   }}>= sync</button -->
+    <!-- > -->
+    <!---->
+    <button
+      data-test="btn-sync-story"
+      class="btn btn-primary"
+      on:click={() => {
+        updateLocalStories();
+        updateLocalDocuments();
+      }}>= fetch from dbx</button
+    >
     <a href={$url(`./config`)} class="btn btn-primary" data-test="a-config"
       >$ configurations</a
     >
