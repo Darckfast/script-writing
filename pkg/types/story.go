@@ -5,11 +5,11 @@ type Link struct {
 }
 
 type Story struct {
-	Ifid      string   `json:"ifid"`
-	Passages  Passages `json:"passages"`
-	StoryName string   `json:"storyName"`
-	Type      string   `json:"type"`
-	Group     string   `json:"group"`
+	Ifid      string `json:"ifid"`
+	Passages  []any  `json:"passages"`
+	StoryName string `json:"storyName"`
+	Type      string `json:"type"`
+	Group     string `json:"group"`
 }
 
 type Stories []Story
@@ -40,18 +40,4 @@ type Passage struct {
 	Seen       bool   `json:"seen,omitempty"`
 	LinkChosen int    `json:"linkChosen,omitempty"`
 	KeepFormat bool   `json:"keepFormat,omitempty"`
-}
-
-type Passages []Passage
-
-func (passages *Passages) FindByPID(pid int) (*Passage, bool) {
-	for index := range *passages {
-		value := &(*passages)[index]
-
-		if value.Pid == pid {
-			return value, true
-		}
-	}
-
-	return &Passage{}, false
 }
