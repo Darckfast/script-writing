@@ -75,6 +75,8 @@
   };
 
   const bundleStories = async () => {
+    await documentsSync();
+    await storiesSync();
     await ExportBundle();
   };
 </script>
