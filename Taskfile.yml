@@ -54,6 +54,9 @@ tasks:
   dev:
     cmds:
       - wails dev
+  go:update:
+    cmds:
+      - go get -u .
   gen-module:
     cmds:
       - wails generate module
