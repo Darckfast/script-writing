@@ -23,7 +23,7 @@
     if (prop.type === "boolean") prop.value = true;
 
     $localProps[$params.storyId].push(structuredClone(prop));
-    $localProps[$params.storyId] = [...$localProps[$params.storyId]];
+    $localProps = { ...$localProps };
 
     prop.name = "";
     prop.value = undefined;
@@ -31,7 +31,7 @@
 
   const remove = (index: number): void => {
     $localProps[$params.storyId].splice(index, 1);
-    $localProps[$params.storyId] = [...$localProps[$params.storyId]];
+    $localProps = { ...$localProps };
   };
 
   $: if (!$localProps[$params.storyId]) {

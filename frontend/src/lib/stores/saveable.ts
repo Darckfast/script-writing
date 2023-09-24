@@ -1,5 +1,6 @@
 import {
   loadV2,
+  save,
   saveV2
 } from '@/functions/loadSave/loadSave'
 import {
@@ -16,12 +17,14 @@ interface Saveable<T> {
   initialSate: T
   syncEvery?: number
   key: string
+  localOnly?: boolean
 }
 
 export const createSaveable = <T = unknown>({
   initialSate,
   syncEvery = 60 * 5,
-  key
+  key,
+  localOnly = false
 }: Saveable<T>) => {
   const saveableObject = writable<T>(initialSate)
   const lastUpdate = writable<Dayjs>()
@@ -49,6 +52,13 @@ export const createSaveable = <T = unknown>({
     if (result) {
       saveableObject.set(result)
       lastUpdate.set(dayjs())
+
+      if (localOnly) {
+        saveableObject.subscribe(value => {
+          console.log('saving', key, value)
+          saveV2({ key, value })
+        })
+      }
     }
   })
 
@@ -101,9 +111,10 @@ export const createSaveable = <T = unknown>({
     lastUpdate.set(dayjs())
   }
 
-  setInterval(doSync, syncEvery * 1000)
-
-  void doSync()
+  if (!localOnly) {
+    setInterval(doSync, syncEvery * 1000)
+    void doSync()
+  }
 
   return {
     initialObject: saveableObject,
