@@ -3,6 +3,7 @@ package exporter
 import (
 	"encoding/json"
 	"os"
+
 	"script-writing/pkg/app"
 	"script-writing/pkg/logger"
 	"script-writing/pkg/saveload"
@@ -37,6 +38,12 @@ func prepareBundle() *types.Bundle {
 	bundle := types.Bundle{}
 
 	for _, story := range *stories {
+		if !story.ExportOnBundle {
+			logger.Info.Printf("Story %s (%s) is not flagged to be exported, ignoring\n", story.Ifid, story.StoryName)
+
+			continue
+		}
+
 		singleBundle := bundle.FindByName(story.Group)
 
 		newBundle := false
@@ -79,12 +86,11 @@ func saveExportFile(bundle *types.Bundle) {
 		Title: "Exporting bundle",
 		Filters: []runtime.FileFilter{{
 			DisplayName: "JSON",
-			Pattern:     ".json",
+			Pattern:     "*.json",
 		}},
 		CanCreateDirectories: true,
 		DefaultFilename:      "bundle.json",
 	})
-
 	if err != nil {
 		logger.Error.Println("Error on selecting path to export", err)
 

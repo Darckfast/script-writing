@@ -2,8 +2,6 @@ package main
 
 import (
 	"embed"
-	"fmt"
-	"os"
 
 	"script-writing/pkg/app"
 	"script-writing/pkg/exporter"
@@ -11,20 +9,19 @@ import (
 	"script-writing/pkg/saveload"
 	"script-writing/pkg/store"
 	"script-writing/pkg/syncs"
+	"script-writing/pkg/utils"
 
-	"github.com/joho/godotenv"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 )
 
-//go:embed all:frontend/public
+//go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
-	godotenv.Load("frontend/.env")
+	utils.Init()
 
-	fmt.Println("envs", os.Getenv("NODE_ENV"))
 	app := app.New()
 
 	logger := logger.New()

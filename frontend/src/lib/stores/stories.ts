@@ -22,6 +22,7 @@ export const getPropsAsObject = (
 ) => {
   let basePosition = { x: 0, y: 0 }
 
+
   if (passage.position?.x !== undefined) {
     basePosition = structuredClone(passage.position)
   }
@@ -43,7 +44,6 @@ export const getPropsAsObject = (
     convProps.push(nodeProps[i])
   }
 
-  console.log(convProps)
   return convProps
 }
 

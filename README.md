@@ -11,7 +11,6 @@ This is a tool to help writing stories similar to twison
 
 ## 🗺️ Roadmap
 
-- [ ]  Create a re-builder, for patching older stories format
 - [ ]  Create basic documentation
 - [ ]  Create the project summary
 - [ ]  Add a more efficient way to search for passages PIDs
