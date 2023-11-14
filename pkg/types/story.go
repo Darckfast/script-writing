@@ -5,11 +5,12 @@ type Link struct {
 }
 
 type Story struct {
-	Ifid      string `json:"ifid"`
-	Passages  []any  `json:"passages"`
-	StoryName string `json:"storyName"`
-	Type      string `json:"type"`
-	Group     string `json:"group"`
+	Ifid           string `json:"ifid"`
+	Passages       []any  `json:"passages"`
+	StoryName      string `json:"storyName"`
+	Type           string `json:"type"`
+	ExportOnBundle bool   `json:"exportOnBundle"`
+	Group          string `json:"group"`
 }
 
 type Stories []Story

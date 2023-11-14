@@ -29,7 +29,7 @@ var (
 
 func New() *CustomLogger {
 	cacheDir, _ := os.UserCacheDir()
-	logDir := filepath.Join(cacheDir, "black-cat", "logs.txt")
+	logDir := filepath.Join(cacheDir, "script-writing", "logs.txt")
 
 	logFile, err := os.OpenFile(logDir, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
 

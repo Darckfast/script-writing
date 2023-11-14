@@ -44,7 +44,6 @@ var fileConf = dropbox.Config{
 }
 
 var oauthConf = &oauth2.Config{
-	ClientID: os.Getenv("VITE_DBX_CLIENT_ID"),
 	Scopes: []string{
 		"files.content.write",
 		"files.content.read",
@@ -56,7 +55,7 @@ var oauthConf = &oauth2.Config{
 }
 
 func New() *DBXSync {
-	oauthConf.ClientID = os.Getenv("VITE_DBX_CLIENT_ID")
+	oauthConf.ClientID = utils.DbxClientId
 
 	var storeToken *oauth2.Token
 
@@ -87,6 +86,8 @@ var (
 )
 
 func (dbx *DBXSync) GetAuthURL() string {
+	logger.Info.Println("env", utils.NodeEnv)
+
 	randBytes := utils.GetRandString(64)
 
 	hasher := sha256.New()
@@ -182,7 +183,8 @@ func (*DBXSync) IsAuthenticated() bool {
 func GetFileName(fileName string) string {
 	uploadFileName := fileName
 
-	env := os.Getenv("NODE_ENV")
+	logger.Info.Println("env", utils.NodeEnv)
+	env := utils.NodeEnv
 
 	if env == "development" {
 		uploadFileName = "dev/" + uploadFileName

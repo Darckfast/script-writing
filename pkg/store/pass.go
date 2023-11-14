@@ -6,10 +6,10 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"io"
-	"os"
 
 	"script-writing/pkg/logger"
 	"script-writing/pkg/saveload"
+	"script-writing/pkg/utils"
 )
 
 var (
@@ -19,7 +19,7 @@ var (
 
 func Init(saveLoad *saveload.SaveLoad) {
 	sv = saveLoad
-	encryptionKey = os.Getenv("STORE_ENC_KEY")
+	encryptionKey = utils.EncryptionKey
 }
 
 func SaveStore(storeName string, content any) {

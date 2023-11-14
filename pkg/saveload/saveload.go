@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"script-writing/pkg/logger"
+	"script-writing/pkg/utils"
 )
 
 type SaveLoad struct{}
@@ -22,7 +23,7 @@ func GetDir() string {
 	cacheDir, _ := os.UserCacheDir()
 	dir := filepath.Join(cacheDir, "script-writing", "gameState")
 
-	if os.Getenv("NODE_ENV") != "production" {
+	if utils.NodeEnv != "production" {
 		dir = filepath.Join(dir, "dev")
 	}
 

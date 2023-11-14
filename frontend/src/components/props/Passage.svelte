@@ -1,343 +1,198 @@
 <script lang="ts">
-  import { params } from "@roxi/routify";
-
   import { genColor } from "@/functions/colors/colorGen";
-  import { getConnections, props } from "@/functions/node.utils/nodes.utils";
   import type { syncs } from "@/functions/wailsjs/go/models";
-  import { GetTemporaryLink } from "@/functions/wailsjs/go/syncs/DBXSync";
-  import { localProps } from "@/stores/localProps";
-  import { createEventDispatcher, onMount } from "svelte";
-  import { get } from "svelte/store";
-  import { Anchor, Node, generateInput, generateOutput } from "svelvet";
-  import { stories } from "../../lib/stores/stories";
-  import Copy from "../../styles/icons/copy.svelte";
-  import LinkSlashSolid from "../../styles/icons/link-slash-solid.svelte";
+  import { stories } from "@/stores/stories";
+  import { Handle, Position, type NodeProps } from "@xyflow/svelte";
   import Spinner from "../../styles/icons/spinner.svelte";
   import Trash from "../../styles/icons/trash.svelte";
   import AddButton from "../buttons/AddButton.svelte";
   import ConfirmButton from "../buttons/ConfirmButton.svelte";
-  import ShowHideButton from "../buttons/ShowHideButton.svelte";
-  import TextareaInput from "../inputs/TextareaInput.svelte";
-  import PassagePropMenu from "./AddMenu.svelte";
+  import AddMenu from "./AddMenu.svelte";
 
-  const dispatch = createEventDispatcher();
+  type $$Props = NodeProps;
 
-  export let node: StoryNode;
-  export let isRoot = false;
+  export let data: $$Props["data"];
 
-  let container: HTMLDivElement;
-  let canFetch = false;
+  const updateEdgeEvent = new Event("updateedges");
   let showPropsAvailable = false;
   let imagePrm: Promise<syncs.Result> | undefined;
-  let showProps = false;
 
-  const inputs = generateInput(node);
-  const output = generateOutput(inputs, (input) => input);
-  const linkInputs = generateInput({});
-  const outputLink = generateOutput(inputs, (input) => ({ pid: input.pid }));
+  $: node = $stories[data.storyIndex].passages[data.index];
+  let isRoot = data.index === 0;
 
-  let anchors: TProp[] = [];
+  function addProp(e: CustomEvent<TPropForm>) {
+    $stories[data.storyIndex].passages[data.index][e.detail.name] =
+      e.detail.value;
 
-  $: node = $output;
-  $: ({ storyId } = $params);
-  $: storyProps = $localProps[storyId];
-  $: linkConnections = getConnections(node);
-  $: if (node.image && canFetch) {
-    imagePrm ||= GetTemporaryLink(node.image);
+    document.dispatchEvent(updateEdgeEvent);
   }
 
-  $: {
-    if (showProps) {
-      anchors = props(node);
-    } else {
-      anchors = [];
-    }
-  }
+  function removeNode() {
+    const pid = data.passagePid;
 
-  onMount(() => {
-    let observer = new IntersectionObserver(
-      ([entry], self) => {
-        if (entry.isIntersecting && node.image) {
-          canFetch = true;
+    $stories[data.storyIndex].passages.splice(data.index, 1);
 
-          self.unobserve(entry.target);
+    for (let i = 0; i < $stories[data.storyIndex].passages.length; i++) {
+      const passage = $stories[data.storyIndex].passages[i];
+
+      for (let j = 0; j < passage.links.length; j++) {
+        const { pid: linkPid } = passage.links[j];
+
+        if (linkPid === pid) {
+          $stories[data.storyIndex].passages[i].links.splice(j, 1);
         }
-      },
-      {
-        threshold: 0,
       }
-    );
-
-    observer.observe(container);
-
-    return () => observer.unobserve(container);
-  });
-
-  const remove = () => dispatch("remove", { pid: $output.pid });
-  const changeRoot = () => dispatch("changeRoot");
-  const addNode = () => {
-    let { latestPid } = $stories[$params.storyIndex];
-
-    if (latestPid === undefined) {
-      latestPid = $stories[$params.storyIndex].passages.length;
-      $stories[$params.storyIndex].latestPid = latestPid;
     }
 
-    const newNode = {
-      pid: latestPid + 1,
-      name: 0,
-      cleanText: "",
-      links: [],
-      position: {
-        x: $output.position?.x ?? 0,
-        y: $output.position?.y ?? 0 + 300,
-      },
-    };
+    $stories = $stories;
 
-    const links = getOrCreateEmptyLink();
-
-    if (links.update !== null) {
-      links.update((state) => {
-        return [...state, { pid: newNode.pid }];
-      });
-    }
-
-    dispatch("addNode", newNode);
-  };
-
-  const cloneNode = () => {
-    const currentNode = { ...$output };
-
-    if (currentNode.image !== undefined) {
-      currentNode.image = {
-        ...currentNode.image,
-        promise: {},
-      };
-    }
-
-    const refNode = structuredClone(currentNode);
-    let { latestPid } = $stories[$params.storyIndex];
-
-    latestPid ||= 0;
-
-    refNode.pid = latestPid + 1;
-
-    dispatch("cloneNode", refNode);
-  };
-
-  const getOrCreateEmptyLink = () => {
-    if ($inputs.links === undefined) {
-      const newInputLink = generateInput({ value: [] });
-      $inputs.links = get(newInputLink).value;
-    }
-
-    return $inputs.links;
-  };
-
-  const removeProp = (propName: string) => {
-    if (!propName) return;
-
-    inputs.update((state) => {
-      delete state[propName];
-
-      return state;
-    });
-  };
-
-  const addProp = ({ detail: { name, value } }: any) => {
-    if (name in $inputs) {
-      console.log("key already exists", $inputs, name);
-      return;
-    }
-
-    const propInput = generateInput({});
-
-    propInput.set(value);
-
-    inputs.update((state) => {
-      state[name] = propInput;
-
-      return state;
-    });
-  };
-
-  const onLink = ({ detail: { anchor }, type }: TOnLink) => {
-    const links = getOrCreateEmptyLink();
-
-    if (type === "connection") {
-      if (links.update === null) return;
-
-      links.update((state) => {
-        const pidLink = get<TLink>(get<TLinkCustom>(anchor.store).link);
-
-        if (state.find((link) => link.pid === pidLink.pid)) return state;
-
-        return [...state, pidLink];
-      });
-
-      return;
-    }
-
-    if (type === "disconnection") {
-      if (links.update === null) return;
-
-      links.update((state) => {
-        const { pid } = get<TLink>(get<TLinkCustom>(anchor.store).link);
-        return state.filter((link) => link.pid !== pid);
-      });
-    }
-  };
-
-  const removeAndDestroy = (destroy: () => any) => {
-    if (isRoot) return;
-
-    remove();
-    destroy();
-  };
-
-  $: if (node.position === undefined) {
-    node.position = {
-      x: 0,
-      y: 0,
-    };
+    document.dispatchEvent(updateEdgeEvent);
   }
 </script>
 
 {#if node}
-  <div bind:this={container}>
-    <Node
-      id={`node-${$output.pid}`}
-      bind:position={node.position}
-      let:destroy
-      let:disconnect
-    >
-      <div
-        class="btn btn-primary no-animation flex-col p-2 relative h-fit w-80 border-transparent border-2 shadow"
-      >
-        <TextareaInput
-          data-test={`node-input-${node.pid}`}
-          parameterStore={$inputs.cleanText}
-        />
-
-        {#if node.image && imagePrm}
-          {#await imagePrm}
-            <div class="flex h-96">
-              <Spinner />
-            </div>
-          {:then result}
-            <img
-              src={result.content}
-              alt="message"
-              style="width: 20rem;"
-              loading="lazy"
-              data-lazy-load
-            />
-          {:catch}
-            <img
-              src="/unicorn.svg"
-              alt="error"
-              style="width: 100%;"
-              loading="lazy"
-              data-lazy-load
-            />
-          {/await}
-        {/if}
-        <span
-          class="w-5 h-5 bg-white absolute rounded-full -left-2 -bottom-2"
-          style={`background-color: ${genColor($output.sentBy)};`}
-        />
-
-        <ShowHideButton
-          bind:show={showProps}
-          class="w-4 absolute -bottom-7 left-5 hover:scale-105 transition-all"
-        />
-
-        <button
-          on:click={cloneNode}
-          class="w-8 bg-cyan-400 rounded hover:scale-105 p-1 transition-all absolute right-0 -top-16"
-        >
-          <Copy class="w-6" />
-        </button>
-
-        <AddButton
-          data-test={`node-add-${node.pid}`}
-          class="absolute -right-16 bottom-0 w-8"
-          on:click={addNode}
-        />
-        <AddButton
-          data-test={`node-prop-menu-${node.pid}`}
-          type="prop"
-          class="absolute -bottom-16 right-0 w-8"
-          on:click={() => (showPropsAvailable = !showPropsAvailable)}
-        />
-      </div>
-
-      {#if !isRoot}
-        <div class="absolute flex -top-5 right-1/2 z-0">
-          <Anchor
-            id={`link-out-${$output.pid}`}
-            output
-            direction="north"
-            outputStore={outputLink}
-          />
+  <div class="flex flex-col p-2 relative h-fit w-80 shadow bg-primary rounded">
+    <span class="absolute top-2 left-2 text-white">{node.pid}</span>
+    <textarea
+      bind:value={node.cleanText}
+      class="text-center text-white w-full min-h-8 h-full outline-none p-2 bg-transparent"
+    />
+    {#if node.image && imagePrm}
+      {#await imagePrm}
+        <div class="flex h-96">
+          <Spinner />
         </div>
-
-        <ConfirmButton
-          on:click={(e) => e.stopPropagation()}
-          on:confirm={() => removeAndDestroy(destroy)}
-          classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto p-1 rounded"
-        >
-          <Trash />
-        </ConfirmButton>
-
-        <button
-          class="btn btn-xs absolute left-0 -top-8 btn-secondary"
-          on:click={changeRoot}>make root</button
-        >
-      {:else}
-        <button class="btn btn-xs btn-accent absolute left-0 -top-8">
-          root
-        </button>
-      {/if}
-
-      <div
-        class="absolute flex justify-center items-center -bottom-8 right-1/2 gap-2 z-0"
-      >
-        <button
-          data-test={`node-unlink-${node.pid}`}
-          class="btn btn-square btn-outline btn-accent btn-xs"
-          on:click={() => linkConnections.forEach(disconnect)}
-        >
-          <LinkSlashSolid class="w-4" />
-        </button>
-        <Anchor
-          id={`link-${$output.pid}`}
-          input
-          inputsStore={linkInputs}
-          direction="south"
-          nodeConnect
-          multiple
-          bind:connections={linkConnections}
-          on:connection={onLink}
-          on:disconnection={onLink}
-          key="link"
+      {:then result}
+        <img
+          src={result.content}
+          alt="message"
+          style="width: 20rem;"
+          loading="lazy"
+          data-lazy-load
         />
-      </div>
-
-      <div class="flex flex-col absolute -left-4 top-0 gap-2 z-0">
-        {#each anchors as { name: key } (key)}
-          <Anchor id={key} input inputsStore={inputs} {key} />
-        {/each}
-      </div>
-
-      {#if showPropsAvailable}
-        <PassagePropMenu
-          on:click={() => (showPropsAvailable = !showPropsAvailable)}
-          on:add={addProp}
+      {:catch}
+        <img
+          src="/unicorn.svg"
+          alt="error"
+          style="width: 100%;"
+          loading="lazy"
+          data-lazy-load
         />
-      {/if}
-    </Node>
+      {/await}
+    {/if}
+    <span
+      class="drag-handle w-5 h-5 bg-white absolute rounded-full -left-2 -bottom-2"
+      style={`background-color: ${genColor(node.sentBy)};`}
+    />
+
+    <AddButton
+      data-test={`node-prop-menu-${node.pid}`}
+      type="prop"
+      class="absolute text-white -bottom-10 right-0 w-8"
+      on:click={() => (showPropsAvailable = !showPropsAvailable)}
+    />
   </div>
 
-  <slot {showProps} {removeProp} />
+  {#if !isRoot}
+    <Handle
+      type="source"
+      position={Position.Top}
+      id={`${node.pid}`}
+      on:connect
+      on:connectend
+      on:connectstart
+    />
+
+    <ConfirmButton
+      on:confirm={removeNode}
+      classes="cursor-pointer absolute -top-2 -right-2 w-auto h-auto p-1 rounded"
+    >
+      <Trash />
+    </ConfirmButton>
+  {:else}
+    <button class="btn btn-xs btn-accent absolute left-0 -top-8"> root </button>
+  {/if}
+
+  <Handle
+    type="target"
+    position={Position.Bottom}
+    on:connect
+    on:connectend
+    on:connectstart
+  />
+
+  <Handle
+    type="source"
+    id={`prop-${node.pid}`}
+    isConnectable={false}
+    on:connect
+    on:connectend
+    on:connectstart
+    position={Position.Left}
+  />
+
+  {#if showPropsAvailable}
+    <AddMenu
+      on:add={addProp}
+      on:click={() => (showPropsAvailable = !showPropsAvailable)}
+    />
+  {/if}
 {/if}
+
+<style>
+  :global(.svelte-flow .svelte-flow__handle) {
+    background-color: transparent;
+    border-radius: 999999px;
+    border-width: 2px;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 3px;
+
+    &::after {
+      content: "";
+      display: flex;
+      border-radius: 999999px;
+      height: 100%;
+      width: 100%;
+      background-color: white;
+    }
+  }
+
+  :global(.svelte-flow .svelte-flow__handle-top) {
+    top: -1rem;
+  }
+
+  :global(.svelte-flow .svelte-flow__handle-bottom) {
+    bottom: -1rem;
+  }
+
+  :global(.svelte-flow .svelte-flow__edge-path) {
+    stroke-width: 4px !important;
+  }
+  :global(.svelte-flow .svelte-flow__handle-left) {
+    left: 0rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-style: dashed;
+    border-width: 2px;
+    padding: 2px;
+    border-color: white;
+    background-color: transparent;
+    border-radius: 999999px;
+
+    &::after {
+      content: "";
+      display: flex;
+      border-radius: 999999px;
+      height: 100%;
+      width: 100%;
+      background-color: white;
+    }
+  }
+  :global(
+      .svelte-flow .svelte-flow__edge path,
+      .svelte-flow__connectionline path
+    ) {
+    stroke-width: 2;
+  }
+</style>

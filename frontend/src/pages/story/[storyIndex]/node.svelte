@@ -1,124 +1,292 @@
 <script lang="ts">
-  import { remove } from "@/functions/node.utils/nodes.utils";
+  import { params } from "@roxi/routify";
+  import {
+    Background,
+    BackgroundVariant,
+    Controls,
+    SvelteFlow,
+    useSvelteFlow,
+  } from "@xyflow/svelte";
+  import "@xyflow/svelte/dist/style.css";
+  import { onMount } from "svelte";
+  import { writable } from "svelte/store";
   import { slide } from "svelte/transition";
-  import { Background, Svelvet } from "svelvet";
   import ShowHideButton from "../../../components/buttons/ShowHideButton.svelte";
   import Header from "../../../components/headers/Header.svelte";
-  import PropAnchor from "../../../components/props/Anchor.svelte";
   import PropsMenu from "../../../components/props/Menu.svelte";
   import Passage from "../../../components/props/Passage.svelte";
+  import Prop from "../../../components/props/Prop.svelte";
   import {
-    calculateLeafPositions,
     getPropsAsObject,
     stories,
     storiesFetching,
     storiesSync,
   } from "../../../lib/stores/stories";
 
-  export let storyIndex: string;
+  $: storyIndex = $params.storyIndex;
 
-  let sorting = false;
   let showAddMenu = false;
 
   $: story = $stories[storyIndex] as StoryNode;
+  let connectingNodeId = "0";
 
-  const addNode = ({ detail: nodeToAdd }: CustomEvent<StoryNode>) => {
-    nodeToAdd.name = story.passages.length + 1;
-
-    story.latestPid ||= 1;
-    story.latestPid++;
-
-    story.passages.push(nodeToAdd);
+  interface BaseNode {
+    id: string;
+    position: { x: number; y: number };
+    type: string;
+    data: {
+      index: number;
+      storyIndex: number;
+    };
+  }
+  const nodeTypes = {
+    passage: Passage,
+    prop: Prop,
   };
 
-  const deleteNode = (node: StoryNode) => {
-    if (story.passages.length !== 1) {
-      story.passages = [...remove({ nodes: story.passages, removeNode: node })];
-      return;
+  const nodes = writable<BaseNode[]>([]);
+
+  interface TEdge {
+    id: string;
+    source: string;
+    target: string;
+  }
+
+  const edges = writable<TEdge[]>([]);
+
+  function updateEdges() {
+    if ($stories[storyIndex] === undefined) return;
+
+    const nodesTmp = [];
+    const edgesTmp = [];
+
+    for (let i = 0; i < $stories[storyIndex].passages.length; i++) {
+      const passage = $stories[storyIndex].passages[i];
+
+      const props = getPropsAsObject(passage);
+
+      if (props.length > 0) {
+        for (let j = 0; j < props.length; j++) {
+          const prop = props[j];
+
+          const propPosition = { x: -350, y: j * 50 };
+
+          nodesTmp.push({
+            id: `prop-${prop.name}-${passage.pid}`,
+            position: propPosition,
+            parentNode: `${passage.pid}`,
+            type: "prop",
+            data: {
+              index: i,
+              passagePid: passage.pid,
+              propName: prop.name,
+              storyIndex,
+            },
+          });
+
+          edgesTmp.push({
+            id: `prop-${prop.name}-${passage.pid}`,
+            source: `${passage.pid}`,
+            sourceHandle: `prop-${passage.pid}`,
+            target: `prop-${prop.name}-${passage.pid}`,
+          });
+        }
+      }
+
+      nodesTmp.push({
+        id: `${passage.pid}`,
+        position: passage.position ?? { x: 0, y: i * 150 },
+        type: "passage",
+        dragHandle: ".drag-handle",
+        data: {
+          index: i,
+          passagePid: passage.pid,
+          storyIndex,
+        },
+      });
+
+      if (passage.links.length > 0) {
+        for (let j = 0; j < passage.links.length; j++) {
+          const link = passage.links[j];
+
+          edgesTmp.push({
+            id: `${link.pid}-${passage.pid}`,
+            target: `${passage.pid}`,
+            source: `${link.pid}`,
+          });
+        }
+      }
     }
 
-    story.passages[0] = {
-      cleanText: "",
-      links: [],
-      name: 1,
-      pid: 1,
+    $edges = edgesTmp;
+    $nodes = nodesTmp;
+  }
+
+  onMount(() => {
+    updateEdges();
+
+    document.addEventListener("updateedges", updateEdges);
+
+    return () => {
+      document.removeEventListener("updateedges", updateEdges);
     };
-  };
+  });
 
-  const changeRoot = (index: number) => {
-    const current = story.passages[index];
-    story.passages.splice(index, 1, story.passages[0]);
-    story.passages[0] = current;
+  $: if ($stories[storyIndex] !== undefined) {
+    for (let j = 0; j < $nodes.length; j++) {
+      const node = $nodes[j].data;
 
-    story.passages = [...story.passages];
-  };
+      $stories[storyIndex].passages[node.index].links = [];
+    }
 
-  const organizeNodes = () => {
-    sorting = true;
-    calculateLeafPositions(story.passages, story.ifid);
+    for (let i = 0; i < $edges.length; i++) {
+      if ($edges[i].id.startsWith("prop")) continue;
 
-    story.passages = [...story.passages];
+      let sourceNode = -1;
+      let targetNode = -1;
 
-    setTimeout(() => {
-      sorting = false;
-    }, 1);
-  };
+      for (let j = 0; j < $nodes.length; j++) {
+        if ($nodes[j].id === $edges[i].source) {
+          sourceNode = $nodes[j].data.index;
+        }
+
+        if ($nodes[j].id === $edges[i].target) {
+          targetNode = $nodes[j].data.index;
+        }
+
+        if (sourceNode !== -1 && targetNode !== -1) break;
+      }
+
+      if (sourceNode === -1) {
+        console.log("source not found");
+        continue;
+      }
+
+      const targetPid = $stories[storyIndex].passages[sourceNode].pid;
+      $stories[storyIndex].passages[targetNode].links.push({
+        pid: targetPid,
+      });
+    }
+  }
+
+  $: if ($stories[storyIndex] !== undefined) {
+    for (let i = 0; i < $nodes.length; i++) {
+      const { index: passageIndex } = $nodes[i].data;
+
+      $stories[storyIndex].passages[passageIndex].position = $nodes[i].position;
+    }
+
+    $stories = $stories;
+  }
+
+  const { screenToFlowCoordinate } = useSvelteFlow();
+
+  function addNode({ detail: { event } }: { detail: { event: MouseEvent } }) {
+    const targetIsPane = event.target?.classList.contains("svelte-flow__pane");
+
+    if (!targetIsPane) return;
+
+    const index = $stories[storyIndex].passages.length;
+    let lastPid = $stories[storyIndex].latestPid ?? 0;
+
+    lastPid = lastPid + 1;
+
+    $nodes.push({
+      id: `${lastPid}`,
+      position: screenToFlowCoordinate({
+        x: event.clientX,
+        y: event.clientY,
+      }),
+      type: "passage",
+      dragHandle: ".drag-handle",
+      origin: [0.5, 0.0],
+      data: {
+        index,
+        passagePid: lastPid,
+        storyIndex,
+      },
+    });
+
+    $edges.push({
+      target: connectingNodeId,
+      source: `${lastPid}`,
+      id: `${connectingNodeId}-${lastPid}`,
+    });
+
+    let parentNode: BaseNode | undefined = undefined;
+
+    for (let i = 0; i < $nodes.length; i++) {
+      const node = $nodes[i];
+
+      if (node.id === connectingNodeId) {
+        parentNode = node;
+        break;
+      }
+    }
+
+    if (!parentNode) return;
+
+    const linkPid = {
+      pid: lastPid,
+    };
+
+    $stories[storyIndex].passages.push({
+      pid: lastPid,
+      links: [],
+      name: lastPid,
+      cleanText: "",
+      position: {
+        x: event.clientX,
+        y: event.clientY,
+      },
+    });
+    $stories[storyIndex].latestPid = lastPid;
+    $stories[storyIndex].passages[parentNode.data.index].links.push(linkPid);
+
+    $stories = $stories;
+    $nodes = $nodes;
+    $edges = $edges;
+  }
 </script>
 
-<div class="w-full h-full overflow-hidden flex flex-wrap">
+<div class="w-full h-full overflow-hidden flex flex-wrap text-black relative">
   <Header
     onSync={storiesSync}
     isFetching={storiesFetching}
-    onOrganize={organizeNodes}
     headerName={story?.storyName}
     onReturn={() => ($stories = [...$stories])}
     id={story?.ifid}
   />
 
-  <div
-    class={`${showAddMenu ? "w-2/3" : "w-full"} relative transition-all`}
-    style="height: 90%;"
+  <SvelteFlow
+    fitView
+    {edges}
+    {nodes}
+    {nodeTypes}
+    class="!bg-transparent"
+    on:connectstart={({ detail: { nodeId } }) => {
+      connectingNodeId = nodeId;
+    }}
+    on:connectend={addNode}
   >
-    <Svelvet theme="dark">
-      {#if story && !sorting}
-        {#each story.passages as node, index (node.pid)}
-          <Passage
-            let:showProps
-            let:removeProp
-            bind:node
-            isRoot={index === 0}
-            on:addNode={addNode}
-            on:cloneNode={addNode}
-            on:changeRoot={() => changeRoot(index)}
-            on:remove={() => deleteNode(node)}
-          >
-            {#if showProps}
-              {#each getPropsAsObject(node, story.ifid) as prop}
-                <PropAnchor onRemove={removeProp} {prop} />
-              {/each}
-            {/if}
-          </Passage>
-        {/each}
-      {/if}
+    <Controls />
+    <Background variant={BackgroundVariant.Dots} />
+  </SvelteFlow>
 
-      <Background
-        dotColor="#fff"
-        bgColor="transparent"
-        gridWidth={40}
-        dotSize={3}
-        slot="background"
-      />
-    </Svelvet>
+  <div
+    class="absolute right-0 w-6 h-full flex justify-end items-center"
+    class:w-96={showAddMenu}
+  >
+    <ShowHideButton class="w-6 text-white" bind:show={showAddMenu} />
 
-    <ShowHideButton
-      class="absolute right-4 bottom-1/2 w-6"
-      bind:show={showAddMenu}
-    />
+    {#if showAddMenu}
+      <div
+        class="w-full self-end mb-2 mr-2 text-white backdrop-blur-3xl"
+        style="height: 90%;"
+        transition:slide={{ axis: "x" }}
+      >
+        <PropsMenu />
+      </div>
+    {/if}
   </div>
-
-  {#if showAddMenu}
-    <div class="w-1/3" style="height: 90%;" transition:slide={{ axis: "x" }}>
-      <PropsMenu />
-    </div>
-  {/if}
 </div>

@@ -2,6 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import Trash from "../../styles/icons/trash.svelte";
   import AddButton from "../buttons/AddButton.svelte";
+  import ConfirmButton from "../buttons/ConfirmButton.svelte";
 
   let files: FileList;
 
