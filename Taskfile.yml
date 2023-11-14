@@ -53,7 +53,7 @@ tasks:
       - pnpm update -L
   dev:
     cmds:
-      - wails dev
+      - wails dev -s -skipbindings
   go:update:
     cmds:
       - go get -u .
