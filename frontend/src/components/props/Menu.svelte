@@ -5,7 +5,7 @@
   let tab = "list";
 </script>
 
-<div class="h-full flex flex-wrap">
+<div class="h-full rounded flex flex-wrap">
   <div class="w-full tabs self-start">
     <button
       class="tab tab-lifted"

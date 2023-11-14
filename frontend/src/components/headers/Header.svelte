@@ -31,7 +31,9 @@
   <button on:click={goBack} data-test="btn-return" class="btn btn-primary">
     <ArrowLeft /> go back</button
   >
-  <h1 data-test="story-name">{headerName}</h1>
+  <h1 data-test="story-name" class="text-xl text-white font-bold">
+    {headerName}
+  </h1>
 
   <button
     on:click={() => copy(id)}

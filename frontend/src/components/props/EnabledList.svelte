@@ -39,7 +39,7 @@
   }
 </script>
 
-<div class="w-full h-fit gap-4 flex flex-wrap">
+<div class="w-full h-fit gap-4 p-2 flex flex-wrap">
   {#each propsStore as formValue, index}
     <label class="flex w-full gap-2 items-center">
       {formValue.name}

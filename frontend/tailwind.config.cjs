@@ -7,5 +7,8 @@ module.exports = {
   plugins: [
     require('tailwind-scrollbar')({ nocompatible: true }),
     require('daisyui')
-  ]
+  ],
+  daisyui: {
+    themes: ["black"],
+  },
 }

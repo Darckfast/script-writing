@@ -1,5 +1,3 @@
-import type { Connections } from 'svelvet'
-
 const EXCLUDED_PROPS = [
   'passages',
   'links',
@@ -15,50 +13,6 @@ const EXCLUDED_PROPS = [
   'parentPid',
   'version'
 ]
-
-const add = ({
-  nodeToAdd,
-  nodes
-}: TAddNode): StoryNode[] => {
-  nodes.push(nodeToAdd)
-
-  return nodes
-}
-
-const remove = ({
-  removeNode,
-  nodes
-}: {
-  removeNode: StoryNode
-  nodes: StoryNode[]
-}): StoryNode[] => {
-  return nodes.filter((node) => {
-    node.links = node.links.filter(
-      (link) => link.pid !== removeNode.pid
-    )
-
-    return node.pid !== removeNode.pid
-  })
-}
-
-const update = ({
-  update,
-  nodes
-}: {
-  update: { pid: string | number; [key: string]: any }
-  nodes: StoryNode[]
-}): StoryNode[] => {
-  return nodes.map((node) => {
-    if (node.pid === update.pid) {
-      return {
-        ...node,
-        ...update
-      }
-    }
-
-    return node
-  })
-}
 
 // TODO: need to check for new props type, that do not have value yet
 const getPropType = (value: any) => {
@@ -108,24 +62,6 @@ const props = (object: any): TProp[] => {
   )
 }
 
-const isRoot = (node: StoryNode) => {
-  return node.pid === 'root' || node.pid === 1
-}
-
-const getConnections = (
-  passage: StoryNode
-): Connections => {
-  return passage.links?.map((link) => [
-    `node-${link.pid}`,
-    `link-out-${link.pid}`
-  ])
-}
-
 export {
-  add,
-  getConnections,
-  isRoot,
   props,
-  remove,
-  update
 }
