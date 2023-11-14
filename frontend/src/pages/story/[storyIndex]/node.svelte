@@ -76,6 +76,7 @@
             position: propPosition,
             parentNode: `${passage.pid}`,
             type: "prop",
+            deletable: false,
             data: {
               index: i,
               passagePid: passage.pid,
@@ -98,6 +99,7 @@
         position: passage.position ?? { x: 0, y: i * 150 },
         type: "passage",
         dragHandle: ".drag-handle",
+        deletable: false,
         data: {
           index: i,
           passagePid: passage.pid,
@@ -179,7 +181,7 @@
     $stories = $stories;
   }
 
-  const { screenToFlowCoordinate } = useSvelteFlow();
+  const { screenToFlowPosition } = useSvelteFlow();
 
   function addNode({ detail: { event } }: { detail: { event: MouseEvent } }) {
     const targetIsPane = event.target?.classList.contains("svelte-flow__pane");
@@ -193,12 +195,13 @@
 
     $nodes.push({
       id: `${lastPid}`,
-      position: screenToFlowCoordinate({
+      position: screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
       }),
       type: "passage",
       dragHandle: ".drag-handle",
+      deletable: false,
       origin: [0.5, 0.0],
       data: {
         index,
