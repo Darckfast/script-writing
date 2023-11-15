@@ -2,7 +2,7 @@
 
 <p align="center">
   <img alt="stage" src="https://img.shields.io/badge/-%F0%9F%8E%9A%EF%B8%8Falpha-blueviolet"/>
-  <!-- x-release-please-version --><img alt="Version" src="https://img.shields.io/static/v1?label=version&message=v.0.4.0&color=31c754"/>
+  <!-- x-release-please-version --><img alt="Version" src="https://img.shields.io/static/v1?label=version&message=v.0.5.0&color=31c754"/>
 </p>
 
 # Script writing (WIP)
