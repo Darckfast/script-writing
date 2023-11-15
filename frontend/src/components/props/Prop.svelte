@@ -40,7 +40,7 @@
     </label>
     <ConfirmButton
       on:confirm={removeProp}
-      classes="cursor-pointer  w-auto h-auto p-1 rounded"
+      classes="cursor-pointer w-auto h-auto p-1 rounded"
     >
       <Trash />
     </ConfirmButton>
