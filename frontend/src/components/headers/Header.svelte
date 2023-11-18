@@ -26,14 +26,13 @@
 
 <header
   class:floatHeader
-  class="flex justify-between items-center w-full gap-2 px-2 pb-4"
+  class="flex justify-between items-center w-full gap-2 text-white px-2 pb-4"
 >
   <button on:click={goBack} data-test="btn-return" class="btn btn-primary">
     <ArrowLeft /> go back</button
   >
-  <h1 data-test="story-name" class="text-xl text-white font-bold">
-    {headerName}
-  </h1>
+
+  <input class="input input-bordered w-full max-w-xs" bind:value={headerName} />
 
   <button
     on:click={() => copy(id)}

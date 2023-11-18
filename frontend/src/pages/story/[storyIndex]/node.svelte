@@ -256,7 +256,7 @@
   <Header
     onSync={storiesSync}
     isFetching={storiesFetching}
-    headerName={story?.storyName}
+    bind:headerName={$stories[storyIndex].storyName}
     onReturn={() => ($stories = [...$stories])}
     id={story?.ifid}
   />

@@ -5,11 +5,11 @@
   import ConfirmButton from "../buttons/ConfirmButton.svelte";
 
   $: propsStore = $localProps[$params.storyId] as TPropForm[];
-  $: propTypes = ["text", "number", "file", "boolean"];
+  $: propTypes = ["text", "number", "file", "boolean", "list"];
 
   interface TAvailableProp {
     name: string;
-    value: boolean | number | string | undefined;
+    value: boolean | number | string | any[] | undefined;
     type: string;
   }
 
@@ -21,6 +21,7 @@
 
   const createProp = () => {
     if (prop.type === "boolean") prop.value = true;
+    if (prop.type === "list") prop.value = [""];
 
     $localProps[$params.storyId].push(structuredClone(prop));
     $localProps = { ...$localProps };
@@ -63,6 +64,11 @@
           type="file"
           class="file-input file-input-sm file-input-bordered file-input-primary w-full"
         />
+      {:else if formValue.type === "list"}
+        type list
+        <!-- {#each formValue.value as value} -->
+        <!--   <input bind:value class="input w-full input-primary input-sm" /> -->
+        <!-- {/each} -->
       {:else}
         <input
           placeholder={formValue.placeholder}
