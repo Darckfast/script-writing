@@ -1,17 +1,29 @@
 <script lang="ts">
-  import { url } from "@roxi/routify";
-  import ArrowLeft from "../../styles/icons/arrow-left.svelte";
+  import { load, save } from "@/functions/loadSave/loadSave";
+  import { SelectFolder } from "@/functions/wailsjs/go/exporter/Exporter";
   import { Auth, GetAuthURL } from "@/functions/wailsjs/go/syncs/DBXSync";
-  import Check from "../../styles/icons/check.svelte";
-  import DropboxIcon from "../../styles/icons/dropbox-icon.svelte";
   import {
     BrowserOpenURL,
     ClipboardGetText,
   } from "@/functions/wailsjs/runtime/runtime";
-  import Spinner from "../../styles/icons/spinner.svelte";
   import { globalError } from "@/stores/globalError";
+  import { url } from "@roxi/routify";
+  import ArrowLeft from "../../styles/icons/arrow-left.svelte";
+  import DropboxIcon from "../../styles/icons/dropbox-icon.svelte";
+  import Spinner from "../../styles/icons/spinner.svelte";
 
   let accessCode: string = "";
+  let bundlePath = load({ key: "bundle-path", defaultValue: "" });
+
+  async function selectFolder() {
+    const selectedFolder = await SelectFolder();
+
+    bundlePath = selectedFolder;
+  }
+
+  $: {
+    save({ key: "bundle-path", value: bundlePath });
+  }
 
   async function pasteCode() {
     accessCode ||= await ClipboardGetText();
@@ -33,13 +45,14 @@
   </header>
 
   <div class="flex flex-wrap flex-col items-center justify-center gap-2">
-    <div class="flex gap-2 items-center">
+    <div class="flex gap-2 items-center flex-col">
       {#await GetAuthURL()}
         <Spinner />
       {:then dbxUrl}
         <button
-          class="btn btn-primary gap-2"
-          on:click={() => BrowserOpenURL(dbxUrl)}><DropboxIcon /> oauth</button
+          class="btn btn-primary gap-2 w-full"
+          on:click={() => BrowserOpenURL(dbxUrl)}
+          ><DropboxIcon /> oauth url</button
         >
       {/await}
 
@@ -49,11 +62,20 @@
           placeholder="paste the token here"
           class="input input-primary"
         />
-        <button class="btn btn-primary" on:click={pasteCode}>
-          + paste
+        <button class="btn btn-primary" on:click={pasteCode}> + paste </button>
+      </label>
+
+      <label class="input-group w-auto">
+        <input
+          class="input input-primary"
+          bind:value={bundlePath}
+          placeholder="bundle path"
+        />
+        <button class="btn btn-primary" on:click={selectFolder}>
+          + select
         </button>
       </label>
-    <!-- {#if $dbxAuth.getAccessToken()c>
+      <!-- {#if $dbxAuth.getAccessToken()c>
       <em class="text-green-500">
         <Check />
       </em>

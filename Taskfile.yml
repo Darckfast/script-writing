@@ -60,3 +60,7 @@ tasks:
   gen-module:
     cmds:
       - wails generate module
+  build:
+    cmds:
+      - wails build
+

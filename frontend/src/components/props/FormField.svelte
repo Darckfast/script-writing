@@ -55,21 +55,14 @@
       bind:value={formValue.value}
       class="input w-full input-primary input-sm"
     />
-  {:else if formValue.type === "file"}
-    <!-- <inpuc> -->
-    <!--   data-test={`input-${isAddable ? "local" : "node"}-prop-${formValue.name}`} -->
-    <!--   type="file" -->
-    <!--   bind:files -->
-    <!--   on:change={loadImage} -->
-    <!--   class="file-input file-input-sm file-input-bordered file-input-primary w-full" -->
-    <!-- /> -->
+  {:else if formValue.type === "text"}
+    {#if formValue.value}
+      <span>{formValue.value}</span>
+    {:else}
+      <span> no value </span>
+    {/if}
   {:else}
-    <input
-      placeholder={formValue.placeholder}
-      data-test={`input-${isAddable ? "local" : "node"}-prop-${formValue.name}`}
-      bind:value={formValue.value}
-      class="input w-full input-primary input-sm"
-    />
+    <span>{formValue.type}</span>
   {/if}
 
   {#if isRemovable}

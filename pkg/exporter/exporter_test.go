@@ -2,9 +2,10 @@ package exporter
 
 import (
 	"os"
+	"testing"
+
 	"script-writing/pkg/logger"
 	"script-writing/pkg/saveload"
-	"testing"
 )
 
 func TestMain(m *testing.M) {

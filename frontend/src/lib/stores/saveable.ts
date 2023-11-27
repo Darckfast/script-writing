@@ -1,4 +1,5 @@
 import {
+  load,
   loadV2,
   save,
   saveV2
@@ -9,6 +10,7 @@ import {
   IsAuthenticated,
   UploadFile
 } from '@/functions/wailsjs/go/syncs/DBXSync'
+import { AutoExport } from '@/functions/wailsjs/go/exporter/Exporter'
 import dayjs, { Dayjs } from 'dayjs'
 import { get, writable } from 'svelte/store'
 import { globalError } from './globalError'
@@ -55,7 +57,6 @@ export const createSaveable = <T = unknown>({
 
       if (localOnly) {
         saveableObject.subscribe(value => {
-          console.log('saving', key, value)
           saveV2({ key, value })
         })
       }
@@ -78,6 +79,12 @@ export const createSaveable = <T = unknown>({
       key,
       value: object
     })
+
+    const bundlePath = load({ key: 'bundle-path' })
+
+    if (bundlePath) {
+      await AutoExport(bundlePath)
+    }
 
     const isAuth = await IsAuthenticated()
 

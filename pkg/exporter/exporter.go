@@ -3,6 +3,7 @@ package exporter
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 
 	"script-writing/pkg/app"
 	"script-writing/pkg/logger"
@@ -18,7 +19,7 @@ func New() *Exporter {
 	return &Exporter{}
 }
 
-func (_ *Exporter) ExportBundle() {
+func (*Exporter) ExportBundle() {
 	bundle := prepareBundle()
 	saveExportFile(bundle)
 }
@@ -56,7 +57,7 @@ func prepareBundle() *types.Bundle {
 		}
 
 		if story.Type == "array" {
-			singleBundle.Content = append(singleBundle.Content, story.Passages)
+			singleBundle.Content = append(singleBundle.Content, story.Passages...)
 		} else {
 			singleBundle.Content = append(singleBundle.Content, story)
 		}
@@ -104,4 +105,29 @@ func saveExportFile(bundle *types.Bundle) {
 	if err != nil {
 		logger.Error.Println("Error on saving file", err)
 	}
+}
+
+func (*Exporter) AutoExport(filePath string) {
+	logger.Info.Println("Exporing bundle in", filePath)
+
+	fullFilePath := filepath.Join(filePath, "bundle.json")
+	bundle := prepareBundle()
+	bundleBytes, _ := json.Marshal(bundle)
+
+	os.WriteFile(fullFilePath, bundleBytes, os.ModePerm)
+}
+
+func (*Exporter) SelectFolder() string {
+	selectedPath, err := runtime.OpenDirectoryDialog(app.Ctx, runtime.
+		OpenDialogOptions{
+		Title:                "Path bundle select",
+		DefaultDirectory:     saveload.GetDir(),
+		CanCreateDirectories: true,
+	})
+	if err != nil {
+		logger.Error.Println("Error on selecting path to export", err)
+		return ""
+	}
+
+	return selectedPath
 }
