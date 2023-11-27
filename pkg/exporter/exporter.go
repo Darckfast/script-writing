@@ -56,7 +56,7 @@ func prepareBundle() *types.Bundle {
 		}
 
 		if story.Type == "array" {
-			singleBundle.Content = append(singleBundle.Content, story.Passages)
+			singleBundle.Content = append(singleBundle.Content, story.Passages...)
 		} else {
 			singleBundle.Content = append(singleBundle.Content, story)
 		}
