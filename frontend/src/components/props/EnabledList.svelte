@@ -65,10 +65,7 @@
           class="file-input file-input-sm file-input-bordered file-input-primary w-full"
         />
       {:else if formValue.type === "list"}
-        type list
-        <!-- {#each formValue.value as value} -->
-        <!--   <input bind:value class="input w-full input-primary input-sm" /> -->
-        <!-- {/each} -->
+        // type list
       {:else}
         <input
           placeholder={formValue.placeholder}
